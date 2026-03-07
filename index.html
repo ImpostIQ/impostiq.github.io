@@ -1427,18 +1427,18 @@
 		const QRCodeModal = ({ lobbyId, password, onClose, audioManager, season }) => {
 			const inviteLink = `${window.location.origin}${window.location.pathname}?lobbyId=${lobbyId}&password=${password}`;
 			
-            let qrColor = "020617"; // Default slate-950
-            let qrBgColor = "f8fafc"; // Default slate-50
+            let qrColor = "d8dde3"; 
+            let qrBgColor = "0d121f";
             
             if (season === 'christmas') {
                 qrColor = "0369a1"; // Cold blue (sky-700)
-                qrBgColor = "f0f9ff"; // sky-50
+                qrBgColor = "0d121f"; 
             } else if (season === 'halloween') {
                 qrColor = "ea580c"; // Dark orange (orange-600) for contrast
-                qrBgColor = "fff7ed"; // orange-50
+                qrBgColor = "0d121f"; 
             }
             
-			const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(inviteLink)}&qzone=0&margin=0&bgcolor=${qrBgColor}&color=${qrColor}`;
+			const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=${encodeURIComponent(inviteLink)}&qzone=0&margin=0&bgcolor=${qrBgColor}&color=${qrColor}`;
 
 			const getLogoUrl = () => {
 				if (season === 'christmas') {
@@ -1463,7 +1463,7 @@
 							<h2 className="text-2xl font-display font-bold text-white mb-2">Scan to Join</h2>
 							<p className="text-white/50 mb-6">Scan with a phone to instantly join the lobby.</p>
 
-							<div className="relative w-64 h-64 p-4 bg-slate-50 rounded-2xl shadow-lg border border-white/10">
+							<div className="relative w-64 h-64">
 								<img src={qrCodeUrl} alt="Lobby Invite QR Code" className="w-full h-full object-contain rounded-lg" />
 								<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
 									<div className="w-12 h-12 rounded-full bg-slate-50 p-1.5 shadow-md">
