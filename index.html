@@ -5,33 +5,39 @@
 	<meta name="google-site-verification" content="f_vovPG5F0fSlBF405RthRa9nx-2krtUjjF9oyWBFp0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Impostiq • Find the Spy</title>
+	<meta property="og:site_name" content="Impostiq">
+	<meta name="apple-mobile-web-app-title" content="Impostiq">
 	<meta name="description" content="A social deduction game similar to Spyfall. Players receive a secret word, but the Imposter receives nothing. Players must question each other to find the spy without revealing the word.">
     
     <!-- Structured Data for AIs that don't execute JS (JSON-LD) -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Impostiq • Find the Spy",
-      "applicationCategory": "Game",
-      "operatingSystem": "Web",
-      "description": "A social deduction game similar to Spyfall. Players receive a secret word, but the Imposter receives nothing. Players must question each other to find the spy without revealing the word.",
-      "url": "https://impostiq.github.io",
-      "author": {
-        "@type": "Person",
-        "name": "Jandré du Preez"
-      },
-      "documentation": "https://impostiq.github.io",
-      "gameLocation": [
-        "Local Device",
-        "Online Multiplayer"
-      ]
-    }
-    </script>
+	[
+	  {
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		"name": "Impostiq",
+		"url": "https://impostiq.github.io"
+	  },
+	  {
+		"@context": "https://schema.org",
+		"@type": "SoftwareApplication",
+		"name": "Impostiq • Find the Spy",
+		"applicationCategory": "Game",
+		"operatingSystem": "Web",
+		"description": "A social deduction game similar to Spyfall. Players receive a secret word, but the Imposter receives nothing.",
+		"url": "https://impostiq.github.io",
+		"author": {
+		  "@type": "Person",
+		  "name": "Jandré du Preez"
+		}
+	  }
+	]
+	</script>
+
     
     <!-- Favicon -->
-	<link rel="icon" id="favicon" href="https://em-content.zobj.net/source/microsoft/379/disguised-face_1f978.png" type="image/png">
-	<link rel="apple-touch-icon" href="https://em-content.zobj.net/source/microsoft/379/disguised-face_1f978.png">
+	<link rel="icon" href="./favicon.png" type="image/png">
+	<link rel="apple-touch-icon" href="./favicon.png">
 
 	<!-- Social Media / Share Metadata (Open Graph & Twitter) -->
     <meta property="og:title" content="Impostiq • Find the Spy" />
@@ -83,7 +89,7 @@
             if (images[season]) {
                 const imageUrl = images[season] + cacheBuster;
                 
-                const favicon = document.getElementById('favicon');
+                const favicon = document.querySelector('link[rel="icon"]');
                 const ogImage = document.getElementById('og-image');
                 const twitterImage = document.getElementById('twitter-image');
 
