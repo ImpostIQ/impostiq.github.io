@@ -2360,7 +2360,17 @@
             const [timerEnabled, setTimerEnabled] = useState(true);
             const [inspectedCategory, setInspectedCategory] = useState(null);
             const [enableTwoImposters, setEnableTwoImposters] = useState(false);
+			
+            const [playersExpanded, setPlayersExpanded] = useState(false);
+            const isMobile = useMediaQuery('(max-width: 639px)'); // Tailwind's `sm` breakpoint is 640px
+            const playerDisplayLimit = isMobile ? 3 : 6;
             
+            useEffect(() => {
+                if (players.length <= playerDisplayLimit) {
+                    setPlayersExpanded(false);
+                }
+            }, [players.length, playerDisplayLimit]);
+			
             // Voice recording state
             const [isRecording, setIsRecording] = useState(false);
             const [recordedAudioData, setRecordedAudioData] = useState(null);
@@ -2566,8 +2576,8 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {players.map((p, i) => (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {(playersExpanded ? players : players.slice(0, playerDisplayLimit)).map((p, i) => (
                                         <div
                                             key={i}
                                             className="flex items-center min-w-0 gap-2 bg-white/5 border border-transparent px-3 py-2 rounded-xl animate-fadeIn transition-colors hover:bg-white/10"
@@ -2596,6 +2606,14 @@
                                         </div>
                                     ))}
                                 </div>
+                                {players.length > playerDisplayLimit && !playersExpanded && (
+                                    <button
+                                        onClick={() => setPlayersExpanded(true)}
+                                        className="mt-3 w-full text-center bg-white/10 hover:bg-brand-500/20 text-brand-400 text-sm font-bold py-3 rounded-xl transition-all active:scale-95"
+                                    >
+                                        Show {players.length - playerDisplayLimit} More...
+                                    </button>
+                                )}
                             </section>
 
                             {/* Settings */}
@@ -3585,6 +3603,23 @@
 
         const generateLobbyId = () => generateRandomString(6, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789');
         const generateLobbyPassword = () => generateRandomString(4, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789');
+
+        // NEW: Custom Hook for Media Queries
+        const useMediaQuery = (query) => {
+            const [matches, setMatches] = React.useState(false);
+
+            React.useEffect(() => {
+                const media = window.matchMedia(query);
+                if (media.matches !== matches) {
+                    setMatches(media.matches);
+                }
+                const listener = () => setMatches(media.matches);
+                window.addEventListener("resize", listener);
+                return () => window.removeEventListener("resize", listener);
+            }, [matches, query]);
+
+            return matches;
+        };
 		
 		// --- CORRECTED & RELIABLE: Asset Preloading without Fetch ---
         const preloadAssets = (onProgress) => {
