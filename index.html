@@ -2003,117 +2003,143 @@
 			"Press and hold any category card during setup to sneak a peek at some example words!",
         ];
 
-        // --- MODIFIED: LoadingScreen with real progress and stuttering effect ---
-        const LoadingScreen = ({ onStart, onFinishedLoading }) => {
-            const [currentTipIndex, setCurrentTipIndex] = useState(() => Math.floor(Math.random() * TIPS.length));
-            const [isReady, setIsReady] = useState(false);
+        // --- FINAL: LoadingScreen with a smooth, natural, and faster animation ---
+		const LoadingScreen = ({ onStart, onFinishedLoading }) => {
+			const [currentTipIndex, setCurrentTipIndex] = useState(() => Math.floor(Math.random() * TIPS.length));
+			const [isReady, setIsReady] = useState(false);
+			const [isTrueLoadingComplete, setIsTrueLoadingComplete] = useState(false);
+			const [visualProgress, setVisualProgress] = useState(0);
 
-            // State for actual loading progress
-            const [targetProgress, setTargetProgress] = useState(0);
-            // State for what the user sees on the progress bar
-            const [visualProgress, setVisualProgress] = useState(0);
-            
-            // Tip rotation effect
-            useEffect(() => {
-                const tipInterval = setInterval(() => {
-                    setCurrentTipIndex(prev => {
-                        let newIndex;
-                        do { newIndex = Math.floor(Math.random() * TIPS.length); } while (newIndex === prev && TIPS.length > 1);
-                        return newIndex;
-                    });
-                }, 5000);
-                return () => clearInterval(tipInterval);
-            }, []);
+			// Tip rotation effect
+			useEffect(() => {
+				const tipInterval = setInterval(() => {
+					setCurrentTipIndex(prev => {
+						let newIndex;
+						do { newIndex = Math.floor(Math.random() * TIPS.length); } while (newIndex === prev && TIPS.length > 1);
+						return newIndex;
+					});
+				}, 4500); // Slightly faster tip rotation
+				return () => clearInterval(tipInterval);
+			}, []);
 
-            // Effect to handle the asset loading and progress tracking
-            useEffect(() => {
-                let loadedCount = 0;
-                let totalAssets = 0;
+			// Asset loading in the background
+			useEffect(() => {
+				const { assetPromise } = preloadAssets(() => {});
+				assetPromise.then(() => {
+					setIsTrueLoadingComplete(true);
+				});
+			}, []);
 
-                const handleProgress = () => {
-                    loadedCount++;
-                    const newProgress = Math.round((loadedCount / totalAssets) * 100);
-                    setTargetProgress(newProgress);
-                };
+			// --- UPDATED: Refined animation logic with pauses ---
+			useEffect(() => {
+				let timeoutId;
 
-                // This function now returns the total count and the promise
-                const { assetPromise, count } = preloadAssets(handleProgress);
-                totalAssets = count;
+				// Recursive function to handle the visual loading animation
+				const animateProgress = (currentProgress) => {
+					// Stop the visual animation if real loading is already done
+					if (isTrueLoadingComplete) {
+						return;
+					}
 
-                assetPromise.then(() => {
-                    setTargetProgress(100); // Ensure it hits 100%
-                    // Wait a moment after loading is complete before showing the button
-                    setTimeout(() => {
-                        onFinishedLoading();
-                        setIsReady(true);
-                    }, 500);
-                });
-            }, [onFinishedLoading]);
+					// --- "Natural" Animation Logic ---
+					
+					// 1. Determine if we should pause briefly
+					// This creates a small chance to pause, simulating file processing.
+					const shouldPause = Math.random() < 0.05 && currentProgress > 25 && currentProgress < 80;
 
-            // NEW: Effect to create a SMOOTH progress bar animation
-            useEffect(() => {
-                const interval = setInterval(() => {
-                    if (visualProgress < targetProgress) {
-                        setVisualProgress(prev => Math.min(prev + 1, targetProgress));
-                    } else {
-                        clearInterval(interval);
-                    }
-                }, 15); // Update every 15ms for a smooth animation
+					if (shouldPause) {
+						// A short, variable-length pause to feel more natural.
+						const pauseDuration = 400 + Math.random() * 600; // Pause for 0.4s to 1.0s
+						timeoutId = setTimeout(() => {
+							animateProgress(currentProgress); // Continue from the same spot after the pause
+						}, pauseDuration);
+					} else {
+						// 2. Calculate a steady, slightly variable increment
+						const increment = 1.5 + Math.random() * 2;
+						let nextProgress = Math.min(currentProgress + increment, 99); // Cap at 99% until real loading is done
 
-                return () => clearInterval(interval); // Cleanup on unmount or when dependencies change
-            }, [targetProgress, visualProgress]);
+						setVisualProgress(nextProgress); // Set the new target for the CSS transition
 
-            return (
-                <div className="h-[100dvh] flex flex-col items-center justify-center p-8 bg-slate-950 text-center relative overflow-hidden animate-fadeIn">
-                    <div className="absolute inset-0 pointer-events-none">
-                        <div className="blob bg-brand-600/50 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
-                        <div className="blob bg-cyan-600/50 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
-                    </div>
-                    
-                    <div className="relative z-10 flex flex-col items-center w-full max-w-sm">
-                        <div className="w-28 h-28 mb-8 relative flex items-center justify-center">
-                            <div className="absolute inset-0 bg-brand-500/20 rounded-full animate-pulse-slow blur-xl"></div>
-                            <img src="https://em-content.zobj.net/source/microsoft-teams/400/disguised-face_1f978.png" alt="Loading Icon" draggable="false" className="w-24 h-24 animate-float" />
-                        </div>
-                        
-                        <SeasonalTitle season={currentSeason} className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 mb-4 drop-shadow-lg tracking-tight" />
-                        <p className="text-white/50 font-semibold text-lg mb-12">Find the spy before time runs out.</p>
+						// 3. Schedule the next step
+						const nextFrameDelay = 150; 
+						timeoutId = setTimeout(() => {
+							animateProgress(nextProgress);
+						}, nextFrameDelay);
+					}
+				};
 
-                        <div className="w-full h-24 flex flex-col items-center justify-center">
-                            {isReady ? (
-                                <button
-                                    onClick={onStart}
-                                    className="w-full max-w-xs bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 animate-slide-up"
-                                >
-                                    <i className="fa-solid fa-play text-sm"></i> START GAME
-                                </button>
-                            ) : (
-                                <div className="w-full max-w-xs animate-fadeIn">
-                                    <div className="w-full bg-slate-800/50 rounded-full h-4 mb-4 border border-white/5 overflow-hidden relative">
-										{/* The animated fill - NOTE: duration is now much faster to keep up with state changes */}
+				if (isTrueLoadingComplete) {
+					// If assets are loaded, cancel any visual animation and smoothly burst to 100%
+					clearTimeout(timeoutId);
+					setVisualProgress(100); 
+					
+					// Wait for the CSS transition to finish before showing the button
+					setTimeout(() => {
+						onFinishedLoading();
+						setIsReady(true);
+					}, 700);
+
+				} else {
+					// Start the visual loading animation
+					animateProgress(visualProgress);
+				}
+
+				// Cleanup function
+				return () => clearTimeout(timeoutId);
+
+			}, [isTrueLoadingComplete]); // Re-run only when real loading finishes
+
+			return (
+				<div className="h-[100dvh] flex flex-col items-center justify-center p-8 bg-slate-950 text-center relative overflow-hidden animate-fadeIn">
+					<div className="absolute inset-0 pointer-events-none">
+						<div className="blob bg-brand-600/50 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
+						<div className="blob bg-cyan-600/50 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
+					</div>
+					
+					<div className="relative z-10 flex flex-col items-center w-full max-w-sm">
+						<div className="w-28 h-28 mb-8 relative flex items-center justify-center">
+							<div className="absolute inset-0 bg-brand-500/20 rounded-full animate-pulse-slow blur-xl"></div>
+							<img src="https://em-content.zobj.net/source/microsoft-teams/400/disguised-face_1f978.png" alt="Loading Icon" draggable="false" className="w-24 h-24 animate-float" />
+						</div>
+						
+						<SeasonalTitle season={currentSeason} className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 mb-4 drop-shadow-lg tracking-tight" />
+						<p className="text-white/50 font-semibold text-lg mb-12">Find the spy before time runs out.</p>
+
+						<div className="w-full h-24 flex flex-col items-center justify-center">
+							{isReady ? (
+								<button
+									onClick={onStart}
+									className="w-full max-w-xs bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 animate-slide-up"
+								>
+									<i className="fa-solid fa-play text-sm"></i> START GAME
+								</button>
+							) : (
+								<div className="w-full max-w-xs animate-fadeIn">
+									<div className="w-full bg-slate-800/50 rounded-full h-4 mb-4 border border-white/5 overflow-hidden relative">
+										{/* The animated fill with CSS transition for smoothness */}
 										<div 
-											className="bg-brand-500 h-full rounded-full transition-all duration-150 ease-linear" 
+											className="bg-brand-500 h-full rounded-full transition-[width] duration-500 ease-out" 
 											style={{ width: `${visualProgress}%` }}
 										></div>
 										
 										{/* The percentage text overlay */}
 										<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
 											<span className="text-[10px] font-display font-black text-white drop-shadow-md tracking-wider">
-												{visualProgress}%
+												{Math.floor(visualProgress)}%
 											</span>
 										</div>
 									</div>
-                                    <p key={currentTipIndex} className="text-white/60 font-medium text-sm animate-fadeIn h-10">
-                                        <i className="fa-solid fa-lightbulb text-brand-400 mr-2"></i>
-                                        {TIPS[currentTipIndex]}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+									<p key={currentTipIndex} className="text-white/60 font-medium text-sm animate-fadeIn h-10">
+										<i className="fa-solid fa-lightbulb text-brand-400 mr-2"></i>
+										{TIPS[currentTipIndex]}
+									</p>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+			);
+		};
 
         const FaIcon = ({ name, sizeClass = "text-xl", className = "" }) => {
             const [currentImageIndex, setCurrentImageIndex] = useState(0);
