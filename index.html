@@ -1965,7 +1965,6 @@
             "The Imposter doesn't know the secret word. Ask questions that might expose them!",
             "Pay attention to hesitation. The Imposter might need extra time to think of a lie.",
             "Try to ask a question only a true agent would know the answer to.",
-            "Long-press on a category card during setup to see example words.",
             "The first player on the turn order list asks the first question.",
             "Innocent agents should try to prove they know the word without giving it away.",
             "Random Mode chooses a category from the entire word bank for an extra challenge.",
@@ -2014,8 +2013,6 @@
             // State for what the user sees on the progress bar
             const [visualProgress, setVisualProgress] = useState(0);
             
-            const stutterTimeoutRef = useRef(null);
-
             // Tip rotation effect
             useEffect(() => {
                 const tipInterval = setInterval(() => {
@@ -2053,18 +2050,18 @@
                 });
             }, [onFinishedLoading]);
 
-            // Effect to create a much FASTER "stuttering" progress bar animation
+            // NEW: Effect to create a SMOOTH progress bar animation
             useEffect(() => {
-                if (visualProgress < targetProgress) {
-                    if (stutterTimeoutRef.current) {
-                        clearTimeout(stutterTimeoutRef.current);
+                const interval = setInterval(() => {
+                    if (visualProgress < targetProgress) {
+                        setVisualProgress(prev => Math.min(prev + 1, targetProgress));
+                    } else {
+                        clearInterval(interval);
                     }
-                    stutterTimeoutRef.current = setTimeout(() => {
-                        setVisualProgress(targetProgress);
-                    }, Math.random() * 30 + 10); // Random delay between 10ms and 40ms
-                }
-                return () => clearTimeout(stutterTimeoutRef.current);
-            }, [targetProgress]);
+                }, 15); // Update every 15ms for a smooth animation
+
+                return () => clearInterval(interval); // Cleanup on unmount or when dependencies change
+            }, [targetProgress, visualProgress]);
 
             return (
                 <div className="h-[100dvh] flex flex-col items-center justify-center p-8 bg-slate-950 text-center relative overflow-hidden animate-fadeIn">
@@ -2093,9 +2090,9 @@
                             ) : (
                                 <div className="w-full max-w-xs animate-fadeIn">
                                     <div className="w-full bg-slate-800/50 rounded-full h-4 mb-4 border border-white/5 overflow-hidden relative">
-										{/* The animated fill */}
+										{/* The animated fill - NOTE: duration is now much faster to keep up with state changes */}
 										<div 
-											className="bg-brand-500 h-full rounded-full transition-all duration-300 ease-out" 
+											className="bg-brand-500 h-full rounded-full transition-all duration-150 ease-linear" 
 											style={{ width: `${visualProgress}%` }}
 										></div>
 										
@@ -2307,6 +2304,7 @@
         const SetupScreen = ({ onStartGame, audioManager, onBack }) => {
             const DEFAULT_PLAYERS = [{ name: 'Player 1', audioData: null }, { name: 'Player 2', audioData: null }, { name: 'Player 3', audioData: null }];
             const MIN_PLAYERS = 3;
+			const [playerError, setPlayerError] = useState('');
 
             // --- State Persistence Logic ---
             const [players, setPlayers] = useState(() => {
@@ -2356,10 +2354,26 @@
             });
 
             const [newPlayerName, setNewPlayerName] = useState('');
-            const [timerMinutes, setTimerMinutes] = useState(3);
-            const [timerEnabled, setTimerEnabled] = useState(true);
+            const [timerMinutes, setTimerMinutes] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('imposter_timerMinutes');
+                    return saved ? JSON.parse(saved) : 3; // Default to 3 minutes
+                } catch { return 3; }
+            });
+            const [timerEnabled, setTimerEnabled] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('imposter_timerEnabled');
+                    // Check for null to correctly handle when 'false' is saved
+                    return saved !== null ? JSON.parse(saved) : true; // Default to enabled
+                } catch { return true; }
+            });
             const [inspectedCategory, setInspectedCategory] = useState(null);
-            const [enableTwoImposters, setEnableTwoImposters] = useState(false);
+            const [enableTwoImposters, setEnableTwoImposters] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('imposter_enableTwoImposters');
+                    return saved ? JSON.parse(saved) : false; // Default to disabled
+                } catch { return false; }
+            });
 			
             const [playersExpanded, setPlayersExpanded] = useState(false);
             const isMobile = useMediaQuery('(max-width: 639px)'); // Tailwind's `sm` breakpoint is 640px
@@ -2389,6 +2403,9 @@
             useEffect(() => { localStorage.setItem('imposter_random_mode', JSON.stringify(isRandomMode)); }, [isRandomMode]);
             useEffect(() => { localStorage.setItem('imposter_speak_category', JSON.stringify(speakCategory)); }, [speakCategory]);
             useEffect(() => { localStorage.setItem('imposter_fake_word_mode', JSON.stringify(isFakeWordMode)); }, [isFakeWordMode]);
+			useEffect(() => { localStorage.setItem('imposter_timerEnabled', JSON.stringify(timerEnabled)); }, [timerEnabled]);
+            useEffect(() => { localStorage.setItem('imposter_timerMinutes', JSON.stringify(timerMinutes)); }, [timerMinutes]);
+            useEffect(() => { localStorage.setItem('imposter_enableTwoImposters', JSON.stringify(enableTwoImposters)); }, [enableTwoImposters]);
 
             useEffect(() => {
                 if (players.length < 10) {
@@ -2432,13 +2449,23 @@
             };
             
             const addPlayer = () => {
-                if (newPlayerName.trim()) {
-                    audioManager.playSound('uiClick');
-                    setPlayers([...players, { name: newPlayerName.trim(), audioData: recordedAudioData }]);
-                    setNewPlayerName('');
-                    setRecordedAudioData(null); // Reset for the next player
-                    if (navigator.vibrate) navigator.vibrate(10);
+                const trimmedName = newPlayerName.trim();
+                if (!trimmedName) {
+                    setPlayerError('Please enter a codename.');
+                    return;
                 }
+                const isDuplicate = players.some(p => p.name.toLowerCase() === trimmedName.toLowerCase());
+                if (isDuplicate) {
+                    setPlayerError('That codename is already in use.');
+                    return;
+                }
+
+                audioManager.playSound('uiClick');
+                setPlayers([...players, { name: trimmedName, audioData: recordedAudioData }]);
+                setNewPlayerName('');
+                setRecordedAudioData(null);
+                setPlayerError(''); // Clear error on success
+                if (navigator.vibrate) navigator.vibrate(10);
             };
 
             const removePlayer = (index) => {
@@ -2537,17 +2564,23 @@
                                     <span className="ml-auto text-[10px] bg-white/5 px-2 py-1 rounded-md text-white/50">{players.length} / {MIN_PLAYERS}+</span>
                                 </h2>
                                 <div className="flex flex-col gap-3 mb-4">
-                                    <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-all pr-4">
-                                        <input
-                                            type="text"
-                                            value={newPlayerName}
-                                            onChange={(e) => setNewPlayerName(e.target.value)}
-                                            onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
-                                            placeholder="Enter codename..."
-                                            className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
-                                        />
-                                        {newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
-                                    </div>
+                                    <div className="flex flex-col gap-2">
+										<div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-all pr-4">
+											<input
+												type="text"
+												value={newPlayerName}
+												onChange={(e) => {
+													setNewPlayerName(e.target.value);
+													if (playerError) setPlayerError(''); // Clear error on new input
+												}}
+												onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
+												placeholder="Enter codename..."
+												className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
+											/>
+											{newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
+										</div>
+										{playerError && <p className="text-red-400 text-xs text-center animate-fadeIn">{playerError}</p>}
+									</div>
                                     <div className="flex gap-3 relative">
                                         <button 
                                             onClick={handleMicClick}
@@ -3621,12 +3654,12 @@
             return matches;
         };
 		
-		// --- CORRECTED & RELIABLE: Asset Preloading without Fetch ---
+		// --- FASTER & OPTIMIZED: Asset Preloading ---
         const preloadAssets = (onProgress) => {
             const imageUrls = new Set();
-            const audioUrls = new Set();
+            const essentialAudioUrls = new Set();
 
-            // 1. Gather all static UI and background images
+            // 1. Gather all static UI and background images (these are small and worth preloading)
             [
                 'https://em-content.zobj.net/source/microsoft-teams/400/disguised-face_1f978.png',
                 'https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png',
@@ -3657,15 +3690,14 @@
                 }
             });
 
-            // 3. Gather all AUDIO_URLS
-            Object.values(AUDIO_URLS).forEach(value => {
-                if (typeof value === 'string') {
-                    audioUrls.add(value);
-                } else if (typeof value === 'object' && value !== null) {
-                    Object.values(value).forEach(nestedUrl => audioUrls.add(nestedUrl));
-                }
-            });
-
+            // 3. Gather ONLY A FEW ESSENTIAL AUDIO_URLS. This is the key change for speed.
+            // We are no longer preloading all the large voice-over files.
+            essentialAudioUrls.add(AUDIO_URLS.uiClick);
+            essentialAudioUrls.add(AUDIO_URLS.startMission);
+            essentialAudioUrls.add(AUDIO_URLS.mainMenuMusic);
+            essentialAudioUrls.add(AUDIO_URLS.christmasMainMenuMusic);
+            essentialAudioUrls.add(AUDIO_URLS.halloweenMainMenuMusic);
+            
             const imagePromises = Array.from(imageUrls).map(src => {
                 return new Promise(resolve => {
                     if (!src || typeof src !== 'string') return resolve();
@@ -3677,15 +3709,16 @@
                 });
             });
 
-            const audioPromises = Array.from(audioUrls).map(src => {
+            const audioPromises = Array.from(essentialAudioUrls).map(src => {
                 return new Promise(resolve => {
                     if (!src || typeof src !== 'string') return resolve();
                     const audio = new Audio();
+                    audio.preload = 'auto'; // Preload is sufficient, canplaythrough is slow
                     const assetLoaded = () => { if (onProgress) onProgress(); resolve(); };
-                    audio.addEventListener('canplaythrough', assetLoaded, { once: true });
+                    // Resolve faster on 'loadeddata' instead of waiting for the whole file
+                    audio.addEventListener('loadeddata', assetLoaded, { once: true });
                     audio.addEventListener('error', assetLoaded, { once: true });
                     audio.src = src;
-                    audio.load(); // Important: explicitly tell the browser to start loading
                 });
             });
 
