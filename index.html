@@ -1311,12 +1311,13 @@
                             <section className="glass-panel rounded-[2rem] p-6 flex flex-col gap-4">
                                 <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-all pr-4">
                                     <input
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        placeholder="Enter codename..."
-                                        className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
-                                    />
+										type="text"
+										value={username}
+										onChange={(e) => setUsername(e.target.value)}
+										placeholder="Enter codename..."
+										maxLength="25"
+										className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
+									/>
                                     {username.trim() && <PlayerAvatar name={username} className="w-8 h-8 rounded-full" />}
                                 </div>
                                 {isJoining && (
@@ -2616,6 +2617,7 @@
 												}}
 												onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
 												placeholder="Enter codename..."
+												maxLength="25"
 												className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
 											/>
 											{newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
@@ -3456,7 +3458,7 @@
                                                 {selectedVotes.includes(player.id) && <i className="fa-solid fa-check text-xs text-white"></i>}
                                             </div>
                                             <PlayerAvatar name={player.name} className="w-8 h-8 rounded-full" />
-                                            <span className="font-bold text-lg">{player.name}</span>
+                                            <span className="font-bold text-lg truncate">{player.name}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -3536,7 +3538,7 @@
                                 <img src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" alt="Ninja" draggable="false" className="w-30 h-30 drop-shadow-lg relative top-3" />
                             </div>
                             <h2 className="text-3xl font-display font-bold text-white mb-2">{title}</h2>
-                            <p className="text-4xl font-black text-red-400 tracking-tight drop-shadow-sm">{roguePlayerNames}</p>
+                            <p className="text-4xl font-black text-red-400 tracking-tight drop-shadow-sm w-full truncate">{roguePlayerNames}</p>
                         </>
                     );
                 }
