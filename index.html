@@ -1313,7 +1313,7 @@
                                     <input
 										type="text"
 										value={username}
-										onChange={(e) => setUsername(e.target.value)}
+										onChange={(e) => setUsername(e.target.value.slice(0, 25))}
 										placeholder="Enter codename..."
 										maxLength="25"
 										className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
@@ -1325,7 +1325,7 @@
 										<input
 											type="text"
 											value={lobbyId}
-											onChange={(e) => setLobbyId(e.target.value.toUpperCase().slice(0, 6))}
+											onChange={(e) => setLobbyId(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 6))}
 											placeholder="Lobby ID"
 											maxLength="6"
 											className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-all placeholder:text-white/20 font-mono text-lg tracking-widest text-white"
@@ -1333,7 +1333,7 @@
 										<input
 											type="text"
 											value={password}
-											onChange={(e) => setPassword(e.target.value.toUpperCase().slice(0, 4))}
+											onChange={(e) => setPassword(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 4))}
 											placeholder="Password"
 											maxLength="4"
 											className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-all placeholder:text-white/20 font-mono text-lg tracking-widest text-white"
@@ -2612,7 +2612,7 @@
 												type="text"
 												value={newPlayerName}
 												onChange={(e) => {
-													setNewPlayerName(e.target.value);
+													setNewPlayerName(e.target.value.slice(0, 25));
 													if (playerError) setPlayerError(''); // Clear error on new input
 												}}
 												onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
@@ -2999,7 +2999,7 @@
                     </div>
                     
                     <h2 className="text-brand-400 text-xs font-bold uppercase tracking-[0.4em] mb-4">Classified Info For</h2>
-                    <h1 className="text-6xl font-display font-black text-white mb-16 drop-shadow-2xl">{player.name}</h1>
+                    <h1 className="text-6xl font-display font-black text-white mb-16 drop-shadow-2xl break-words max-w-full">{player.name}</h1>
                     
                     <div className="w-full max-w-sm">
                         <button 
@@ -3645,7 +3645,7 @@
                         )}
                         <button 
                             onClick={isHost ? onBackToHome : onConfirmExit}
-                            className="w-full bg-white/5 hover:bg-white/10 text-white/70 py-4 rounded-[1.5rem] font-display font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-white/5 hover:bg-white/10 text-white/70 py-5 rounded-[1.5rem] font-display font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-3"
                         >
                             <i className="fa-solid fa-house text-sm"></i> BACK TO HOME
                         </button>
