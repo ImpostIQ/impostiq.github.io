@@ -2066,19 +2066,19 @@
 
 					if (shouldPause) {
 						// A short, variable-length pause to feel more natural.
-						const pauseDuration = 400 + Math.random() * 600; // Pause for 0.4s to 1.0s
+						const pauseDuration = 100 + Math.random() * 150; // Much shorter pause (0.1s to 0.25s)
 						timeoutId = setTimeout(() => {
 							animateProgress(currentProgress); // Continue from the same spot after the pause
 						}, pauseDuration);
 					} else {
 						// 2. Calculate a steady, slightly variable increment
-						const increment = 1.5 + Math.random() * 2;
+						const increment = 6 + Math.random() * 8; // Much faster increment leaps
 						let nextProgress = Math.min(currentProgress + increment, 99); // Cap at 99% until real loading is done
 
 						setVisualProgress(nextProgress); // Set the new target for the CSS transition
 
 						// 3. Schedule the next step
-						const nextFrameDelay = 150; 
+						const nextFrameDelay = 40; // Super fast frame delay (40ms)
 						timeoutId = setTimeout(() => {
 							animateProgress(nextProgress);
 						}, nextFrameDelay);
@@ -3748,6 +3748,9 @@
                     const assetLoaded = () => { if (onProgress) onProgress(); resolve(); };
                     img.onload = assetLoaded;
                     img.onerror = assetLoaded;
+                    
+                    // CRITICAL FIX: Fallback timeout so a single slow image doesn't hang the game
+                    setTimeout(assetLoaded, 1500);
                 });
             });
 
@@ -3761,6 +3764,10 @@
                     audio.addEventListener('loadeddata', assetLoaded, { once: true });
                     audio.addEventListener('error', assetLoaded, { once: true });
                     audio.src = src;
+                    
+                    // CRITICAL FIX: Mobile browsers block audio from preloading before user interaction.
+                    // This 500ms timeout ensures the loading screen NEVER hangs at 99%.
+                    setTimeout(assetLoaded, 500);
                 });
             });
 
