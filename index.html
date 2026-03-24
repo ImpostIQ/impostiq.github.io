@@ -4655,10 +4655,15 @@
                     audioManagerRef.current.unlockAudio();
                     audioManagerRef.current.playSound('uiClick');
                 }
-                setIsLoading(false);
-                if (initialLobbyParams) {
-                    setGameMode('online');
-                }
+                // FIX: Add a minimal timeout. This pushes the state update to the next
+                // event loop tick, giving mobile browsers a moment to process the audio
+                // context unlock from the user's first click, preventing a UI hang.
+                setTimeout(() => {
+                    setIsLoading(false);
+                    if (initialLobbyParams) {
+                        setGameMode('online');
+                    }
+                }, 50);
             };
 
             // --- RENDER LOGIC ---
