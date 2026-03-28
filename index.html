@@ -1969,10 +1969,10 @@
 			useEffect(() => {
 				const { assetPromise } = preloadAssets(() => {});
 				
-				// Force a minimum 7-second wait so users can read the tips
+				// Force a minimum 4-second wait so users can read at least one tip
 				Promise.all([
 					assetPromise,
-					new Promise(resolve => setTimeout(resolve, 7000)) 
+					new Promise(resolve => setTimeout(resolve, 4000)) 
 				]).then(() => {
 					setIsTrueLoadingComplete(true);
 				});
@@ -1989,23 +1989,23 @@
 						return;
 					}
 
-					// Randomize increments and delays for a natural, "stuttering" network load feel
+					// Calibrated for exactly 4 seconds: Smooth overall flow with random 1-10% jumps
 					let increment;
 					let nextFrameDelay;
 					
 					const rand = Math.random();
-					if (rand < 0.15) {
-						// 15% chance to "jump" (large increment, short delay before next calc)
-						increment = Math.random() * 12 + 5; // Jump 5% to 17%
-						nextFrameDelay = Math.random() * 100 + 50; 
-					} else if (rand < 0.35) {
-						// 20% chance to "pause" (tiny increment, long delay)
-						increment = Math.random() * 1 + 0.1; // Creep up 0.1% to 1.1%
-						nextFrameDelay = Math.random() * 400 + 300; // Wait 300ms to 700ms
+					if (rand < 0.12) {
+						// 12% chance to "jump" randomly between 1% and 10%
+						increment = Math.random() * 9 + 1; 
+						nextFrameDelay = Math.random() * 100 + 80; // Slightly longer delay after a big jump
+					} else if (rand < 0.22) {
+						// 10% chance for a realistic minor "network pause"
+						increment = Math.random() * 0.5 + 0.1; 
+						nextFrameDelay = Math.random() * 150 + 100;
 					} else {
-						// 65% chance for normal steady loading
-						increment = Math.random() * 4 + 1; // Go up 1% to 5%
-						nextFrameDelay = Math.random() * 150 + 50; // Wait 50ms to 200ms
+						// 78% chance for fast, steady, and smooth loading
+						increment = Math.random() * 1.5 + 0.8; // Steady 0.8% to 2.3% climbs
+						nextFrameDelay = Math.random() * 40 + 20; // Very fast updates (20-60ms) to ensure it keeps pace
 					}
 
 					let nextProgress = Math.min(currentProgress + increment, 99); // Cap at 99%
@@ -2070,11 +2070,20 @@
 							) : (
 								<div className="w-full max-w-xs animate-fadeIn">
 									<div className="w-full bg-slate-800/50 rounded-full h-4 mb-4 border border-white/5 overflow-hidden relative">
-										{/* The animated fill with CSS transition for smoothness */}
+										{/* The animated fill with CSS transition for smoothness and shimmer overlay */}
 										<div 
-											className="bg-brand-500 h-full rounded-full transition-[width] duration-500 ease-out" 
+											className="bg-brand-500 h-full rounded-full transition-[width] duration-200 ease-out relative overflow-hidden" 
 											style={{ width: `${visualProgress}%` }}
-										></div>
+										>
+											{/* Subtle, smooth, fast-sweeping Shimmer Effect overlay */}
+											<div 
+												className="absolute top-0 bottom-0 w-[150%] -skew-x-12" 
+												style={{ 
+													background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+													animation: 'subtleShine 1s linear infinite' 
+												}}
+											></div>
+										</div>
 										
 										{/* The percentage text overlay */}
 										<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
