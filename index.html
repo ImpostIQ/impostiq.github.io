@@ -1961,19 +1961,24 @@
 						do { newIndex = Math.floor(Math.random() * TIPS.length); } while (newIndex === prev && TIPS.length > 1);
 						return newIndex;
 					});
-				}, 4500); // Slightly faster tip rotation
+				}, 5000); // Slightly faster tip rotation
 				return () => clearInterval(tipInterval);
 			}, []);
 
 			// Asset loading in the background
 			useEffect(() => {
 				const { assetPromise } = preloadAssets(() => {});
-				assetPromise.then(() => {
+				
+				// Force a minimum 7-second wait so users can read the tips
+				Promise.all([
+					assetPromise,
+					new Promise(resolve => setTimeout(resolve, 7000)) 
+				]).then(() => {
 					setIsTrueLoadingComplete(true);
 				});
 			}, []);
 
-			// --- UPDATED: Refined animation logic with pauses ---
+			// --- UPDATED: Refined animation logic ---
 			useEffect(() => {
 				let timeoutId;
 
@@ -1984,31 +1989,33 @@
 						return;
 					}
 
-					// --- "Natural" Animation Logic ---
+					// Randomize increments and delays for a natural, "stuttering" network load feel
+					let increment;
+					let nextFrameDelay;
 					
-					// 1. Determine if we should pause briefly
-					// This creates a small chance to pause, simulating file processing.
-					const shouldPause = Math.random() < 0.05 && currentProgress > 25 && currentProgress < 80;
-
-					if (shouldPause) {
-						// A short, variable-length pause to feel more natural.
-						const pauseDuration = 100 + Math.random() * 150; // Much shorter pause (0.1s to 0.25s)
-						timeoutId = setTimeout(() => {
-							animateProgress(currentProgress); // Continue from the same spot after the pause
-						}, pauseDuration);
+					const rand = Math.random();
+					if (rand < 0.15) {
+						// 15% chance to "jump" (large increment, short delay before next calc)
+						increment = Math.random() * 12 + 5; // Jump 5% to 17%
+						nextFrameDelay = Math.random() * 100 + 50; 
+					} else if (rand < 0.35) {
+						// 20% chance to "pause" (tiny increment, long delay)
+						increment = Math.random() * 1 + 0.1; // Creep up 0.1% to 1.1%
+						nextFrameDelay = Math.random() * 400 + 300; // Wait 300ms to 700ms
 					} else {
-						// 2. Calculate a steady, slightly variable increment
-						const increment = 6 + Math.random() * 8; // Much faster increment leaps
-						let nextProgress = Math.min(currentProgress + increment, 99); // Cap at 99% until real loading is done
-
-						setVisualProgress(nextProgress); // Set the new target for the CSS transition
-
-						// 3. Schedule the next step
-						const nextFrameDelay = 40; // Super fast frame delay (40ms)
-						timeoutId = setTimeout(() => {
-							animateProgress(nextProgress);
-						}, nextFrameDelay);
+						// 65% chance for normal steady loading
+						increment = Math.random() * 4 + 1; // Go up 1% to 5%
+						nextFrameDelay = Math.random() * 150 + 50; // Wait 50ms to 200ms
 					}
+
+					let nextProgress = Math.min(currentProgress + increment, 99); // Cap at 99%
+
+					setVisualProgress(nextProgress); // Set the new target for the CSS transition
+
+					// Schedule the next step
+					timeoutId = setTimeout(() => {
+						animateProgress(nextProgress);
+					}, nextFrameDelay);
 				};
 
 				if (isTrueLoadingComplete) {
