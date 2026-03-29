@@ -9,7 +9,6 @@
 	<meta name="apple-mobile-web-app-title" content="Impostiq">
 	<meta name="description" content="A social deduction game similar to Spyfall. Players receive a secret word, but the Imposter receives nothing. Players must question each other to find the spy without revealing the word.">
     
-    <!-- Structured Data for AIs that don't execute JS (JSON-LD) -->
     <script type="application/ld+json">
 	[
 	  {
@@ -37,12 +36,9 @@
 	]
 	</script>
 
-    
-    <!-- Favicon -->
 	<link rel="icon" href="https://impostiq.github.io/favicon192.png" sizes="192x192" type="image/png">
 	<link rel="apple-touch-icon" href="https://impostiq.github.io/favicon.png">
 
-	<!-- Social Media / Share Metadata (Open Graph & Twitter) -->
     <meta property="og:title" content="Impostiq • Find the Spy" />
     <meta property="og:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
     
@@ -55,23 +51,19 @@
     <meta name="twitter:title" content="Impostiq • Find the Spy" />
     <meta name="twitter:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
     
-    <!-- Same image link as above -->
     <meta name="twitter:image" id="twitter-image" content="https://impostiq.github.io/imageicon1024.png" />
 
-    <!-- DYNAMIC METADATA SCRIPT -->
     <script>
         (function() {
             const getSeasonalInfo = () => {
                 const now = new Date();
-                const month = now.getMonth() + 1; // 0-indexed
+                const month = now.getMonth() + 1;
                 const day = now.getDate();
                 
-                // Halloween: Oct 24 - Nov 7
                 if ((month === 10 && day >= 24) || (month === 11 && day <= 7)) {
                     return 'halloween';
                 }
 
-                // Christmas: Dec 18 - Jan 1
                 if ((month === 12 && day >= 18) || (month === 1 && day <= 1)) {
                     return 'christmas';
                 }
@@ -81,7 +73,6 @@
 
             const season = getSeasonalInfo();
             
-            // This forces the browser to clear the cache by adding a unique version string
             const cacheBuster = "?v=" + season + "-" + new Date().getFullYear(); 
 
             const images = {
@@ -107,13 +98,11 @@
         })();
     </script>
 
-	<!-- Screen Orientation Lock -->
 	<script>
 		document.addEventListener('DOMContentLoaded', () => {
 			try {
 				if (screen.orientation && screen.orientation.lock) {
 					screen.orientation.lock('portrait').catch(err => {
-						// This might fail on some devices or if not in fullscreen, but it's best effort.
 						console.log("Could not lock screen orientation:", err);
 					});
 				}
@@ -123,25 +112,19 @@
 		});
 	</script>
 
-	<!-- Tailwind CSS -->
 	<script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     
-    <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
     
     <script>
@@ -237,7 +220,6 @@
         body {
             background-color: #020617;
             color: #f8fafc;
-            /* overflow: hidden; is now handled by the 'html, body' rule above */
             -webkit-tap-highlight-color: transparent;
             touch-action: none; 
             height: 100%; 
@@ -253,7 +235,6 @@
             pointer-events: none;
         }
 
-        /* Modern Glassmorphism */
         .glass-panel {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(20px);
@@ -272,14 +253,12 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 3D Flip Animation Classes */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
         .rotate-y-0 { transform: rotateY(0deg); }
 
-        /* Supercell Background Animation */
         .supercell-container {
             position: absolute;
             inset: 0;
@@ -294,18 +273,17 @@
             background-size: cover;
             background-position: center;
             mix-blend-mode: overlay;
-            opacity: 0; /* Both start invisible */
-            animation: alternateFade 16s infinite; /* A bit faster looks better */
+            opacity: 0;
+            animation: alternateFade 16s infinite;
         }
 
         .supercell-bg-1 {
             background-image: url('https://www.clashchamps.com/wp-content/uploads/2024/06/czJOx2-Q.png');
-            /* No delay */
         }
 
         .supercell-bg-2 {
             background-image: url('https://wallpapercat.com/w/full/0/4/f/283609-2500x1466-desktop-hd-clash-of-clans-wallpaper.jpg');
-            animation-delay: 8s; /* Half the duration delay */
+            animation-delay: 8s;
         }
 
         @keyframes alternateFade {
@@ -316,7 +294,6 @@
             100% { opacity: 0; }
         }
 
-        /* Ambient Blobs */
         .blob {
             position: absolute;
             border-radius: 50%;
@@ -331,21 +308,16 @@
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
         
-		/* --- Corrected Timer Slider Styles --- */
-
-		/* Style the track for Webkit (Chrome, Safari) */
 		.timer-slider::-webkit-slider-runnable-track {
 		  width: 100%;
-		  height: 8px; /* This creates the thin line */
+		  height: 8px;
 		  cursor: pointer;
-		  background: #0f172a; /* This was the old bg-slate-950 */
-		  border-radius: 9999px; /* This was the old rounded-full */
+		  background: #0f172a;
+		  border-radius: 9999px;
 		}
 
-		/* Style the thumb for Webkit (Chrome, Safari) */
 		.timer-slider::-webkit-slider-thumb {
 		  -webkit-appearance: none;
-		  /* This margin calculation perfectly centers the 28px thumb on the 8px track */
 		  margin-top: -10px; 
 		  height: 28px;
 		  width: 28px;
@@ -359,7 +331,6 @@
 		  border-radius: 50%;
 		}
 
-		/* Style the track for Firefox */
 		.timer-slider::-moz-range-track {
 		  width: 100%;
 		  height: 8px;
@@ -368,7 +339,6 @@
 		  border-radius: 9999px;
 		}
 
-		/* Style the thumb for Firefox */
 		.timer-slider::-moz-range-thumb {
 		  width: 28px;
 		  height: 28px;
@@ -383,18 +353,16 @@
 		  border-radius: 50%;
 		}
 
-        /* Subtle Shine Effect */
         .subtle-shine-container {
             position: relative;
             overflow: hidden;
-            isolation: isolate; /* Creates a new stacking context */
+            isolation: isolate;
         }
 
         .subtle-shine-container::before {
             content: '';
             position: absolute;
             inset: 0;
-            /* A very subtle, faded gradient */
             background: linear-gradient(
                 110deg,
                 transparent 30%,
@@ -403,7 +371,6 @@
                 transparent 70%
             );
             transform: translateX(-100%);
-            /* Slower, smoother, faded animation loop */
             animation: subtleShine 7s ease-in-out infinite;
         }
 
@@ -423,7 +390,6 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- FIREBASE SETUP ---
         const firebaseConfig = {
           apiKey: "AIzaSyCebdOffzrb0D2efbgC9eDPRAr-hYgIXS8",
           authDomain: "imposter-e571f.firebaseapp.com",
@@ -437,9 +403,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        // --- END FIREBASE SETUP ---
 
-        // --- DATA ---
         const CATEGORY_ICONS = {
             Supercell: "https://twitch.supercell.com/supercell-logo.png",
             Celebs: "https://em-content.zobj.net/source/microsoft-teams/337/smiling-face-with-sunglasses_1f60e.png",
@@ -487,7 +451,6 @@
         };
 
         const AUDIO_URLS = {
-            // SFX (not affected by mute)
             startMission: "https://impostiq.github.io/sound/startmiss.mp3",
             startRandomMission: "https://impostiq.github.io/sound/startrandmiss.mp3",
             selectCategory: "https://impostiq.github.io/sound/selectcat.mp3",
@@ -500,19 +463,16 @@
             toggleMode: "https://impostiq.github.io/sound/togglemode.mp3",
             turnOrderReveal: "https://impostiq.github.io/sound/turnorder.mp3",
             
-            // Critical alerts & results (not affected by mute)
             alarm: "https://impostiq.github.io/sound/alarm.mp3",
             imposterWin: "https://impostiq.github.io/sound/impwin.mp3",
             agentWin: "https://impostiq.github.io/sound/agwin.mp3",
 
-            // Background Music (affected by mute)
             mainMenuMusic: "https://impostiq.github.io/sound/mainmenumus.mp3",
             christmasMainMenuMusic: "https://impostiq.github.io/sound/christmasmainmenmus.mp3",
             halloweenMainMenuMusic: "https://impostiq.github.io/sound/halloweenmainmenmus.mp3",
             categorySelectionMusic: "https://impostiq.github.io/sound/catselmus.mp3",
             timerMusic: "https://impostiq.github.io/sound/timermus.mp3",
             
-            // Voice overs
             categories: {
                 Supercell: "https://impostiq.github.io/sound/voicelines/supercell.mp3",
                 Celebs: "https://impostiq.github.io/sound/voicelines/celebs.mp3",
@@ -544,21 +504,18 @@
             }
         };
 		
-        // --- SEASONAL CATEGORY LOGIC ---
         const getSeasonalInfo = () => {
             const now = new Date();
-            const month = now.getMonth() + 1; // getMonth() is 0-indexed
+            const month = now.getMonth() + 1;
             const day = now.getDate();
             let season = 'default';
             let categories = [];
 
-            // Halloween: Oct 24 - Nov 7
             if ((month === 10 && day >= 24) || (month === 11 && day <= 7)) {
                 season = 'halloween';
                 categories.push('Halloween');
             }
 
-            // Christmas: Dec 18 - Jan 1
             if ((month === 12 && day >= 18) || (month === 1 && day <= 1)) {
                 season = 'christmas';
                 categories.push('Christmas');
@@ -569,11 +526,8 @@
         
         const { season: currentSeason, categories: seasonalCategories } = getSeasonalInfo();
         
-        // --- COMPONENTS ---
-		
 		const OfflineScreen = () => (
             <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 bg-slate-950 text-center animate-fadeIn select-none overflow-hidden">
-                {/* Background Atmosphere */}
                 <div className="absolute inset-0 pointer-events-none">
                      <div className="blob bg-red-600/10 top-[-20%] left-[-20%] w-[80%] h-[80%] blur-[100px]"></div>
                      <div className="blob bg-orange-600/10 bottom-[-20%] right-[-20%] w-[80%] h-[80%] blur-[100px] animation-delay-2000"></div>
@@ -581,7 +535,6 @@
 
                 <div className="relative z-10 w-full max-w-sm glass-panel p-8 rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-slide-up">
                     
-                    {/* Old Icon (Restored) */}
                     <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-red-500/30 animate-pulse">
                         <i className="fa-solid fa-wifi text-4xl text-red-500"></i>
                     </div>
@@ -603,10 +556,8 @@
         );
 
         const SeasonalTitle = ({ season, className }) => {
-			// We removed the bg-clip-text from the base wrapper so it doesn't hide the image
 			const baseWrapperClass = className ? className.replace(/text-transparent|bg-clip-text|bg-gradient-to-br|from-white|via-white|to-white\/50/g, '').trim() : "text-6xl font-display font-black drop-shadow-lg tracking-tight";
 			
-			// We put the gradient text effect ONLY on the spans
 			const textGradientClass = "text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50";
 
 			if (season === 'christmas') {
@@ -646,7 +597,6 @@
             if (!name) return null;
             const avatarUrl = `https://api.dicebear.com/9.x/croodles-neutral/svg?seed=${encodeURIComponent(name)}`;
             
-            // This cleaner filter just inverts the color, making black lines white.
             const monochromeFilter = { filter: 'invert(1)' };
 
             return (
@@ -661,7 +611,6 @@
             );
         };
 
-        // NEW: How to Play Modal
 		const HowToPlayModal = ({ onClose }) => {
 			const scenarios = {
 				imposter: [
@@ -824,22 +773,19 @@
 					const diffX = touchStartCoords.x - currentX;
 					const diffY = touchStartCoords.y - currentY;
 					
-					// Only consider it a swipe if horizontal movement is greater than vertical
 					if (Math.abs(diffX) > Math.abs(diffY)) {
-						// Now check if the swipe is significant enough
-						if (diffX > 20) { // Swiped left
+						if (diffX > 20) {
 							onSwipeLeft();
-							setTouchStartCoords(null); // Reset to prevent multiple triggers
-						} else if (diffX < -20) { // Swiped right
+							setTouchStartCoords(null);
+						} else if (diffX < -20) {
 							onSwipeRight();
-							setTouchStartCoords(null); // Reset to prevent multiple triggers
+							setTouchStartCoords(null);
 						}
 					}
-					// If diffY is greater, do nothing, allowing the default scroll behavior
 				};
 				
 				const handleTouchEnd = () => {
-					setTouchStartCoords(null); // Reset on touch end
+					setTouchStartCoords(null);
 				};
 
 				return { onTouchStart: handleTouchStart, onTouchMove: handleTouchMove, onTouchEnd: handleTouchEnd };
@@ -864,7 +810,6 @@
 						</div>
 						
 						<div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-8 text-white/80 leading-relaxed overscroll-y-contain transform-gpu">
-							{/* Section 1: Objective */}
 							<section>
 								<h3 className="font-bold text-lg text-brand-400 mb-2 flex items-center gap-2">
 									<img src="https://em-content.zobj.net/source/microsoft-teams/337/direct-hit_1f3af.png" alt="Objective Icon" className="w-8 h-8" />
@@ -873,7 +818,6 @@
 								<p>A battle of wits and deception. In the classic game, the <span className="text-teal-400 font-semibold">Agents</span> must identify the <span className="text-red-400 font-semibold">Imposter</span>. In the alternate "Fake Word" mode, they must find the player who was given a different secret word.</p>
 							</section>
 
-							{/* Section 2: Setup */}
 							<section>
 								<h3 className="font-bold text-lg text-brand-400 mb-2 flex items-center gap-2">
 									<img src="https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png" alt="Setup Icon" className="w-8 h-8" style={{ position: 'relative', top: '-2px' }} />
@@ -889,7 +833,6 @@
 								</div>
 							</section>
 							
-							{/* Section 3: Gameplay */}
 							<section>
 								<h3 className="font-bold text-lg text-brand-400 mb-2 flex items-center gap-2">
 									<img src="https://em-content.zobj.net/source/microsoft-teams/364/speaking-head_1f5e3-fe0f.png" alt="Gameplay Icon" className="w-8 h-8" />
@@ -902,7 +845,6 @@
 								</div>
 							</section>
 
-							{/* Section: Imposter Mode Scenarios */}
 							<section>
 								<h3 className="font-bold text-lg text-red-400 mb-2 flex items-center gap-2">
 									<img src="https://em-content.zobj.net/source/microsoft-teams/363/eyes_1f440.png" alt="Imposter Icon" className="w-7 h-7 -mt-1" />
@@ -949,7 +891,6 @@
 								</div>
 							</section>
 
-							{/* Section: Fake Word Mode Scenarios */}
 							<section>
 								<h3 className="font-bold text-lg text-yellow-400 mb-2 flex items-center gap-2">
 									<img src="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/3d/1f3ad_3d.png" alt="Fake Word Icon" className="w-7 h-7" />
@@ -996,7 +937,6 @@
 								</div>
 							</section>
 
-							{/* Section: Word Confusion */}
 							<section>
 								<h3 className="font-bold text-lg text-yellow-400 mb-2 flex items-center gap-2">
 									<img src="https://em-content.zobj.net/source/microsoft-teams/337/face-with-monocle_1f9d0.png" alt="Confusion Icon" className="w-7 h-7" />
@@ -1011,7 +951,6 @@
 								<p className="mt-3 text-xs text-white/50"><i className="fa-solid fa-lightbulb mr-1"></i>This feature ensures the game is always fair, even with a massive word bank.</p>
 							</section>
 							
-							{/* Section 5: Agent Strategy */}
 							<section>
 								<h3 className="font-bold text-lg text-teal-400 mb-2 flex items-center gap-2">
 									 <img src="https://em-content.zobj.net/source/microsoft-teams/337/busts-in-silhouette_1f465.png" alt="Agent Strategy Icon" className="w-8 h-8" style={{ position: 'relative', top: '-2px' }} />
@@ -1025,7 +964,6 @@
 								</div>
 							</section>
 
-							{/* Section 6: Imposter Strategy */}
 							 <section>
 								<h3 className="font-bold text-lg text-red-400 mb-2 flex items-center gap-2">
 									<img src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" alt="Imposter Strategy Icon" className="w-8 h-8" style={{ position: 'relative', top: '-2px' }} />
@@ -1039,7 +977,6 @@
 								</div>
 							</section>
 
-							{/* Section 7: Voting */}
 							<section>
 								<h3 className="font-bold text-lg text-brand-400 mb-2 flex items-center gap-2">
 									<img src="https://em-content.zobj.net/source/microsoft-teams/337/hammer-and-pick_2692-fe0f.png" alt="Voting Icon" className="w-7 h-7" />
@@ -1055,7 +992,6 @@
 			);
 		};
 
-        // NEW: Game Mode Selection Screen (Restyled)
         const GameModeSelectionScreen = ({ onSelectMode, onShowHowToPlay, audioManager, onMuteToggle, isMuted, roundedWordCount }) => {
             const [isDownloading, setIsDownloading] = useState(false);
             const[isAndroid, setIsAndroid] = useState(false);
@@ -1063,16 +999,12 @@
             useEffect(() => {
                 const userAgent = navigator.userAgent || navigator.vendor || window.opera;
                 
-                // 1. Check if the user is on an Android device
                 const isAndroidDevice = /android/i.test(userAgent);
                 
-                // 2. Check if running inside an Android WebView (which is what standard APK wrappers use)
                 const isWebView = /wv/i.test(userAgent);
                 
-                // 3. Check if running as an installed Web App / PWA (Added to Home Screen)
                 const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-                // Only show the download button if it's Android AND NOT already inside the APK or installed app
                 if (isAndroidDevice && !isWebView && !isStandalone) {
                     setIsAndroid(true);
                 }
@@ -1082,7 +1014,6 @@
                 audioManager.playSound('uiClick');
                 setIsDownloading(true);
                 
-                // Create a temporary link to trigger the download without leaving the page
                 const link = document.createElement('a');
                 link.href = 'https://www.dropbox.com/scl/fi/rga3pi6nqgy8l8wsmtt6y/Impostiq.apk?rlkey=rr74d13bg1wy90toa4fz00jxi&st=dpwfiv7i&dl=1';
                 link.download = 'Impostiq.apk';
@@ -1090,7 +1021,6 @@
                 link.click();
                 document.body.removeChild(link);
                 
-                // Revert button text/icon after 3 seconds
                 setTimeout(() => setIsDownloading(false), 3000);
             };
 
@@ -1117,7 +1047,6 @@
                                 className="relative w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-90 transition-transform group disabled:cursor-wait"
                             >
                                 <i className="fa-brands fa-android text-lg"></i>
-                                {/* Download Tooltip */}
                                 <div className={`absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-[10px] font-bold px-3 py-1.5 rounded shadow-lg transition-opacity duration-300 pointer-events-none ${isDownloading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                                     {isDownloading ? "Downloading APK..." : "Download App"}
                                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-b-4 border-b-slate-800"></div>
@@ -1163,13 +1092,11 @@
             );
         };
         
-        // NEW: Online Lobby Screen (Restyled)
         const OnlineLobbyScreen = ({ user, onJoin, onCreate, audioManager, onBack, initialParams }) => {
             const [isJoining, setIsJoining] = useState(true);
             const [lobbyId, setLobbyId] = useState('');
             const [password, setPassword] = useState('');
             
-            // FIX: Load username immediately from storage so avatar is there instantly
             const [username, setUsername] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_username');
@@ -1182,13 +1109,12 @@
 
             useEffect(() => {
                 try {
-                    // Prioritize initialParams from props (passed from App component)
                     if (initialParams && initialParams.lobbyId) {
                         setLobbyId(initialParams.lobbyId.toUpperCase());
                         if (initialParams.password) {
                             setPassword(initialParams.password.toUpperCase());
                         }
-                        setIsJoining(true); // Force joining mode if params are passed
+                        setIsJoining(true);
                     }
                 } catch {}
             }, [initialParams]);
@@ -1291,7 +1217,6 @@
             );
         };
         
-        // NEW: Modal for Confusion Poll
         const ConfusionPollModal = ({ onVote }) => {
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
@@ -1321,7 +1246,6 @@
             );
         };
         
-        // NEW: Imposter Notification Modal
         const ImposterVoteNotificationModal = ({ onClose }) => {
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
@@ -1343,7 +1267,6 @@
             );
         };
         
-        // NEW: Restart Notification Modal
         const RestartNotificationModal = ({ word, onClose }) => {
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
@@ -1368,7 +1291,6 @@
             );
         };
 
-        // NEW: QR Code Modal
 		const QRCodeModal = ({ lobbyId, password, onClose, audioManager, season }) => {
 			const inviteLink = `${window.location.origin}${window.location.pathname}?lobbyId=${lobbyId}&password=${password}`;
 			
@@ -1376,10 +1298,10 @@
             let qrBgColor = "0d121f";
             
             if (season === 'christmas') {
-                qrColor = "0369a1"; // Cold blue (sky-700)
+                qrColor = "0369a1";
                 qrBgColor = "0d121f"; 
             } else if (season === 'halloween') {
-                qrColor = "ea580c"; // Dark orange (orange-600) for contrast
+                qrColor = "ea580c";
                 qrBgColor = "0d121f"; 
             }
             
@@ -1433,7 +1355,6 @@
 			);
 		};
 
-        // NEW: Waiting Room Screen (Restyled & Feature-Rich)
         const WaitingRoom = ({ lobbyData, lobbyPlayers, user, lobbyId, onStartGame, onStartMission, onLeaveLobby, audioManager, onConfusionVote, season, displayCategories, wordBank }) => {
             const isHost = user.uid === lobbyData.hostId;
             const MIN_PLAYERS = 3;
@@ -1442,23 +1363,17 @@
             const categoryLongPressTimerRef = useRef(null);
             const [showQRCode, setShowQRCode] = useState(false);
 
-            // Poll logic
             const pollIsActive = lobbyData.gameState === 'reveal' && lobbyPlayers.some(p => p.status === 'confused');
             
-            // Logic for enabling the host's start button
             const allPlayersReady = lobbyData.gameState === 'reveal' && lobbyPlayers.length > 0 && lobbyPlayers.every(p => {
                 const isImposter = lobbyData.imposterIds?.includes(p.id);
-                // A player is ready if they have seen their card AND (the poll is not active OR (they are the imposter in classic mode) OR they have voted in the poll)
-                // In fake word mode, the imposter doesn't exist, so everyone needs to vote.
                 const needsToVote = lobbyData.isFakeWordMode ? true : !isImposter;
                 return p.hasSeenCard && (!pollIsActive || !needsToVote || p.status);
             });
 
-            // Confusion Poll Logic for the current user
             const me = lobbyPlayers.find(p => p.id === user.uid);
             const isMyRoleImposter = !lobbyData.isFakeWordMode && lobbyData.imposterIds?.includes(user.uid);
             
-            // Show poll IF: poll is active, I am not the imposter in classic mode, and I have not voted yet.
             const showConfusionPoll = lobbyData.gameState === 'reveal' && pollIsActive && !isMyRoleImposter && !me?.status;
 
             const handleCategorySelect = (cat) => {
@@ -1483,11 +1398,10 @@
                 if (isHost) {
                     const newValue = !currentValue;
                     
-                    // If turning on Fake Word Mode, turn off incompatible settings
                     if(settingName === 'isFakeWordMode' && newValue) {
                         db.collection('lobbies').doc(lobbyId).update({
                             isFakeWordMode: true,
-                            notifyImposterOnVote: false, // Turn off notification
+                            notifyImposterOnVote: false,
                             lastSoundEvent: { name: 'switchOn', timestamp: Date.now() }
                         });
                     } else {
@@ -1535,7 +1449,6 @@
                 const inviteLink = `${window.location.origin}${window.location.pathname}?lobbyId=${lobbyId}&password=${lobbyData.password}`;
                 audioManager.playSound('uiClick');
 
-                // --- START: Holiday Share Text Logic ---
                 let shareTitle = 'Impostiq Game Invite';
                 let shareText = `Join my Impostiq game! Lobby ID: ${lobbyId}`;
 
@@ -1546,27 +1459,20 @@
                     shareTitle = '🎃 Spooky Impostiq Invite';
                     shareText = `Something is lurking in the shadows... 👻\n\nCan you find the ghost before it's too late?\n\n📍 Lobby ID: ${lobbyId}`;
                 }
-                // --- END: Holiday Share Text Logic ---
 
-                // Define share data
                 const shareData = {
                     title: shareTitle,
                     text: shareText,
                     url: inviteLink
                 };
 
-                // Check if browser supports sharing (Must be HTTPS)
                 if (navigator.share) {
                     try {
                         await navigator.share(shareData);
                     } catch (err) {
                         console.log('Share failed or canceled:', err);
-                        // Note: We do NOT fallback to clipboard here intentionally, 
-                        // because if the user manually cancels the share menu, 
-                        // we don't want to annoy them with a "Copied" popup.
                     }
                 } else {
-                    // Fallback for browsers/contexts that don't support sharing (like HTTP local testing)
                     navigator.clipboard.writeText(inviteLink).then(() => {
                         setShowCopied(true);
                         setTimeout(() => setShowCopied(false), 2000);
@@ -1946,14 +1852,12 @@
 			"Press and hold any category card during setup to sneak a peek at some example words!",
         ];
 
-        // --- FINAL: LoadingScreen with a smooth, natural, and faster animation ---
 		const LoadingScreen = ({ onStart, onFinishedLoading, isDataLoading }) => {
 			const [currentTipIndex, setCurrentTipIndex] = useState(() => Math.floor(Math.random() * TIPS.length));
 			const [isReady, setIsReady] = useState(false);
 			const [isTrueLoadingComplete, setIsTrueLoadingComplete] = useState(false);
 			const [visualProgress, setVisualProgress] = useState(0);
 
-			// Tip rotation effect
 			useEffect(() => {
 				const tipInterval = setInterval(() => {
 					setCurrentTipIndex(prev => {
@@ -1961,15 +1865,13 @@
 						do { newIndex = Math.floor(Math.random() * TIPS.length); } while (newIndex === prev && TIPS.length > 1);
 						return newIndex;
 					});
-				}, 5000); // Slightly faster tip rotation
+				}, 5000);
 				return () => clearInterval(tipInterval);
 			}, []);
 
-			// Asset loading in the background
 			useEffect(() => {
 				const { assetPromise } = preloadAssets(() => {});
 				
-				// Force a minimum 4-second wait so users can read at least one tip
 				Promise.all([
 					assetPromise,
 					new Promise(resolve => setTimeout(resolve, 4000)) 
@@ -1978,68 +1880,56 @@
 				});
 			}, []);
 
-			// --- UPDATED: Refined animation logic ---
 			useEffect(() => {
 				let timeoutId;
 
-				// Recursive function to handle the visual loading animation
 				const animateProgress = (currentProgress) => {
-					// Stop the visual animation if real loading is already done
 					if (isTrueLoadingComplete) {
 						return;
 					}
 
-					// Calibrated for exactly 4 seconds: Smooth overall flow with random 1-10% jumps
 					let increment;
 					let nextFrameDelay;
 					
 					const rand = Math.random();
 					if (rand < 0.12) {
-						// 12% chance to "jump" randomly between 1% and 10%
 						increment = Math.random() * 9 + 1; 
-						nextFrameDelay = Math.random() * 100 + 80; // Slightly longer delay after a big jump
+						nextFrameDelay = Math.random() * 100 + 80;
 					} else if (rand < 0.22) {
-						// 10% chance for a realistic minor "network pause"
 						increment = Math.random() * 0.5 + 0.1; 
 						nextFrameDelay = Math.random() * 150 + 100;
 					} else {
-						// 78% chance for fast, steady, and smooth loading
-						increment = Math.random() * 1.5 + 0.8; // Steady 0.8% to 2.3% climbs
-						nextFrameDelay = Math.random() * 40 + 20; // Very fast updates (20-60ms) to ensure it keeps pace
+						increment = Math.random() * 1.5 + 0.8;
+						nextFrameDelay = Math.random() * 40 + 20;
 					}
 
-					let nextProgress = Math.min(currentProgress + increment, 99); // Cap at 99%
+					let nextProgress = Math.min(currentProgress + increment, 99);
 
-					setVisualProgress(nextProgress); // Set the new target for the CSS transition
+					setVisualProgress(nextProgress);
 
-					// Schedule the next step
 					timeoutId = setTimeout(() => {
 						animateProgress(nextProgress);
 					}, nextFrameDelay);
 				};
 
 				if (isTrueLoadingComplete) {
-					// If assets are loaded, cancel any visual animation and smoothly burst to 100%
 					clearTimeout(timeoutId);
 					setVisualProgress(100); 
 					
-					// Wait for the CSS transition to finish before showing the button
 					setTimeout(() => {
 						onFinishedLoading();
 						setIsReady(true);
 					}, 700);
 
 				} else {
-					// Hold at 0% for a split second so the user can visibly see it start from the beginning
 					timeoutId = setTimeout(() => {
 						animateProgress(visualProgress);
-					}, 400); // 400ms delay before the bar starts filling
+					}, 400);
 				}
 
-				// Cleanup function
 				return () => clearTimeout(timeoutId);
 
-			}, [isTrueLoadingComplete]); // Re-run only when real loading finishes
+			}, [isTrueLoadingComplete]);
             
             const isFullyReady = isReady && !isDataLoading;
 
@@ -2070,12 +1960,10 @@
 							) : (
 								<div className="w-full max-w-xs animate-fadeIn">
 									<div className="w-full bg-slate-800/50 rounded-full h-4 mb-4 border border-white/5 overflow-hidden relative">
-										{/* The animated fill with CSS transition for smoothness and shimmer overlay */}
 										<div 
 											className="bg-brand-500 h-full rounded-full transition-[width] duration-200 ease-out relative overflow-hidden" 
 											style={{ width: `${visualProgress}%` }}
 										>
-											{/* Subtle, smooth, fast-sweeping Shimmer Effect overlay */}
 											<div 
 												className="absolute top-0 bottom-0 w-[150%] -skew-x-12" 
 												style={{ 
@@ -2085,7 +1973,6 @@
 											></div>
 										</div>
 										
-										{/* The percentage text overlay */}
 										<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
 											<span className="text-[10px] font-display font-black text-white drop-shadow-md tracking-wider">
 												{`${Math.floor(visualProgress)}%`}
@@ -2138,12 +2025,11 @@
             return <i className={`fa-solid ${name} ${sizeClass} ${className}`}></i>;
         };
 
-        // Modal for Long Press Category Info
         const CategoryInfoModal = ({ category, onClose, wordBank }) => {
             if (!category || !wordBank) return null;
             
             const categoryWords = wordBank[category];
-            if (!categoryWords) return null; // Safety check
+            if (!categoryWords) return null;
             
             const examples = categoryWords.slice(0, 8).join(", ");
             const remainingCount = categoryWords.length - 8;
@@ -2182,7 +2068,6 @@
             );
         };
         
-        // NEW: Modal for removed players
         const RemovedModal = ({ onClose }) => {
 			return (
 				<div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
@@ -2205,7 +2090,6 @@
             );
         };
         
-        // NEW: Modal for when host closes lobby
         const LobbyClosedModal = ({ hostName, onClose }) => {
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
@@ -2228,7 +2112,6 @@
             );
         };
 
-        // NEW: Modal to review turn order during game
         const TurnOrderReviewModal = ({ players, onClose }) => {
             if (!players || players.length === 0) return null;
             
@@ -2260,7 +2143,6 @@
             );
         };
         
-        // NEW: Modal to confirm leaving a lobby
         const ExitLobbyConfirmModal = ({ onConfirm, onCancel }) => {
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
@@ -2291,13 +2173,11 @@
             );
         };
 
-        // 1. Setup Screen
         const SetupScreen = ({ onStartGame, audioManager, onBack, displayCategories, wordBank, activeWordBank }) => {
             const DEFAULT_PLAYERS = [{ name: 'Player 1', audioData: null }, { name: 'Player 2', audioData: null }, { name: 'Player 3', audioData: null }];
             const MIN_PLAYERS = 3;
 			const [playerError, setPlayerError] = useState('');
 
-            // --- State Persistence Logic ---
             const [players, setPlayers] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_players');
@@ -2348,26 +2228,25 @@
             const [timerMinutes, setTimerMinutes] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_timerMinutes');
-                    return saved ? JSON.parse(saved) : 3; // Default to 3 minutes
+                    return saved ? JSON.parse(saved) : 3;
                 } catch { return 3; }
             });
             const [timerEnabled, setTimerEnabled] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_timerEnabled');
-                    // Check for null to correctly handle when 'false' is saved
-                    return saved !== null ? JSON.parse(saved) : true; // Default to enabled
+                    return saved !== null ? JSON.parse(saved) : true;
                 } catch { return true; }
             });
             const [inspectedCategory, setInspectedCategory] = useState(null);
             const [enableTwoImposters, setEnableTwoImposters] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_enableTwoImposters');
-                    return saved ? JSON.parse(saved) : false; // Default to disabled
+                    return saved ? JSON.parse(saved) : false;
                 } catch { return false; }
             });
 			
             const [playersExpanded, setPlayersExpanded] = useState(false);
-            const isMobile = useMediaQuery('(max-width: 639px)'); // Tailwind's `sm` breakpoint is 640px
+            const isMobile = useMediaQuery('(max-width: 639px)');
             const playerDisplayLimit = isMobile ? 3 : 6;
             
             useEffect(() => {
@@ -2376,7 +2255,6 @@
                 }
             }, [players.length, playerDisplayLimit]);
 			
-            // Voice recording state
             const [isRecording, setIsRecording] = useState(false);
             const [recordedAudioData, setRecordedAudioData] = useState(null);
             const [showMicTooltip, setShowMicTooltip] = useState(false);
@@ -2384,11 +2262,9 @@
             const audioChunksRef = useRef([]);
             const micTooltipTimer = useRef(null);
 
-            // Long press logic
             const categoryLongPressTimerRef = useRef(null);
             const playerPressTimerRef = useRef(null);
             
-            // --- Save effects ---
             useEffect(() => { localStorage.setItem('imposter_players', JSON.stringify(players)); }, [players]);
             useEffect(() => { localStorage.setItem('imposter_category', JSON.stringify(selectedCategory)); }, [selectedCategory]);
             useEffect(() => { localStorage.setItem('imposter_random_mode', JSON.stringify(isRandomMode)); }, [isRandomMode]);
@@ -2424,14 +2300,14 @@
                             const reader = new FileReader();
                             reader.readAsDataURL(audioBlob);
                             reader.onloadend = () => {
-                                setRecordedAudioData(reader.result); // Save as Base64 data URL
+                                setRecordedAudioData(reader.result);
                             };
                             stream.getTracks().forEach(track => track.stop());
                         };
 
                         mediaRecorder.start();
                         setIsRecording(true);
-                        setRecordedAudioData(null); // Clear previous recording
+                        setRecordedAudioData(null);
                     } catch (err) {
                         console.error("Error accessing microphone:", err);
                         alert("Microphone access was denied. Please allow it in your browser settings.");
@@ -2455,7 +2331,7 @@
                 setPlayers([...players, { name: trimmedName, audioData: recordedAudioData }]);
                 setNewPlayerName('');
                 setRecordedAudioData(null);
-                setPlayerError(''); // Clear error on success
+                setPlayerError('');
                 if (navigator.vibrate) navigator.vibrate(10);
             };
 
@@ -2540,7 +2416,6 @@
 
                     <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
                         <div className="max-w-lg mx-auto p-6 pt-28">
-                            {/* Header */}
                             <div class="mb-10 text-center">
                                 <SeasonalTitle season={currentSeason} className="text-5xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 mb-2 drop-shadow-lg tracking-tight" />
 								<div class="subtle-shine-container inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
@@ -2548,7 +2423,6 @@
 								</div>
 							</div>
 
-                            {/* Players */}
                             <section className="mb-6 glass-panel rounded-[2rem] p-6">
                                 <h2 className="text-sm font-bold tracking-widest text-brand-400 mb-4 flex items-center gap-2 uppercase">
                                     <i className="fa-solid fa-users"></i> Agents
@@ -2562,7 +2436,7 @@
 												value={newPlayerName}
 												onChange={(e) => {
 													setNewPlayerName(e.target.value.slice(0, 25));
-													if (playerError) setPlayerError(''); // Clear error on new input
+													if (playerError) setPlayerError('');
 												}}
 												onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
 												placeholder="Enter codename..."
@@ -2641,7 +2515,6 @@
                                 )}
                             </section>
 
-                            {/* Settings */}
                             <section className="mb-6 glass-panel rounded-[2rem] p-6 space-y-3">
                                 <div className="flex items-center justify-between">
                                     <div className="pr-4">
@@ -2750,7 +2623,6 @@
                                 </div>
                             </section>
 
-                            {/* Categories */}
                             <section>
                                 <div className="flex items-center justify-between mb-4 px-2">
                                     <h2 className="text-sm font-bold tracking-widest text-teal-400 flex items-center gap-2 uppercase">
@@ -2880,7 +2752,6 @@
                         </div>
                     </div>
 
-                    {/* Fixed Bottom Start Button */}
                     <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#020617] via-[#020617] to-transparent z-50">
                         <div className="max-w-lg mx-auto pb-[env(safe-area-inset-bottom)]">
                             <button
@@ -2899,7 +2770,6 @@
             );
         };
 
-        // 2. Card Reveal Screen (Enhanced with 3D Flip)
         const CardRevealScreen = ({ player, word, onNext, isLastPlayer, audioManager, onAcknowledge, isOnline, onConfused }) => {
             const [step, setStep] = useState(isOnline ? 'reveal' : 'handover'); 
             const [isFlipped, setIsFlipped] = useState(false);
@@ -2967,14 +2837,11 @@
 
             const renderFlipCard = () => (
                 <div className="flex flex-col items-center justify-center h-full w-full p-6 relative">
-                    {/* Background Overlay */}
                     <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-0"></div>
 
-                    {/* Card Container */}
                     <div className="relative w-full max-w-xs aspect-[3/4] perspective-1000 z-10 cursor-pointer" onClick={handleReveal}>
                         <div className={`relative w-full h-full transition-transform duration-700 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
                             
-                            {/* FRONT (Locked) */}
                             <div className="absolute inset-0 backface-hidden">
                                 <div className="w-full h-full bg-slate-900 rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col items-center justify-center p-8 relative overflow-hidden group">
                                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/soft-wallpaper.png')] opacity-10"></div>
@@ -2992,7 +2859,6 @@
                                 </div>
                             </div>
 
-                            {/* BACK (Revealed) */}
                             <div className="absolute inset-0 rotate-y-180 backface-hidden">
                                 <div className={`w-full h-full rounded-[2.5rem] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden shadow-2xl border ${
                                      word === "IMPOSTER" 
@@ -3000,7 +2866,6 @@
                                         : 'bg-gradient-to-br from-teal-950 to-slate-950 border-teal-500/20'
                                 }`}>
                                     
-                                    {/* Shine Effect */}
                                     <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
                                          <div className="absolute w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
                                     </div>
@@ -3034,11 +2899,10 @@
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
                     <div className={`w-full max-w-sm mt-8 transition-all duration-700 transform ${isFlipped ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
                         <button 
                             onClick={(e) => {
-                                e.stopPropagation(); // Prevent re-triggering flip
+                                e.stopPropagation();
                                 handleAckAndNext();
                             }}
                             className="w-full bg-white hover:bg-slate-200 text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg shadow-[0_0_30px_rgba(255,255,255,0.1)] active:scale-95 transition-all flex items-center justify-center gap-3"
@@ -3078,7 +2942,6 @@
         };
 
         const TurnOrderScreen = ({ players, onStartMission, audioManager, isHost }) => {
-    // 1. Remove the countdown state and timer useEffect
     
     useEffect(() => {
         if (audioManager) {
@@ -3135,14 +2998,12 @@
     );
 };
 
-        // 4. Game Timer Screen
         const GameTimerScreen = ({ lobbyData, onEndGame, firstPlayer, audioManager, isHost, lobbyId }) => {
             const [showTurnOrder, setShowTurnOrder] = useState(false);
             const { duration, missionStartTime, turnOrder } = lobbyData || {};
             const [timeLeft, setTimeLeft] = useState(duration || 0);
             const timerRef = useRef(null);
 
-            // Force the timer music to play as soon as the screen is shown
             useEffect(() => {
                 if (audioManager) {
                     audioManager.playMusic('timerMusic');
@@ -3157,9 +3018,9 @@
                 let timerExpired = false;
                 const updateTimer = () => {
                     const getStartTime = () => {
-                        if (missionStartTime.toDate) return missionStartTime.toDate().getTime(); // Firestore timestamp
-                        if (missionStartTime instanceof Date) return missionStartTime.getTime(); // JS Date for local game
-                        return Date.now(); // Fallback
+                        if (missionStartTime.toDate) return missionStartTime.toDate().getTime();
+                        if (missionStartTime instanceof Date) return missionStartTime.getTime();
+                        return Date.now();
                     };
 
                     const startTime = getStartTime();
@@ -3169,7 +3030,7 @@
                     setTimeLeft(newTimeLeft);
 
                     if (newTimeLeft <= 0 && !timerExpired) {
-                        timerExpired = true; // Prevents multiple triggers
+                        timerExpired = true;
                         clearInterval(timerRef.current);
                         
                         audioManager.stopMusic(); 
@@ -3177,7 +3038,6 @@
                         
                         if (navigator.vibrate) navigator.vibrate();
                         
-                        // Host ends the game for everyone in online mode
                         if (isHost && lobbyId) {
                             onEndGame();
                         }
@@ -3221,7 +3081,6 @@
                         <div className="blob bg-brand-900/30 top-0 left-0 w-full h-full"></div>
                     </div>
 
-                    {/* Header */}
                     <div className="w-full mt-8 glass-panel p-4 rounded-[1.5rem] flex items-center justify-between gap-4 z-10">
                         <div className="flex items-center gap-4 min-w-0">
                             <div className="bg-brand-500/20 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
@@ -3247,13 +3106,11 @@
                         </button>
                     </div>
 
-                    {/* Timer */}
                     <div className="flex-1 flex flex-col items-center justify-center z-10 w-full relative">
                         {duration ? (
                             <div className="relative transform scale-90 sm:scale-100 transition-transform">
                                 <div className={`absolute inset-0 rounded-full blur-[100px] transition-all duration-1000 ${timeLeft < 30 ? 'bg-red-500/20' : 'bg-brand-500/10'}`}></div>
                                 <div className="relative">
-                                    {/* Track */}
                                     <svg className="w-72 h-72 transform -rotate-90">
                                         <circle cx="144" cy="144" r="120" stroke="rgba(255,255,255,0.05)" strokeWidth="8" fill="transparent" />
                                         <circle 
@@ -3287,7 +3144,6 @@
                         )}
                     </div>
 
-                    {/* Action */}
                     <div className="w-full z-10 pb-[env(safe-area-inset-bottom)] mb-6">
                         <button 
                             onClick={handleIdentifyImposter}
@@ -3302,7 +3158,6 @@
             );
         };
         
-        // 5. Voting Screen
         const VotingScreen = ({ lobbyData, lobbyPlayers, user, lobbyId, audioManager }) => {
             const me = lobbyPlayers.find(p => p.id === user.uid);
             const [selectedVotes, setSelectedVotes] = useState([]);
@@ -3318,7 +3173,6 @@
                     if (prev.length < numImposters) {
                         return [...prev, targetPlayerId];
                     }
-                    // If already at max votes, replace the last selection
                     return [...prev.slice(0, prev.length - 1), targetPlayerId];
                 });
             };
@@ -3425,7 +3279,6 @@
             )
         };
 
-		// 6. Results Screen
         const ResultScreen = ({ lobbyData, lobbyPlayers, onRestart, onBackToHome, onConfirmExit, audioManager, isHost, isLocal }) => {
             const { gameResult, imposterIds, imposterIndices, fakeWordPlayerIds, fakeWordPlayerIndices, secretWord, fakeWord, turnOrder, players } = lobbyData;
             const isFakeWordMode = lobbyData.isFakeWordMode;
@@ -3439,7 +3292,6 @@
 
             const roguePlayerNames = roguePlayers.map(p => p?.name || "Unknown").join(' & ');
 
-            // New logic to check if all players are present for a rematch
             const originalPlayerCount = turnOrder?.length || 0;
             const currentPlayerCount = lobbyPlayers.length;
             const notAllPlayersPresent = !isLocal && originalPlayerCount > 0 && originalPlayerCount !== currentPlayerCount;
@@ -3451,7 +3303,7 @@
 
                 let soundToPlay = null;
                 if (isLocal) {
-                    soundToPlay = audioManager.getSound('imposterWin'); // Same sound for local reveal
+                    soundToPlay = audioManager.getSound('imposterWin');
                 } else if (gameResult?.winner === 'imposter' || gameResult?.winner === 'fakeWordPlayer') {
                     soundToPlay = audioManager.getSound('imposterWin');
                 } else if (gameResult?.winner === 'agents') {
@@ -3508,7 +3360,7 @@
                         <p className="text-white">{title.replace('...', '')} <span className="font-bold text-red-400">{roguePlayerNames}</span></p>
                         </>
                     );
-                } else { // Agents win
+                } else {
                      return (
                         <>
                          <div className="w-28 h-28 bg-gradient-to-br from-teal-500/20 to-transparent rounded-full flex items-center justify-center mx-auto mb-8 ring-1 ring-teal-500/40 shadow-[0_0_40px_rgba(20,184,166,0.1)] overflow-hidden">
@@ -3603,16 +3455,11 @@
             );
         };
         
-        // --- HELPER FUNCTIONS ---
-        // Fisher-Yates Shuffle - Unbiased randomization
         const shuffleArray = (array) => {
             let currentIndex = array.length, randomIndex;
-            // While there remain elements to shuffle.
             while (currentIndex > 0) {
-                // Pick a remaining element.
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
-                // And swap it with the current element.
                 [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
             }
             return array;
@@ -3629,7 +3476,6 @@
         const generateLobbyId = () => generateRandomString(6, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789');
         const generateLobbyPassword = () => generateRandomString(4, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789');
 
-        // NEW: Custom Hook for Media Queries
         const useMediaQuery = (query) => {
             const [matches, setMatches] = React.useState(false);
 
@@ -3646,12 +3492,10 @@
             return matches;
         };
 		
-		// --- FASTER & OPTIMIZED: Asset Preloading ---
         const preloadAssets = (onProgress) => {
             const imageUrls = new Set();
             const essentialAudioUrls = new Set();
 
-            // 1. Gather all static UI and background images (these are small and worth preloading)
             [
                 'https://em-content.zobj.net/source/microsoft-teams/400/disguised-face_1f978.png',
                 'https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png',
@@ -3673,7 +3517,6 @@
                 'https://picjumbo.com/wp-content/uploads/dark-halloween-background-with-glowing-halloween-pumpkins-free-image.jpeg'
             ].forEach(url => imageUrls.add(url));
 
-            // 2. Gather all CATEGORY_ICONS
             Object.values(CATEGORY_ICONS).forEach(icon => {
                 if (Array.isArray(icon)) {
                     icon.forEach(url => imageUrls.add(url));
@@ -3682,8 +3525,6 @@
                 }
             });
 
-            // 3. Gather ONLY A FEW ESSENTIAL AUDIO_URLS. This is the key change for speed.
-            // We are no longer preloading all the large voice-over files.
             essentialAudioUrls.add(AUDIO_URLS.uiClick);
             essentialAudioUrls.add(AUDIO_URLS.startMission);
             essentialAudioUrls.add(AUDIO_URLS.mainMenuMusic);
@@ -3697,7 +3538,6 @@
                     img.onload = assetLoaded;
                     img.onerror = assetLoaded;
                     
-                    // CRITICAL FIX: Fallback timeout so a single slow image doesn't hang the game
                     setTimeout(assetLoaded, 1500);
                 });
             });
@@ -3706,15 +3546,12 @@
                 return new Promise(resolve => {
                     if (!src || typeof src !== 'string') return resolve();
                     const audio = new Audio();
-                    audio.preload = 'auto'; // Preload is sufficient, canplaythrough is slow
+                    audio.preload = 'auto';
                     const assetLoaded = () => { if (onProgress) onProgress(); resolve(); };
-                    // Resolve faster on 'loadeddata' instead of waiting for the whole file
                     audio.addEventListener('loadeddata', assetLoaded, { once: true });
                     audio.addEventListener('error', assetLoaded, { once: true });
                     audio.src = src;
                     
-                    // CRITICAL FIX: Mobile browsers block audio from preloading before user interaction.
-                    // This 500ms timeout ensures the loading screen NEVER hangs at 99%.
                     setTimeout(assetLoaded, 500);
                 });
             });
@@ -3726,7 +3563,6 @@
             };
         };
 
-        // --- MAIN APP ---
         const App = () => {
             useEffect(() => {
                 const timer = setTimeout(() => {
@@ -3736,7 +3572,6 @@
                 return () => clearTimeout(timer);
             }, []);
 
-			// Network State
             const [isOnlineStatus, setIsOnlineStatus] = useState(navigator.onLine);
             const [wordBank, setWordBank] = useState(null);
 
@@ -3748,7 +3583,6 @@
                         
                         const text = await response.text();
                         
-                        // This is a safer way to parse the JS object from the text file than using eval()
                         const startIndex = text.indexOf('{');
                         const endIndex = text.lastIndexOf('}');
                         if (startIndex === -1 || endIndex === -1) {
@@ -3756,14 +3590,12 @@
                         }
                         const objectString = text.substring(startIndex, endIndex + 1);
 
-                        // Use the Function constructor to safely create the object
                         const getObject = new Function('return ' + objectString);
                         const bank = getObject();
                         
                         setWordBank(bank);
                     } catch (error) {
                         console.error("Fatal Error: Failed to fetch or parse word bank.", error);
-                        // Here you could set an error state to show a permanent error message to the user
                     }
                 };
                 fetchWordBank();
@@ -3779,15 +3611,13 @@
                 };
             }, []);
             
-            // Core App State
             const [isLoading, setIsLoading] = useState(true);
-            const [appReady, setAppReady] = useState(false); // New state for preloading
+            const [appReady, setAppReady] = useState(false);
             const [user, setUser] = useState(null);
-            const [gameMode, setGameMode] = useState('select'); // 'select', 'local', 'online'
-            const [showHowToPlay, setShowHowToPlay] = useState(false); // New state for "How to Play" modal
+            const [gameMode, setGameMode] = useState('select');
+            const [showHowToPlay, setShowHowToPlay] = useState(false);
             const [initialLobbyParams, setInitialLobbyParams] = useState(null);
 
-            // Local Game State
             const [localGameState, setLocalGameState] = useState('setup'); 
             const [localGameData, setLocalGameData] = useState({
                 players: [],
@@ -3804,7 +3634,6 @@
             });
             const [localCurrentPlayerIndex, setLocalCurrentPlayerIndex] = useState(0);
 
-            // Online Game State
             const [lobbyId, setLobbyId] = useState(null);
             const [lobbyData, setLobbyData] = useState(null);
             const [lobbyPlayers, setLobbyPlayers] = useState([]);
@@ -3814,12 +3643,10 @@
             const [lobbyClosedInfo, setLobbyClosedInfo] = useState(null);
             const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
             
-            // Notification States
             const [restartNotification, setRestartNotification] = useState(null);
             const [showImposterVoteNotification, setShowImposterVoteNotification] = useState(false);
             const lastSeenRestartTimestampRef = useRef(0);
 
-            // Audio Manager, Mute State & Sync State
             const audioManagerRef = useRef(null);
             const [isMuted, setIsMuted] = useState(() => {
                 try {
@@ -3831,13 +3658,11 @@
             });
             const lastPlayedEventTimestamp = useRef(0);
             
-            // --- Refs to hold the latest state for use in Firestore listeners ---
             const latestLobbyData = useRef(lobbyData);
             const latestLobbyPlayers = useRef(lobbyPlayers);
             const previousGameStateRef = useRef();
             const previousPlayersRef = useRef(lobbyPlayers);
             
-            // --- Derived Data from Fetched Word Bank ---
             const derivedData = React.useMemo(() => {
                 if (!wordBank) {
                     return {
@@ -3865,13 +3690,10 @@
                 const roundedWordCount = Math.floor(totalWords / 250) * 250;
 
                 return { activeWordBank, displayCategories, roundedWordCount };
-            }, [wordBank]); // Note: seasonalCategories is stable from the outer scope
+            }, [wordBank]);
 
             const { activeWordBank, displayCategories, roundedWordCount } = derivedData;
             
-            // --- Effects ---
-
-            // Keep refs updated with the latest state
             useEffect(() => {
                 latestLobbyData.current = lobbyData;
             }, [lobbyData]);
@@ -3880,9 +3702,7 @@
                 latestLobbyPlayers.current = lobbyPlayers;
             }, [lobbyPlayers]);
             
-            // Initialize Audio Manager
             useEffect(() => {
-                // Ensure this only runs once
                 if (audioManagerRef.current) return;
             
                 const manager = {
@@ -3892,16 +3712,13 @@
                     isUnlocked: false,
                     currentMusicTrack: null,
             
-                    // This function is crucial. It must be called by a user interaction (e.g., a click).
                     unlockAudio: function() {
                         if (this.isUnlocked) return;
                         this.isUnlocked = true;
-                        // A common trick to "wake up" the audio context in some browsers
                         const silentSound = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
                         silentSound.play().catch(() => {});
                     },
             
-                    // Initialize a single sound
                     initSound: function(name, url, options = {}) {
                         try {
                             const audio = new Audio(url);
@@ -3932,8 +3749,6 @@
                         if (soundToPlay) {
                             soundToPlay.currentTime = 0;
                             soundToPlay.play().catch(error => {
-                                // This error often happens if the user hasn't interacted yet.
-                                // It's generally safe to ignore in this context.
                             });
                         }
                     },
@@ -3991,13 +3806,11 @@
                     getSound: function(name) { return this.sounds[name]; }
                 };
             
-                // --- Initialize all sounds defined in AUDIO_URLS ---
                 const musicTracks = ['mainMenuMusic', 'categorySelectionMusic', 'timerMusic', 'christmasMainMenuMusic', 'halloweenMainMenuMusic'];
                 
                 Object.entries(AUDIO_URLS).forEach(([key, value]) => {
                     if (typeof value === 'string') {
                         const isMusic = musicTracks.includes(key);
-                        // Define special options for specific sounds
                         let options = { isMusic, loop: isMusic };
                         if (key === 'categorySelectionMusic') options.volume = 0.7;
                         if (key === 'timerMusic') options.volume = 0.5;
@@ -4024,7 +3837,6 @@
                 }
             }, [isMuted]);
 
-            // Auth, and URL Param Handling
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
                 const lobbyIdParam = params.get('lobbyId');
@@ -4053,7 +3865,6 @@
                 };
             }, []);
 
-            // Background Music Manager
             useEffect(() => {
                 if (isLoading || !audioManagerRef.current || !audioManagerRef.current.isUnlocked) return;
                 
@@ -4081,7 +3892,6 @@
 
             }, [isLoading, gameMode, localGameState, lobbyId, lobbyData?.gameState, audioManagerRef.current?.isUnlocked, currentSeason]);
             
-            // Handle Browser Tab Visibility
             useEffect(() => {
                 const handleVisibilityChange = () => {
                     if (document.hidden) {
@@ -4104,7 +3914,6 @@
                 }
             };
 
-            // Firestore Listeners & Game Logic for Online Mode
             useEffect(() => {
                 if (gameMode !== 'online' || !lobbyId || !user) {
                     if (lobbyListenerUnsubscribe.current) lobbyListenerUnsubscribe.current();
@@ -4120,7 +3929,6 @@
                         const previousData = latestLobbyData.current;
                         setLobbyData(data);
                         
-                        // --- Sound logic based on state changes ---
                         if (previousData && data.gameState !== previousData.gameState) {
                             if (previousData.gameState === 'waiting' && data.gameState === 'reveal') {
                                 audioManagerRef.current.playSound(data.isRandomMode ? 'startRandomMission' : 'startMission');
@@ -4197,7 +4005,6 @@
 
                         const pollIsActive = newPlayers.some(p => p.status === 'confused');
                         if (pollIsActive) {
-                            // In fake word mode, everyone is polled. In classic, imposters are excluded.
                             const agentsToPoll = currentLobbyDoc.isFakeWordMode 
                                 ? newPlayers.filter(p => !p.status)
                                 : newPlayers.filter(p => !rogueIds.includes(p.id) && !p.status);
@@ -4237,22 +4044,18 @@
             }, [lobbyData, user, lobbyId]);
 
 
-            // --- LOCAL GAME HANDLERS ---
             const startLocalGame = (players, selectedCategories, duration, isRandomMode, speakCategory, enableTwoImposters, isFakeWordMode) => {
-                // Use proper shuffle
                 const shuffledPlayers = shuffleArray([...players]);
                 
                 const useRandom = isRandomMode || (selectedCategories && selectedCategories.length === 0);
                 let finalCategory;
                 
-                // --- CRASH FIX START: Validate Category ---
                 const validCategories = Object.keys(activeWordBank);
                 
                 if (useRandom) {
                     finalCategory = validCategories[Math.floor(Math.random() * validCategories.length)];
                 } else {
                     finalCategory = selectedCategories[0]; 
-                    // Verify the selected category actually exists in the current season
                     if (!activeWordBank[finalCategory]) {
                         console.warn(`Category ${finalCategory} not found in active bank. Defaulting to Movies.`);
                         finalCategory = 'Movies';
@@ -4260,18 +4063,15 @@
                 }
                 
                 const words = activeWordBank[finalCategory];
-                // Safety check to prevent the "length of undefined" crash
                 if (!words || words.length === 0) {
                      alert("Error: Word bank is empty for this category. Please try another.");
                      return;
                 }
-                // --- CRASH FIX END ---
 
                 const secretWord = words[Math.floor(Math.random() * words.length)];
                 
                 const numRoguePlayers = enableTwoImposters && shuffledPlayers.length >= 10 ? 2 : 1;
                 
-                // Use proper shuffle for indices
                 const playerIndices = Array.from(Array(shuffledPlayers.length).keys());
                 const shuffledIndices = shuffleArray([...playerIndices]);
                 const roguePlayerIndices = shuffledIndices.slice(0, numRoguePlayers);
@@ -4336,7 +4136,6 @@
                 });
             };
             
-            // --- ONLINE GAME HANDLERS ---
             const deleteLobby = async (lobbyIdToDelete) => {
                 const lobbyRef = db.collection('lobbies').doc(lobbyIdToDelete);
                 const playersRef = lobbyRef.collection('players');
@@ -4436,27 +4235,21 @@
              const handleStartGameOnline = async () => {
                 if (lobbyPlayers.length < 3) return;
                 
-                // --- ONLINE CRASH FIX START ---
                 let finalCategory = lobbyData.category;
                 const validCategories = Object.keys(activeWordBank);
 
-                // If Random Mode is ON, pick a valid random category
                 if (lobbyData.isRandomMode) {
                     finalCategory = validCategories[Math.floor(Math.random() * validCategories.length)];
                 } 
-                // If Random Mode is OFF, check if the selected category is valid
                 else if (!activeWordBank[finalCategory]) {
                     console.warn(`Online Lobby Category ${finalCategory} invalid. Defaulting to Movies.`);
                     finalCategory = 'Movies';
                 }
 
-                // Get words and ensure safety
                 const wordsForCategory = activeWordBank[finalCategory] || [];
                 if (wordsForCategory.length === 0) {
-                    // Fallback to Movies if the list is somehow empty
                     finalCategory = 'Movies';
                 }
-                // --- ONLINE CRASH FIX END ---
 
                 const actualWords = activeWordBank[finalCategory];
                 const availableWords = actualWords.filter(word => !(lobbyData.usedWords || []).includes(word));
@@ -4464,10 +4257,8 @@
                 let wordPool = availableWords.length > 0 ? availableWords : actualWords;
                 const secretWord = wordPool[Math.floor(Math.random() * wordPool.length)];
                 
-                // 1. Determine Turn Order (Shuffle the lobby players)
                 const turnOrderList = shuffleArray([...lobbyPlayers]);
                 
-                // 2. Determine Imposters/FakeWordPlayers INDEPENDENTLY from turn order
                 const numRoguePlayers = lobbyData.enableTwoImposters && lobbyPlayers.length >= 10 ? 2 : 1;
                 
                 const allPlayerIds = turnOrderList.map(p => p.id);
@@ -4477,7 +4268,7 @@
                 let updatePayload = {
                     secretWord,
                     turnOrder: turnOrderList.map(p => ({name: p.name, id: p.id})),
-                    category: finalCategory, // Ensure we save the valid category back to the DB
+                    category: finalCategory, 
                     gameState: 'reveal',
                     usedWords: firebase.firestore.FieldValue.arrayUnion(secretWord),
                 };
@@ -4487,10 +4278,10 @@
                     const fakeWord = wordPool.length > 0 ? wordPool[Math.floor(Math.random() * wordPool.length)] : secretWord;
                     updatePayload.fakeWord = fakeWord;
                     updatePayload.fakeWordPlayerIds = roguePlayerIds;
-                    updatePayload.imposterIds = []; // Clear imposterIds
+                    updatePayload.imposterIds = []; 
                 } else {
                     updatePayload.imposterIds = roguePlayerIds;
-                    updatePayload.fakeWordPlayerIds = []; // Clear fakeWordPlayerIds
+                    updatePayload.fakeWordPlayerIds = []; 
                 }
                 
                 await db.collection('lobbies').doc(lobbyId).update(updatePayload);
@@ -4543,7 +4334,6 @@
             const calculateConfusionResult = async (currentLobbyData, currentLobbyPlayers) => {
                 const rogueIds = currentLobbyData.isFakeWordMode ? currentLobbyData.fakeWordPlayerIds : currentLobbyData.imposterIds;
 				
-				// In Fake Word mode, everyone is polled. In Classic, imposters are not.
                 const polledPlayers = currentLobbyData.isFakeWordMode
                     ? currentLobbyPlayers
                     : currentLobbyPlayers.filter(p => !rogueIds.includes(p.id));
@@ -4608,7 +4398,7 @@
                         const accusedPlayer = currentLobbyPlayers.find(p => p.id === accusedIds[0]);
                         result = { winner: isFakeWordMode ? 'fakeWordPlayer' : 'imposter', reason: 'wrong_vote', accusedName: accusedPlayer?.name || 'an agent' };
                     }
-                } else { // Logic for 2 imposters/fake cards
+                } else { 
                     const accusedTopTwoIds = sortedAccused.slice(0, 2).map(([id]) => id);
                     const isTieForSecond = sortedAccused.length > 2 && sortedAccused[1][1] === sortedAccused[2][1];
 
@@ -4670,9 +4460,6 @@
                     audioManagerRef.current.unlockAudio();
                     audioManagerRef.current.playSound('uiClick');
                 }
-                // FIX: Add a minimal timeout. This pushes the state update to the next
-                // event loop tick, giving mobile browsers a moment to process the audio
-                // context unlock from the user's first click, preventing a UI hang.
                 setTimeout(() => {
                     setIsLoading(false);
                     if (initialLobbyParams) {
@@ -4681,7 +4468,6 @@
                 }, 50);
             };
 
-            // --- RENDER LOGIC ---
             const renderContent = () => {
                 if (isLoading || !user || !wordBank) {
                     return <LoadingScreen onStart={handleStart} onFinishedLoading={() => setAppReady(true)} isDataLoading={!wordBank} />;
@@ -4754,7 +4540,7 @@
                             audioManager={audioManagerRef.current} isHost={isHost}
                         />;
                     }
-                    return <LoadingScreen onStart={handleStart} onFinishedLoading={() => setAppReady(true)} isDataLoading={!wordBank} />; // Fallback
+                    return <LoadingScreen onStart={handleStart} onFinishedLoading={() => setAppReady(true)} isDataLoading={!wordBank} />; 
                 }
             };
             
