@@ -1670,16 +1670,20 @@
                                         <h2 className="text-sm font-bold tracking-widest text-teal-400 flex items-center gap-2 uppercase">
                                             <i className="fa-solid fa-layer-group"></i> Mission
                                         </h2>
-                                        <div className={`flex bg-slate-950/50 p-1 rounded-lg border border-white/5 ${!isHost && 'opacity-50 pointer-events-none'}`}>
+                                        <div className={`relative flex bg-slate-950/50 p-1 rounded-lg border border-white/5 w-44 ${!isHost && 'opacity-50 pointer-events-none'}`}>
+                                            <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md pointer-events-none transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform ${lobbyData.isRandomMode ? 'translate-x-full' : 'translate-x-0'}`}>
+                                                <div className={`absolute inset-0 rounded-md bg-white/15 transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${lobbyData.isRandomMode ? 'opacity-0' : 'opacity-100'}`}></div>
+                                                <div className={`absolute inset-0 rounded-md bg-gradient-to-r from-brand-500 to-fuchsia-500 shadow-[0_2px_10px_rgba(139,92,246,0.3)] transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${lobbyData.isRandomMode ? 'opacity-100' : 'opacity-0'}`}></div>
+                                            </div>
                                             <button 
                                                 onClick={() => handleModeChange(false)}
-                                                className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${!lobbyData.isRandomMode ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                                                className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${!lobbyData.isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
                                             >
                                                 Select
                                             </button>
                                             <button 
                                                 onClick={() => handleModeChange(true)}
-                                                className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${lobbyData.isRandomMode ? 'bg-gradient-to-r from-brand-600 to-fuchsia-600 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                                                className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${lobbyData.isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
                                             >
                                                 Random
                                             </button>
@@ -2647,16 +2651,20 @@
                                         <i className="fa-solid fa-layer-group"></i> Mission
                                     </h2>
                                     
-                                    <div className="flex bg-slate-950/50 p-1 rounded-lg border border-white/5">
+                                    <div className="relative flex bg-slate-950/50 p-1 rounded-lg border border-white/5 w-44">
+                                        <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md pointer-events-none transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform ${isRandomMode ? 'translate-x-full' : 'translate-x-0'}`}>
+                                            <div className={`absolute inset-0 rounded-md bg-white/15 transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isRandomMode ? 'opacity-0' : 'opacity-100'}`}></div>
+                                            <div className={`absolute inset-0 rounded-md bg-gradient-to-r from-brand-500 to-fuchsia-500 shadow-[0_2px_10px_rgba(139,92,246,0.3)] transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isRandomMode ? 'opacity-100' : 'opacity-0'}`}></div>
+                                        </div>
                                         <button 
                                             onClick={() => handleModeChange(false)}
-                                            className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${!isRandomMode ? 'bg-white/10 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                                            className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${!isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
                                         >
                                             Select
                                         </button>
                                         <button 
                                             onClick={() => handleModeChange(true)}
-                                            className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${isRandomMode ? 'bg-gradient-to-r from-brand-600 to-fuchsia-600 text-white shadow-sm' : 'text-white/30 hover:text-white/60'}`}
+                                            className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
                                         >
                                             Random
                                         </button>
