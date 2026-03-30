@@ -390,7 +390,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const firebaseConfig = {
+        const firebaseConfig1 = {
           apiKey: "AIzaSyCebdOffzrb0D2efbgC9eDPRAr-hYgIXS8",
           authDomain: "imposter-e571f.firebaseapp.com",
           projectId: "imposter-e571f",
@@ -400,9 +400,27 @@
           measurementId: "G-KHJRQCSH8Z"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        const firebaseConfig2 = {
+          apiKey: "AIzaSyBBz2ale-4v6oDTnoNIf6DzhQVbC6f4QGw",
+          authDomain: "imposteralt-d0240.firebaseapp.com",
+          projectId: "imposteralt-d0240",
+          storageBucket: "imposteralt-d0240.firebasestorage.app",
+          messagingSenderId: "819065213127",
+          appId: "1:819065213127:web:e55cfe193714bf794eaee2",
+          measurementId: "G-GCNF98G56E"
+        };
+
+        const app1 = firebase.initializeApp(firebaseConfig1, "APP1");
+        const app2 = firebase.initializeApp(firebaseConfig2, "APP2");
+
+        const ptDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+        const ptHour = ptDate.getHours();
+        
+        const useApp1Default = (ptHour >= 0 && ptHour < 2);
+		
+        let activeApp = useApp1Default ? app1 : app2;
+        let db = activeApp.firestore();
+        let auth = activeApp.auth();
 
         const CATEGORY_ICONS = {
             Supercell: "https://twitch.supercell.com/supercell-logo.png",
@@ -4209,27 +4227,55 @@
                 setLobbyId(newLobbyId);
             };
 
-            const handleJoinLobby = async (lobbyId, password, username) => {
+            const handleJoinLobby = async (lobbyIdToJoin, password, username) => {
                 if (audioManagerRef.current) audioManagerRef.current.unlockAudio();
-                const lobbyRef = db.collection('lobbies').doc(lobbyId);
-                const lobbyDoc = await lobbyRef.get();
-                if (!lobbyDoc.exists) throw new Error('Lobby not found.');
+                
+                let targetDb = db;
+                let lobbyRef = targetDb.collection('lobbies').doc(lobbyIdToJoin);
+                let lobbyDoc = await lobbyRef.get();
+                
+                if (!lobbyDoc.exists) {
+                    const otherApp = activeApp === app1 ? app2 : app1;
+                    const otherDb = otherApp.firestore();
+                    const otherLobbyRef = otherDb.collection('lobbies').doc(lobbyIdToJoin);
+                    const otherLobbyDoc = await otherLobbyRef.get();
+                    
+                    if (otherLobbyDoc.exists) {
+                        activeApp = otherApp;
+                        db = otherDb;
+                        auth = activeApp.auth();
+                        
+                        if (!auth.currentUser) {
+                            await auth.signInAnonymously();
+                        }
+                        setUser(auth.currentUser);
+                        
+                        targetDb = db;
+                        lobbyRef = otherLobbyRef;
+                        lobbyDoc = otherLobbyDoc;
+                    } else {
+                        throw new Error('Lobby not found.');
+                    }
+                }
+                
                 const data = lobbyDoc.data();
                 if (data.password !== password) throw new Error('Incorrect password.');
                 if (data.gameState !== 'waiting') throw new Error('Game is already in progress.');
 
                 const playersSnapshot = await lobbyRef.collection('players').get();
-                if (playersSnapshot.docs.some(doc => doc.id === user.uid)) {
-                    setLobbyId(lobbyId);
+                const currentUid = auth.currentUser.uid; 
+                
+                if (playersSnapshot.docs.some(doc => doc.id === currentUid)) {
+                    setLobbyId(lobbyIdToJoin);
                     return;
                 }
                 if (playersSnapshot.docs.map(doc => doc.data().name).includes(username)) throw new Error('Username is already taken.');
                 
-                await lobbyRef.collection('players').doc(user.uid).set({
+                await lobbyRef.collection('players').doc(currentUid).set({
                     name: username,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                setLobbyId(lobbyId);
+                setLobbyId(lobbyIdToJoin);
             };
             
              const handleStartGameOnline = async () => {
