@@ -4237,18 +4237,21 @@
                 if (!lobbyDoc.exists) {
                     const otherApp = activeApp === app1 ? app2 : app1;
                     const otherDb = otherApp.firestore();
+                    const otherAuth = otherApp.auth();
+                    
+                    if (!otherAuth.currentUser) {
+                        await otherAuth.signInAnonymously();
+                    }
+                    
                     const otherLobbyRef = otherDb.collection('lobbies').doc(lobbyIdToJoin);
                     const otherLobbyDoc = await otherLobbyRef.get();
                     
                     if (otherLobbyDoc.exists) {
                         activeApp = otherApp;
                         db = otherDb;
-                        auth = activeApp.auth();
+                        auth = otherAuth;
                         
-                        if (!auth.currentUser) {
-                            await auth.signInAnonymously();
-                        }
-                        setUser(auth.currentUser);
+                        setUser(auth.currentUser); 
                         
                         targetDb = db;
                         lobbyRef = otherLobbyRef;
