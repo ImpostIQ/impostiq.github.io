@@ -1465,19 +1465,22 @@
             };
 
             const handleCopyInvite = async () => {
+				if (!me) return;
+
+				const inviterName = me.name;
 				const inviteCode = encodeInviteCode(lobbyId, lobbyData.password);
 				const inviteLink = `${window.location.origin}${window.location.pathname}?invite=${inviteCode}`;
 				audioManager.playSound('uiClick');
 
-				let shareTitle = 'Impostiq Game Invite';
-				let shareText = `Join my Impostiq game! Invite Code: ${inviteCode}\nOr manually enter Lobby ID: ${lobbyId}`;
+				let shareTitle = `${inviterName} has invited you to Impostiq!`;
+				let shareText = `${inviterName} is challenging you to a game of Impostiq! 🕵🏻 Think you can find the spy before time runs out?`;
 
 				if (season === 'christmas') {
-					shareTitle = '🎁 Festive Impostiq Invite';
-					shareText = `The North Pole has a traitor! 🎅🏻\n\nJoin my game and help us find the Grinch before he steals the presents.\n\n📍 Invite Code: ${inviteCode}`;
+					shareTitle = '🎁 A Festive Mission Awaits!';
+					shareText = `It's ${inviterName}! 🎅🏻 The North Pole has a traitor, and I need your help to find the Grinch before they steal all the presents. Join the hunt!`;
 				} else if (season === 'halloween') {
-					shareTitle = '🎃 Spooky Impostiq Invite';
-					shareText = `Something is lurking in the shadows... 👻\n\nCan you find the ghost before it's too late?\n\n📍 Invite Code: ${inviteCode}`;
+					shareTitle = '🎃 A Spooky Summons!';
+					shareText = `${inviterName} needs your help! 👻 Something is lurking in the shadows... Join my spooky Impostiq game and help us unmask the ghost... if you dare.`;
 				}
 
 				const shareData = {
