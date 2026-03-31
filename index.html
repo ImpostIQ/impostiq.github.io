@@ -1033,7 +1033,7 @@
                 setIsDownloading(true);
                 
                 const link = document.createElement('a');
-                link.href = 'https://www.dropbox.com/scl/fi/rga3pi6nqgy8l8wsmtt6y/Impostiq.apk?rlkey=rr74d13bg1wy90toa4fz00jxi&st=dpwfiv7i&dl=1';
+                link.href = 'https://www.dropbox.com/scl/fi/2e3f7q22ndjofutyi02gn/Impostiq.apk?rlkey=ea7i9t02ntbaqno778en3dand&st=xj4t9k7x&dl=1';
                 link.download = 'Impostiq.apk';
                 document.body.appendChild(link);
                 link.click();
@@ -1310,7 +1310,8 @@
         };
 
 		const QRCodeModal = ({ lobbyId, password, onClose, audioManager, season }) => {
-			const inviteLink = `${window.location.origin}${window.location.pathname}?lobbyId=${lobbyId}&password=${password}`;
+            const inviteCode = encodeInviteCode(lobbyId, password);
+			const inviteLink = `${window.location.origin}${window.location.pathname}?invite=${inviteCode}`;
 			
             let qrColor = "d8dde3"; 
             let qrBgColor = "0d121f";
@@ -1464,18 +1465,19 @@
             };
 
             const handleCopyInvite = async () => {
-                const inviteLink = `${window.location.origin}${window.location.pathname}?lobbyId=${lobbyId}&password=${lobbyData.password}`;
+                const inviteCode = encodeInviteCode(lobbyId, lobbyData.password);
+                const inviteLink = `${window.location.origin}${window.location.pathname}?invite=${inviteCode}`;
                 audioManager.playSound('uiClick');
 
                 let shareTitle = 'Impostiq Game Invite';
-                let shareText = `Join my Impostiq game! Lobby ID: ${lobbyId}`;
+                let shareText = `Join my Impostiq game! Invite Code: ${inviteCode}\nOr manually enter Lobby ID: ${lobbyId}`;
 
                 if (season === 'christmas') {
                     shareTitle = '🎁 Festive Impostiq Invite';
-                    shareText = `The North Pole has a traitor! 🎅🏻\n\nJoin my game and help us find the Grinch before he steals the presents.\n\n📍 Lobby ID: ${lobbyId}`;
+                    shareText = `The North Pole has a traitor! 🎅🏻\n\nJoin my game and help us find the Grinch before he steals the presents.\n\n📍 Invite Code: ${inviteCode}`;
                 } else if (season === 'halloween') {
                     shareTitle = '🎃 Spooky Impostiq Invite';
-                    shareText = `Something is lurking in the shadows... 👻\n\nCan you find the ghost before it's too late?\n\n📍 Lobby ID: ${lobbyId}`;
+                    shareText = `Something is lurking in the shadows... 👻\n\nCan you find the ghost before it's too late?\n\n📍 Invite Code: ${inviteCode}`;
                 }
 
                 const shareData = {
@@ -3499,8 +3501,34 @@
             return result;
         };
 
-        const generateLobbyId = () => generateRandomString(6, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789');
-        const generateLobbyPassword = () => generateRandomString(4, 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789');
+        const LOBBY_ALPHABET = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789'; 
+        const generateLobbyId = () => generateRandomString(6, LOBBY_ALPHABET);
+        const generateLobbyPassword = () => generateRandomString(4, LOBBY_ALPHABET);
+
+        const encodeInviteCode = (lobbyId, password) => {
+            let combined = 0;
+            const fullStr = lobbyId + password;
+            // Mathematically combine 10 characters into one massive Integer
+            for (let i = 0; i < 10; i++) {
+                combined = combined * 34 + LOBBY_ALPHABET.indexOf(fullStr[i]);
+            }
+            return combined.toString(36).toUpperCase().padStart(10, '0');
+        };
+
+        const decodeInviteCode = (code) => {
+            if (!code || code.length !== 10) return null;
+            let combined = parseInt(code, 36);
+            if (isNaN(combined)) return null;
+            let str = '';
+            // Unpack the Integer back into the original 10 characters
+            for (let i = 0; i < 10; i++) {
+                const char = LOBBY_ALPHABET[combined % 34];
+                if (!char) return null; 
+                str = char + str;
+                combined = Math.floor(combined / 34);
+            }
+            return { lobbyId: str.slice(0, 6), password: str.slice(6, 10) };
+        };
 
         const useMediaQuery = (query) => {
             const [matches, setMatches] = React.useState(false);
@@ -3865,10 +3893,18 @@
 
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
-                const lobbyIdParam = params.get('lobbyId');
-                const passwordParam = params.get('password');
-                if (lobbyIdParam) {
-                    setInitialLobbyParams({ lobbyId: lobbyIdParam, password: passwordParam || '' });
+                const inviteCode = params.get('invite');
+                const oldLobbyId = params.get('lobbyId'); 
+                const oldPassword = params.get('password');
+                
+                if (inviteCode && inviteCode.length === 10) {
+                    const decoded = decodeInviteCode(inviteCode);
+                    if (decoded) {
+                        setInitialLobbyParams({ lobbyId: decoded.lobbyId, password: decoded.password });
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                } else if (oldLobbyId) {
+                    setInitialLobbyParams({ lobbyId: oldLobbyId, password: oldPassword || '' });
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 
