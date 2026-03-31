@@ -1465,40 +1465,48 @@
             };
 
             const handleCopyInvite = async () => {
-                const inviteCode = encodeInviteCode(lobbyId, lobbyData.password);
-                const inviteLink = `${window.location.origin}${window.location.pathname}?invite=${inviteCode}`;
-                audioManager.playSound('uiClick');
+				const inviteCode = encodeInviteCode(lobbyId, lobbyData.password);
+				const inviteLink = `${window.location.origin}${window.location.pathname}?invite=${inviteCode}`;
+				audioManager.playSound('uiClick');
 
-                let shareTitle = 'Impostiq Game Invite';
-                let shareText = `Join my Impostiq game! Invite Code: ${inviteCode}\nOr manually enter Lobby ID: ${lobbyId}`;
+				let shareTitle = 'Impostiq Game Invite';
+				let shareText = `Join my Impostiq game! Invite Code: ${inviteCode}\nOr manually enter Lobby ID: ${lobbyId}`;
 
-                if (season === 'christmas') {
-                    shareTitle = '🎁 Festive Impostiq Invite';
-                    shareText = `The North Pole has a traitor! 🎅🏻\n\nJoin my game and help us find the Grinch before he steals the presents.\n\n📍 Invite Code: ${inviteCode}`;
-                } else if (season === 'halloween') {
-                    shareTitle = '🎃 Spooky Impostiq Invite';
-                    shareText = `Something is lurking in the shadows... 👻\n\nCan you find the ghost before it's too late?\n\n📍 Invite Code: ${inviteCode}`;
-                }
+				if (season === 'christmas') {
+					shareTitle = '🎁 Festive Impostiq Invite';
+					shareText = `The North Pole has a traitor! 🎅🏻\n\nJoin my game and help us find the Grinch before he steals the presents.\n\n📍 Invite Code: ${inviteCode}`;
+				} else if (season === 'halloween') {
+					shareTitle = '🎃 Spooky Impostiq Invite';
+					shareText = `Something is lurking in the shadows... 👻\n\nCan you find the ghost before it's too late?\n\n📍 Invite Code: ${inviteCode}`;
+				}
 
-                const shareData = {
-                    title: shareTitle,
-                    text: shareText,
-                    url: inviteLink
-                };
+				const shareData = {
+					title: shareTitle,
+					text: shareText,
+					url: inviteLink
+				};
 
-                if (navigator.share) {
-                    try {
-                        await navigator.share(shareData);
-                    } catch (err) {
-                        console.log('Share failed or canceled:', err);
-                    }
-                } else {
-                    navigator.clipboard.writeText(inviteLink).then(() => {
-                        setShowCopied(true);
-                        setTimeout(() => setShowCopied(false), 2000);
-                    }).catch(err => console.error("Clipboard failed", err));
-                }
-            };
+				if (window.median && window.median.share && window.median.share.sharePage) {
+					window.median.share.sharePage({
+						url: inviteLink,
+						title: shareTitle,
+						text: shareText
+					});
+				}
+				else if (navigator.share) {
+					try {
+						await navigator.share(shareData);
+					} catch (err) {
+						console.log('Share failed or canceled:', err);
+					}
+				} 
+				else {
+					navigator.clipboard.writeText(inviteLink).then(() => {
+						setShowCopied(true);
+						setTimeout(() => setShowCopied(false), 2000);
+					}).catch(err => console.error("Clipboard failed", err));
+				}
+			};
 
             const handleRemovePlayer = (playerId) => {
                 if (isHost && user.uid !== playerId) {
