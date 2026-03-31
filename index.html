@@ -416,7 +416,7 @@
         const ptDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
         const ptHour = ptDate.getHours();
         
-        const useApp1Default = (ptHour >= 0 && ptHour < 2);
+        const useApp1Default = (ptHour >= 0 && ptHour < 12);
 		
         let activeApp = useApp1Default ? app1 : app2;
         let db = activeApp.firestore();
