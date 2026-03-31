@@ -5,9 +5,9 @@
     ],
     "target": {
       "namespace": "android_app",
-      "package_name": "co.median.android.jbwrnrx",
+      "package_name": "co.median.android.dyaywap",
       "sha256_cert_fingerprints": [
-        "45:27:74:3B:96:B7:72:7C:01:29:A4:E6:2F:2B:A1:F8:EC:20:03:EB:D2:58:5C:10:0E:9E:C1:74:DB:8F:90:8D"
+        "14:4D:9F:D0:47:CE:05:80:B2:1D:17:CC:CD:5F:9F:7F:CB:23:CD:9E:9F:38:26:C8:AB:F3:25:9D:7C:37:87:3C"
       ]
     }
   }
