@@ -307,6 +307,31 @@
             33% { transform: translate(30px, -50px) scale(1.1); }
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
+        .liquid-blob {
+            position: absolute;
+            filter: blur(40px);
+            mix-blend-mode: screen;
+            animation-iteration-count: infinite;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes liquid-flow-1 {
+            0% { transform: translate(0%, 0%) scale(1) rotate(0deg); border-radius: 43% 57% 65% 35% / 46% 54% 46% 54%; }
+            33% { transform: translate(15%, -15%) scale(1.1) rotate(120deg); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            66% { transform: translate(-10%, 15%) scale(0.95) rotate(240deg); border-radius: 30% 70% 70% 30% / 30% 60% 40% 70%; }
+            100% { transform: translate(0%, 0%) scale(1) rotate(360deg); border-radius: 43% 57% 65% 35% / 46% 54% 46% 54%; }
+        }
+        @keyframes liquid-flow-2 {
+            0% { transform: translate(0%, 0%) scale(0.95) rotate(0deg); border-radius: 54% 46% 35% 65% / 40% 65% 35% 60%; }
+            33% { transform: translate(-15%, 15%) scale(1.05) rotate(-120deg); border-radius: 40% 60% 70% 30% / 50% 40% 60% 50%; }
+            66% { transform: translate(15%, -5%) scale(1) rotate(-240deg); border-radius: 70% 30% 40% 60% / 30% 70% 30% 70%; }
+            100% { transform: translate(0%, 0%) scale(0.95) rotate(-360deg); border-radius: 54% 46% 35% 65% / 40% 65% 35% 60%; }
+        }
+        @keyframes liquid-flow-3 {
+            0% { transform: translate(0%, 0%) scale(1.05) rotate(0deg); border-radius: 30% 70% 40% 60% / 60% 30% 70% 40%; }
+            33% { transform: translate(10%, 15%) scale(0.95) rotate(90deg); border-radius: 60% 40% 70% 30% / 40% 70% 30% 60%; }
+            66% { transform: translate(-15%, -10%) scale(1) rotate(180deg); border-radius: 40% 60% 30% 70% / 70% 40% 60% 30%; }
+            100% { transform: translate(0%, 0%) scale(1.05) rotate(360deg); border-radius: 30% 70% 40% 60% / 60% 30% 70% 40%; }
+        }
         
 		.timer-slider::-webkit-slider-runnable-track {
 		  width: 100%;
@@ -496,7 +521,7 @@
             startMission: "https://impostiq.github.io/sound/startmiss.mp3",
             startRandomMission: "https://impostiq.github.io/sound/startrandmiss.mp3",
             selectCategory: "https://impostiq.github.io/sound/selectcat.mp3",
-            deselectCategory: "https://www.dropbox.com/scl/fi/z9s27e8cx9zi4c9yg9zs9/01HWD5XAR2DPE0H1ZXJCBMF4MX.mp3?rlkey=54rmyfgzcntew0e0qy1lbf98z&raw=1",
+            deselectCategory: "https://impostiq.github.io/sound/deselectcat.mp3",
             playAgain: "https://impostiq.github.io/sound/playagain.mp3",
             switchOn: "https://impostiq.github.io/sound/switchon.mp3",
             switchOff: "https://impostiq.github.io/sound/switchoff.mp3",
@@ -838,7 +863,7 @@
 
 
 			return (
-				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+				<div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-fadeIn">
 					<div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose}></div>
 					<div className="relative w-full max-w-lg h-[90vh] glass-panel rounded-3xl border border-white/10 shadow-2xl animate-slide-up flex flex-col">
 						<div className="flex-shrink-0 p-6 flex items-center justify-between border-b border-white/10">
@@ -1407,13 +1432,187 @@
 			);
 		};
 
+        const CategorySelectionModal = ({ isOpen, onClose, isOnline, displayCategories, onSelect, currentSelection, voteCounts, onInspect, audioManager, season }) => {
+            if (!isOpen) return null;
+
+            const allOptions = ['Mystery Mode', ...displayCategories];
+            const categoryLongPressTimerRef = useRef(null);
+            const isLongPressRef = useRef(false);
+
+            const handleTouchStart = (cat) => {
+                // Reset the long press state for EVERY touch first
+                isLongPressRef.current = false; 
+                
+                if (cat === 'Mystery Mode') return;
+                
+                categoryLongPressTimerRef.current = setTimeout(() => {
+                    isLongPressRef.current = true;
+                    onInspect(cat);
+                    audioManager.playSound('openInfo');
+                    if (navigator.vibrate) navigator.vibrate(30);
+                }, 600);
+            };
+
+            const handleTouchEnd = () => {
+                if (categoryLongPressTimerRef.current) {
+                    clearTimeout(categoryLongPressTimerRef.current);
+                    categoryLongPressTimerRef.current = null;
+                }
+            };
+
+            return (
+                <div className="fixed inset-0 z-[55] flex flex-col bg-slate-950/95 backdrop-blur-xl animate-fadeIn">
+                    <div className="flex items-center justify-between p-6 pb-4 border-b border-white/5 bg-slate-900/50">
+                        <div>
+                            <h2 className="text-2xl font-display font-bold text-white">Select Category</h2>
+                            <p className="text-white/40 text-sm mt-1 max-w-xs">{isOnline ? 'Vote for your preferred category. Long press for examples.' : 'Choose the mission theme. Long press for examples.'}</p>
+                        </div>
+                        <button onClick={onClose} className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
+                            <i className="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-6 no-scrollbar relative">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pb-12">
+                            {allOptions.map(cat => {
+                                const isMystery = cat === 'Mystery Mode';
+                                const iconSource = isMystery ? 'https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png' : CATEGORY_ICONS[cat];
+                                const isSelected = currentSelection === cat;
+                                const votes = isOnline && voteCounts ? voteCounts[cat] || 0 : 0;
+                                const isSupercell = cat === 'Supercell';
+                                const isChristmas = cat === 'Christmas';
+                                const isHalloween = cat === 'Halloween';
+                                const isSeasonal = isChristmas || isHalloween;
+
+                                let cardClasses = `relative overflow-hidden flex flex-col items-center justify-center gap-3 p-5 rounded-[1.5rem] transition-all duration-300 group min-h-[120px] border `;
+                                let checkmarkBg = 'bg-teal-500 text-slate-900';
+
+                                if (isChristmas) {
+                                    if (isSelected) {
+                                        cardClasses += 'bg-red-500/10 border-red-500 shadow-[inset_0_0_0_1px_rgba(239,68,68,1)] text-white';
+                                    } else {
+                                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300 backdrop-blur-md';
+                                    }
+                                } else if (isHalloween) {
+                                    if (isSelected) {
+                                        cardClasses += 'bg-orange-500/10 border-orange-500 shadow-[inset_0_0_0_1px_rgba(249,115,22,1)] text-white';
+                                    } else {
+                                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300 backdrop-blur-md';
+                                    }
+                                } else if (isSupercell) {
+                                    if (isSelected) {
+                                        cardClasses += 'bg-blue-500/10 border-blue-500 shadow-[inset_0_0_0_1px_rgba(59,130,246,1)] text-white';
+                                    } else {
+                                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300 backdrop-blur-md';
+                                    }
+                                } else if (isMystery) {
+                                    if (isSelected) {
+                                        cardClasses += 'bg-slate-800/60 border-fuchsia-400 shadow-[inset_0_0_0_1px_rgba(232,121,249,1)] text-white';
+                                    } else {
+                                        cardClasses += 'bg-slate-800/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] text-slate-400 hover:bg-white/5 hover:border-white/10 backdrop-blur-md';
+                                    }
+                                } else {
+                                    if (isSelected) {
+                                        cardClasses += 'bg-brand-500/10 border-brand-500 shadow-[inset_0_0_0_1px_rgba(139,92,246,1)] text-white';
+                                    } else {
+                                        cardClasses += 'bg-slate-800/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] text-slate-400 hover:bg-white/5 hover:border-white/10 backdrop-blur-md';
+                                    }
+                                }
+
+                                return (
+                                    <button
+                                        key={cat}
+                                        onClick={(e) => {
+                                            if (isLongPressRef.current) {
+                                                e.preventDefault();
+                                                return; 
+                                            }
+                                            audioManager.playSound(isSelected && isOnline ? 'deselectCategory' : 'selectCategory');
+                                            onSelect(cat);
+                                            if (!isOnline) onClose();
+                                        }}
+                                        onMouseDown={() => handleTouchStart(cat)}
+                                        onMouseUp={handleTouchEnd}
+                                        onMouseLeave={handleTouchEnd}
+                                        onTouchStart={() => handleTouchStart(cat)}
+                                        onTouchEnd={handleTouchEnd}
+                                        onTouchMove={handleTouchEnd}
+                                        className={cardClasses}
+                                    >
+                                        {/* --- BACKGROUNDS --- */}
+                                        {isSupercell && (
+                                            <div className="supercell-container pointer-events-none">
+                                                <div className="supercell-bg-1"></div>
+                                                <div className="supercell-bg-2"></div>
+                                            </div>
+                                        )}
+                                        {isSeasonal && (
+                                            <div 
+                                                className="absolute inset-0 bg-cover bg-center pointer-events-none"
+                                                style={{
+                                                    backgroundImage: isChristmas 
+                                                        ? `url("https://i.ibb.co/sJ5r3z3n/christmasimage.png")`
+                                                        : `url("https://img.freepik.com/free-vector/dark-halloween-background-with-cemetery-scary-pumpkin_23-2148632375.jpg?semt=ais_incoming&w=740&q=80")`
+                                                }}
+                                            ></div>
+                                        )}
+                                        {isMystery && (
+                                            <div className={`absolute inset-0 pointer-events-none overflow-hidden transition-opacity duration-500 ${isSelected ? 'opacity-100' : 'opacity-0'}`}>
+                                                <div 
+                                                    className="liquid-blob top-[-30%] left-[-30%] w-[120%] h-[120%] bg-fuchsia-500/20"
+                                                    style={{ animationName: 'liquid-flow-1', animationDuration: '20s' }}
+                                                ></div>
+                                                <div 
+                                                    className="liquid-blob bottom-[-20%] right-[-30%] w-[130%] h-[130%] bg-cyan-500/20"
+                                                    style={{ animationName: 'liquid-flow-2', animationDuration: '25s', animationDelay: '-5s' }}
+                                                ></div>
+                                                <div 
+                                                    className="liquid-blob top-[-10%] left-[-10%] w-[110%] h-[110%] bg-brand-500/20"
+                                                    style={{ animationName: 'liquid-flow-3', animationDuration: '22s', animationDelay: '-12s' }}
+                                                ></div>
+                                            </div>
+                                        )}
+
+                                        {isOnline && votes > 0 && (
+                                            <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md text-[10px] font-bold text-white flex items-center gap-1.5 shadow-sm border border-white/10 z-20">
+                                                <i className="fa-solid fa-fire text-orange-400"></i> {votes}
+                                            </div>
+                                        )}
+
+                                        <div className="relative z-10 flex flex-col items-center gap-3 transition-transform duration-150 group-active:scale-[0.98]">
+                                            {isMystery ? (
+                                                 <img src={iconSource} alt="Dice" draggable="false" className={`w-10 h-10 transition-transform duration-300 drop-shadow-md ${isSelected ? 'rotate-12 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:rotate-12'}`} />
+                                            ) : (
+                                                <FaIcon 
+                                                    name={iconSource} 
+                                                    sizeClass="text-3xl" 
+                                                    className={`transition-colors duration-300 ${isSupercell || isSeasonal ? "brightness-125" : (isSelected ? "text-brand-400" : "text-slate-500 group-hover:text-slate-300")}`} 
+                                                />
+                                            )}
+                                            <span className={`text-xs font-bold tracking-wide ${isSupercell || isSeasonal || isMystery ? 'text-white' : ''}`}>{cat}</span>
+                                        </div>
+                                    </button>
+                                )
+                            })}
+                        </div>
+                    </div>
+                    {isOnline && (
+                        <div className="p-6 pt-2 bg-slate-900/80 border-t border-white/5 backdrop-blur-xl">
+                            <button onClick={onClose} className="w-full bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-[1.25rem] shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all">
+                                Done
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         const WaitingRoom = ({ lobbyData, lobbyPlayers, user, lobbyId, onStartGame, onStartMission, onLeaveLobby, audioManager, onConfusionVote, season, displayCategories, wordBank }) => {
             const isHost = user.uid === lobbyData.hostId;
             const MIN_PLAYERS = 3;
             const [showCopied, setShowCopied] = useState(false);
             const [inspectedCategory, setInspectedCategory] = useState(null);
-            const categoryLongPressTimerRef = useRef(null);
             const [showQRCode, setShowQRCode] = useState(false);
+            const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
             const pollIsActive = lobbyData.gameState === 'reveal' && lobbyPlayers.some(p => p.status === 'confused');
             
@@ -1428,22 +1627,17 @@
             
             const showConfusionPoll = lobbyData.gameState === 'reveal' && pollIsActive && !isMyRoleImposter && !me?.status;
 
-            const handleCategorySelect = (cat) => {
-                if (isHost && lobbyData.category !== cat) {
-                    db.collection('lobbies').doc(lobbyId).update({ 
-                        category: cat,
-                        lastSoundEvent: { name: 'selectCategory', timestamp: Date.now() }
+            const handleVote = (cat) => {
+                if (me?.categoryVote === cat) {
+                    db.collection('lobbies').doc(lobbyId).collection('players').doc(user.uid).update({
+                        categoryVote: firebase.firestore.FieldValue.delete()
+                    });
+                } else {
+                    db.collection('lobbies').doc(lobbyId).collection('players').doc(user.uid).update({
+                        categoryVote: cat
                     });
                 }
-            };
-
-            const handleModeChange = (newModeIsRandom) => {
-                if (isHost && lobbyData.isRandomMode !== newModeIsRandom) {
-                    db.collection('lobbies').doc(lobbyId).update({ 
-                        isRandomMode: newModeIsRandom,
-                        lastSoundEvent: { name: 'toggleMode', timestamp: Date.now() }
-                    });
-                }
+                if (navigator.vibrate) navigator.vibrate(5);
             };
             
             const handleSettingChange = (settingName, currentValue) => {
@@ -1465,7 +1659,6 @@
                 }
             };
 
-
             const handleTwoImposterToggle = () => {
                 if (isHost && lobbyPlayers.length >= 10) {
                     const newValue = !lobbyData.enableTwoImposters;
@@ -1481,21 +1674,6 @@
                     db.collection('lobbies').doc(lobbyId).update({ enableTwoImposters: false });
                 }
             }, [isHost, lobbyPlayers.length, lobbyData?.enableTwoImposters]);
-
-            const handleCategoryTouchStart = (cat) => {
-                categoryLongPressTimerRef.current = setTimeout(() => {
-                    setInspectedCategory(cat);
-                    audioManager.playSound('openInfo');
-                    if (navigator.vibrate) navigator.vibrate(30);
-                }, 600);
-            };
-
-            const handleCategoryTouchEnd = () => {
-                if (categoryLongPressTimerRef.current) {
-                    clearTimeout(categoryLongPressTimerRef.current);
-                    categoryLongPressTimerRef.current = null;
-                }
-            };
 
             const handleCopyInvite = async () => {
 				if (!me) return;
@@ -1551,9 +1729,50 @@
                 }
             };
 
+            const voteCounts = {};
+            lobbyPlayers.forEach(p => {
+                if (p.categoryVote) voteCounts[p.categoryVote] = (voteCounts[p.categoryVote] || 0) + 1;
+            });
+            const maxVotes = Math.max(0, ...Object.values(voteCounts));
+            const leaders = Object.keys(voteCounts).filter(k => voteCounts[k] === maxVotes);
+            
+            let displayTitle = "Mystery Mode";
+            let displayIcon = "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png";
+            let isFaIcon = false;
+
+            if (maxVotes === 0) {
+                displayTitle = "Mystery Mode (Default)";
+                displayIcon = "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png";
+            } else if (leaders.length > 1) {
+                displayTitle = "Tie! (Random resolving)";
+                displayIcon = "fa-solid fa-scale-balanced";
+                isFaIcon = true;
+            } else {
+                displayTitle = leaders[0];
+                if (displayTitle === 'Mystery Mode') {
+                    displayIcon = "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png";
+                } else {
+                    displayIcon = CATEGORY_ICONS[displayTitle];
+                }
+            }
+
             return (
                  <div className="flex flex-col h-[100dvh] relative z-10">
                     <CategoryInfoModal category={inspectedCategory} onClose={() => setInspectedCategory(null)} wordBank={wordBank} />
+                    
+                    <CategorySelectionModal 
+                        isOpen={isCategoryModalOpen}
+                        onClose={() => setIsCategoryModalOpen(false)}
+                        isOnline={true}
+                        displayCategories={displayCategories}
+                        onSelect={handleVote}
+                        currentSelection={me?.categoryVote}
+                        voteCounts={voteCounts}
+                        onInspect={setInspectedCategory}
+                        audioManager={audioManager}
+                        season={season}
+                    />
+
                     {showQRCode && <QRCodeModal lobbyId={lobbyId} password={lobbyData.password} onClose={() => setShowQRCode(false)} audioManager={audioManager} season={season} />}
                     {showConfusionPoll && <ConfusionPollModal onVote={onConfusionVote} />}
                     
@@ -1581,15 +1800,14 @@
 							</div>
                             
 							<section className="mb-6 glass-panel rounded-[2rem] p-6">
-								<div className="flex items-stretch text-center">
-									<div className="w-1/2 pr-3">
+								<div className="flex items-stretch gap-3 text-center">
+									<div className="flex-1 bg-black/20 rounded-xl p-3 border border-white/5">
 										<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Lobby ID</div>
-										<div className="font-mono text-2xl font-bold tracking-widest">{lobbyId}</div>
+										<div className="font-mono text-2xl font-bold tracking-widest text-white">{lobbyId}</div>
 									</div>
-									<div className="w-px bg-white/10"></div>
-									<div className="w-1/2 pl-3">
+									<div className="flex-1 bg-black/20 rounded-xl p-3 border border-white/5">
 										<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Password</div>
-										<div className="font-mono text-2xl font-bold tracking-widest">{lobbyData.password}</div>
+										<div className="font-mono text-2xl font-bold tracking-widest text-white">{lobbyData.password}</div>
 									</div>
 								</div>
 								<div className="flex items-center gap-4 mt-4">
@@ -1614,21 +1832,28 @@
                                         const hasAcknowledgedCard = !!p.hasSeenCard;
 
                                         return (
-                                            <div key={p.id} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${p.id === user.uid ? 'bg-white/10' : 'bg-white/5'}`}>
-                                                <i className={`fa-solid ${p.id === lobbyData.hostId ? 'fa-crown text-yellow-400' : 'fa-user-secret text-white/40'}`}></i>
-                                                <PlayerAvatar name={p.name} className="w-6 h-6 rounded-full"/>
-                                                <span className="font-bold text-white/90 truncate">{p.name}</span>
+                                            <div key={p.id} className={`flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-xl border transition-all ${p.id === user.uid ? 'bg-white/10 border-white/10 shadow-sm' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
+                                                <div className="w-5 flex items-center justify-center flex-shrink-0">
+                                                    <i className={`fa-solid ${p.id === lobbyData.hostId ? 'fa-crown text-yellow-400 text-sm drop-shadow-md' : 'fa-user-secret text-white/20 text-sm'}`}></i>
+                                                </div>
+                                                <PlayerAvatar name={p.name} className="w-7 h-7 rounded-full flex-shrink-0"/>
+                                                <span className={`font-bold truncate ${p.id === user.uid ? 'text-white' : 'text-white/80'}`}>{p.name}</span>
+                                                
                                                 {(lobbyData.gameState === 'reveal' || lobbyData.gameState === 'turnOrder') && (
-                                                    <span className="ml-auto text-xs font-bold flex items-center gap-2">
+                                                    <span className="ml-auto flex-shrink-0 flex items-center justify-center w-8 h-8">
                                                         {hasAcknowledgedCard ? 
-                                                            <i className="fa-solid fa-check-circle text-green-400 animate-fadeIn"></i> :
-                                                            <i className="fa-solid fa-ellipsis text-white/30"></i>
+                                                            <i className="fa-solid fa-check-circle text-green-400 text-lg animate-fadeIn"></i> :
+                                                            <i className="fa-solid fa-ellipsis text-white/30 text-lg"></i>
                                                         }
                                                     </span>
                                                 )}
+                                                
                                                 {isHost && p.id !== user.uid && lobbyData.gameState === 'waiting' && (
-                                                    <button onClick={() => handleRemovePlayer(p.id)} className="ml-auto w-8 h-8 flex items-center justify-center rounded-full text-white/40 hover:bg-red-500/20 hover:text-red-400 transition-colors">
-                                                        <i className="fa-solid fa-trash-can text-xs"></i>
+                                                    <button 
+                                                        onClick={() => handleRemovePlayer(p.id)} 
+                                                        className="ml-auto w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full text-white/30 hover:bg-red-500/20 hover:text-red-400 transition-all active:scale-90"
+                                                    >
+                                                        <i className="fa-solid fa-trash-can text-sm"></i>
                                                     </button>
                                                 )}
                                             </div>
@@ -1639,206 +1864,120 @@
                             
                             {lobbyData.gameState === 'waiting' && (
                                 <>
-                                 <section className="mb-6 glass-panel rounded-[2rem] p-6 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <div className="pr-4">
-                                            <h3 className="font-bold text-white/90 text-base flex items-center gap-3">
-                                                <i className="fa-solid fa-masks-theater text-yellow-400/80 w-5 text-center"></i>
-                                                <span>Fake Word Mode</span>
-                                            </h3>
-                                            <p className="text-white/40 text-xs mt-1 pl-8">One agent gets a different word. They don't know it's fake.</p>
-                                        </div>
-                                        <button 
-                                            onClick={() => handleSettingChange('isFakeWordMode', lobbyData.isFakeWordMode)}
-                                            disabled={!isHost}
-                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
-                                        >
-                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.isFakeWordMode ? 'translate-x-5' : 'translate-x-0'}`} />
-                                        </button>
-                                    </div>
-                                    <div className="h-px bg-white/10"></div>
-                                    <div 
-                                        className={`flex items-center justify-between transition-opacity duration-300 ${(lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) ? 'opacity-50' : ''}`}
-                                        title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (lobbyPlayers.length < 10 ? "Requires 10 or more players" : "Add a second spy to the mission")}
-                                    >
-                                        <div className="pr-4">
-                                            <h3 className="font-bold text-white/90 text-base flex items-center gap-3">
-                                                <i className="fa-solid fa-user-secret text-orange-400/80 w-5 text-center"></i>
-                                                <span>{lobbyData.isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</span>
-                                            </h3>
-                                            <p className="text-white/40 text-xs mt-1 pl-8">Adds a second rogue agent when 10 or more agents are in the lobby.</p>
-                                        </div>
-                                        <button 
-                                            onClick={() => handleSettingChange('enableTwoImposters', lobbyData.enableTwoImposters)}
-                                            disabled={!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode}
-                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${(!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
-                                        >
-                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.enableTwoImposters ? 'translate-x-5' : 'translate-x-0'}`} />
-                                        </button>
-                                    </div>
-                                    <div className="h-px bg-white/10"></div>
-                                     <div className={`flex items-center justify-between transition-opacity duration-300 ${lobbyData.isFakeWordMode ? 'opacity-50' : ''}`} title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : ""}>
-                                        <div className="pr-4">
-                                            <h3 className="font-bold text-red-400/90 text-base flex items-center gap-3">
-                                                <i className="fa-solid fa-bell text-red-400/80 w-5 text-center"></i>
-                                                <span>Notify Imposter on Vote</span>
-                                            </h3>
-                                            <p className="text-white/40 text-xs mt-1 pl-8">Shows a pop-up to the Imposter if an agent initiates a word-check.</p>
-                                        </div>
-                                        <button 
-                                            onClick={() => handleSettingChange('notifyImposterOnVote', lobbyData.notifyImposterOnVote)}
-                                            disabled={!isHost || lobbyData.isFakeWordMode}
-                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.notifyImposterOnVote ? 'bg-red-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'opacity-50 cursor-not-allowed'}`}
-                                        >
-                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.notifyImposterOnVote ? 'translate-x-5' : 'translate-x-0'}`} />
-                                        </button>
-                                    </div>
-                                    <div className="h-px bg-white/10"></div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="pr-4">
-                                            <h3 className="font-bold text-white/90 text-base flex items-center gap-3">
-                                                <i className="fa-solid fa-volume-high text-purple-400/80 w-5 text-center"></i>
-                                                <span>Speak Category</span>
-                                            </h3>
-                                            <p className="text-white/40 text-xs mt-1 pl-8">Announces the chosen category name when the mission begins.</p>
-                                        </div>
-                                        <button 
-                                            onClick={() => handleSettingChange('speakCategory', lobbyData.speakCategory)}
-                                            disabled={!isHost}
-                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.speakCategory ? 'bg-purple-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
-                                        >
-                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.speakCategory ? 'translate-x-5' : 'translate-x-0'}`} />
-                                        </button>
-                                    </div>
-                                 </section>
-                                <section>
-                                    <div className="flex items-center justify-between mb-4 px-2">
-                                        <h2 className="text-sm font-bold tracking-widest text-teal-400 flex items-center gap-2 uppercase">
-                                            <i className="fa-solid fa-layer-group"></i> Mission
+                                <section className="mb-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h2 className="text-sm font-bold tracking-widest text-brand-400 flex items-center gap-2 uppercase">
+                                            <i class="fa-solid fa-gear"></i> Settings
                                         </h2>
-                                        <div className={`relative flex bg-slate-950/50 p-1 rounded-lg border border-white/5 w-44 ${!isHost && 'opacity-50 pointer-events-none'}`}>
-                                            <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md pointer-events-none transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform ${lobbyData.isRandomMode ? 'translate-x-full' : 'translate-x-0'}`}>
-                                                <div className={`absolute inset-0 rounded-md bg-white/15 transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${lobbyData.isRandomMode ? 'opacity-0' : 'opacity-100'}`}></div>
-                                                <div className={`absolute inset-0 rounded-md bg-gradient-to-r from-brand-500 to-fuchsia-500 shadow-[0_2px_10px_rgba(139,92,246,0.3)] transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${lobbyData.isRandomMode ? 'opacity-100' : 'opacity-0'}`}></div>
-                                            </div>
-                                            <button 
-                                                onClick={() => handleModeChange(false)}
-                                                className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${!lobbyData.isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
-                                            >
-                                                Select
-                                            </button>
-                                            <button 
-                                                onClick={() => handleModeChange(true)}
-                                                className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${lobbyData.isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
-                                            >
-                                                Random
-                                            </button>
-                                        </div>
+                                        {maxVotes > 0 && (
+                                            <span className="text-[10px] bg-brand-500/20 text-brand-300 px-2 py-1 rounded-md font-bold">
+                                                {maxVotes} VOTE{maxVotes !== 1 ? 'S' : ''} LEAD
+                                            </span>
+                                        )}
                                     </div>
-                                    {lobbyData.isRandomMode ? (
-                                        <div className="glass-panel rounded-[2rem] p-8 text-center animate-fadeIn border border-brand-500/20 relative overflow-hidden group">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-fuchsia-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
-                                            <div className="relative z-10 py-8">
-                                                <div className="w-24 h-24 mx-auto bg-gradient-to-br from-brand-500 to-fuchsia-600 rounded-3xl rotate-12 flex items-center justify-center shadow-lg shadow-brand-900/40 mb-6 group-hover:rotate-[20deg] group-hover:scale-110 transition-transform duration-500">
-                                                    <img src="https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png" alt="Dice" draggable="false" className="w-16 h-16 drop-shadow-md" />
-                                                </div>
-                                                <h3 className="text-2xl font-display font-bold text-white mb-2">Mystery Mode</h3>
-                                                <p className="text-white/50 text-sm max-w-[200px] mx-auto leading-relaxed">
-                                                    The system will automatically select a random category for your mission.
-                                                </p>
-                                            </div>
+                                    <button
+                                        onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
+                                        className="w-full glass-panel hover:bg-white/5 border border-white/10 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
+                                    >
+                                        <div className="w-14 h-14 rounded-2xl bg-brand-500/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                                            {isFaIcon ? (
+                                                <i className={`${displayIcon} text-2xl text-yellow-400 drop-shadow-md`}></i>
+                                            ) : (
+                                                displayTitle === 'Mystery Mode' || displayTitle === 'Mystery Mode (Default)' ? (
+                                                    <img src={displayIcon} alt="Random" className="w-8 h-8 drop-shadow-md" />
+                                                ) : (
+                                                    <FaIcon name={displayIcon} sizeClass="text-3xl" className="text-brand-400 drop-shadow-md" />
+                                                )
+                                            )}
                                         </div>
-                                    ) : (
-                                        <div className={`grid grid-cols-2 sm:grid-cols-3 gap-3 ${!isHost && 'opacity-60'}`}>
-											{displayCategories.map(cat => {
-												const iconSource = CATEGORY_ICONS[cat];
-												const isSelected = lobbyData.category === cat;
-												const isSupercell = cat === 'Supercell';
-												const isChristmas = cat === 'Christmas';
-												const isHalloween = cat === 'Halloween';
-												const isSeasonal = isChristmas || isHalloween;
-												
-												let cardClasses = `relative overflow-hidden flex flex-col items-center justify-center gap-3 p-4 rounded-[1.5rem] border transition-all duration-300 active:scale-95 group min-h-[110px] `;
-												let checkmarkBg = 'bg-teal-500 text-slate-900';
-
-												if (isChristmas) {
-													if (isSelected) {
-														cardClasses += 'border-red-400 bg-red-900/20 ring-red-500 shadow-lg shadow-red-900/40 text-white';
-														checkmarkBg = 'bg-red-500 text-white';
-													} else {
-														cardClasses += 'border-white/10 bg-slate-900/40 opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-													}
-												} else if (isHalloween) {
-													if (isSelected) {
-														cardClasses += 'border-orange-400 bg-orange-900/20 ring-orange-500 shadow-lg shadow-orange-900/40 text-white';
-														 checkmarkBg = 'bg-orange-500 text-white';
-													} else {
-														cardClasses += 'border-white/10 bg-slate-900/40 opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-													}
-												} else if (isSupercell) {
-													if (isSelected) {
-														cardClasses += 'border-blue-400 bg-blue-900/20 ring-blue-500 shadow-lg shadow-blue-900/40 text-white';
-														checkmarkBg = 'bg-blue-500 text-white';
-													} else {
-														cardClasses += 'border-white/10 bg-slate-900/40 opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-													}
-												} else {
-													if (isSelected) {
-														cardClasses += 'glass-panel bg-teal-500/10 border-teal-500/40 text-teal-100 shadow-[0_0_20px_rgba(20,184,166,0.1)]';
-													} else {
-														cardClasses += 'glass-panel-lighter border-white/5 text-slate-400 hover:bg-white/5 hover:border-white/10';
-													}
-												}
-
-												return (
-													<button
-														key={cat}
-														onClick={() => handleCategorySelect(cat)}
-														onMouseDown={() => handleCategoryTouchStart(cat)}
-														onMouseUp={handleCategoryTouchEnd}
-														onMouseLeave={handleCategoryTouchEnd}
-														onTouchStart={() => handleCategoryTouchStart(cat)}
-														onTouchEnd={handleCategoryTouchEnd}
-														onTouchMove={handleCategoryTouchEnd}
-														className={cardClasses}
-													>
-														{isSupercell && (
-															<div className="supercell-container pointer-events-none">
-																<div className="supercell-bg-1"></div>
-																<div className="supercell-bg-2"></div>
-															</div>
-														)}
-														{isSeasonal && (
-															<div 
-																className="absolute inset-0 bg-cover bg-center pointer-events-none"
-																style={{
-																	backgroundImage: isChristmas 
-																		? `url("https://i.pinimg.com/736x/d5/fb/7f/d5fb7f4ce4b18b147fa210a5299ea66f.jpg")`
-																		: `url("https://picjumbo.com/wp-content/uploads/dark-halloween-background-with-glowing-halloween-pumpkins-free-image.jpeg")`
-																}}
-															></div>
-														)}
-
-														<div className="relative z-10 flex flex-col items-center gap-2">
-															<FaIcon 
-																name={iconSource} 
-																sizeClass="text-2xl" 
-																className={`transition-all duration-300 ${isSupercell || isSeasonal ? "drop-shadow-md brightness-125" : (isSelected ? "text-teal-400 scale-110" : "text-white/40 group-hover:text-white/70")}`} 
-															/>
-															<span className={`text-xs font-bold tracking-wide transition-colors ${isSupercell || isSeasonal ? 'text-white drop-shadow-md' : ''}`}>{cat}</span>
-														</div>
-
-														{isSelected && (
-															<div className={`absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-sm ${checkmarkBg}`}>
-																<i className="fa-solid fa-check"></i>
-															</div>
-														)}
-													</button>
-												)
-											})}
+                                        <div className="text-left flex-1 min-w-0">
+                                            <h3 className="text-white font-display font-bold text-lg truncate">{displayTitle}</h3>
+                                            <p className="text-white/40 text-xs mt-1">{me?.categoryVote ? `You voted for: ${me.categoryVote}` : 'Tap to cast your vote'}</p>
                                         </div>
-                                    )}
+                                        <i className="fa-solid fa-chevron-right text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"></i>
+                                    </button>
                                 </section>
+
+								 <section className="mb-6 space-y-3">
+								 <div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all">
+										<div className="flex items-center gap-4 pr-4">
+											<div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
+												<i className="fa-solid fa-masks-theater text-lg"></i>
+											</div>
+											<div>
+												<h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
+												<p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
+											</div>
+										</div>
+										<button 
+											onClick={() => handleSettingChange('isFakeWordMode', lobbyData.isFakeWordMode)}
+											disabled={!isHost}
+											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
+										>
+											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.isFakeWordMode ? 'translate-x-5' : 'translate-x-0'}`} />
+										</button>
+									</div>
+
+									<div 
+										className={`flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all duration-300 ${(lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) ? 'opacity-50' : ''}`}
+										title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (lobbyPlayers.length < 10 ? "Requires 10 or more players" : "Add a second spy to the mission")}
+									>
+										<div className="flex items-center gap-4 pr-4">
+											<div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
+												<i className="fa-solid fa-user-secret text-lg"></i>
+											</div>
+											<div>
+												<h3 className="font-bold text-white/90 text-sm">{lobbyData.isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
+												<p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10 or more agents are in the lobby.</p>
+											</div>
+										</div>
+										<button 
+											onClick={() => handleSettingChange('enableTwoImposters', lobbyData.enableTwoImposters)}
+											disabled={!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode}
+											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${(!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
+										>
+											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.enableTwoImposters ? 'translate-x-5' : 'translate-x-0'}`} />
+										</button>
+									</div>
+
+									 <div className={`flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'opacity-50' : ''}`} title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : ""}>
+										<div className="flex items-center gap-4 pr-4">
+											<div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
+												<i className="fa-solid fa-bell text-lg"></i>
+											</div>
+											<div>
+												<h3 className="font-bold text-red-400/90 text-sm">Notify Imposter on Vote</h3>
+												<p className="text-white/40 text-xs mt-1 leading-relaxed">Shows a pop-up to the Imposter if an agent initiates a word-check.</p>
+											</div>
+										</div>
+										<button 
+											onClick={() => handleSettingChange('notifyImposterOnVote', lobbyData.notifyImposterOnVote)}
+											disabled={!isHost || lobbyData.isFakeWordMode}
+											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.notifyImposterOnVote ? 'bg-red-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'opacity-50 cursor-not-allowed'}`}
+										>
+											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.notifyImposterOnVote ? 'translate-x-5' : 'translate-x-0'}`} />
+										</button>
+									</div>
+
+									<div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all">
+										<div className="flex items-center gap-4 pr-4">
+											<div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+												<i className="fa-solid fa-volume-high text-lg"></i>
+											</div>
+											<div>
+												<h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
+												<p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
+											</div>
+										</div>
+										<button 
+											onClick={() => handleSettingChange('speakCategory', lobbyData.speakCategory)}
+											disabled={!isHost}
+											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.speakCategory ? 'bg-purple-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
+										>
+											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.speakCategory ? 'translate-x-5' : 'translate-x-0'}`} />
+										</button>
+									</div>
+								 </section>
                                 </>
                             )}
                         </div>
@@ -2087,7 +2226,7 @@
                 );
             }
 
-            if (name.startsWith('http')) {
+            if (name && name.startsWith('http')) {
                 return <img src={name} alt="icon" draggable="false" className={`w-8 h-8 object-contain ${className}`} />;
             }
             return <i className={`fa-solid ${name} ${sizeClass} ${className}`}></i>;
@@ -2126,10 +2265,6 @@
                             <p className="text-white/90 text-sm leading-relaxed">
                                 {examples}{remainingCount > 0 ? `, and ${Math.floor(remainingCount / 10) * 10}+ more` : ''}
                             </p>
-                        </div>
-                        
-                        <div className="mt-6 text-center text-white/30 text-xs">
-                            Tap anywhere to close
                         </div>
                     </div>
                 </div>
@@ -2267,15 +2402,16 @@
             const [selectedCategory, setSelectedCategory] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_category');
-                    return saved ? JSON.parse(saved) : 'Movies';
-                } catch { return 'Movies'; }
-            });
-
-            const [isRandomMode, setIsRandomMode] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('imposter_random_mode');
-                    return saved ? JSON.parse(saved) : false;
-                } catch { return false; }
+                    if (saved) {
+                        const parsedCategory = JSON.parse(saved);
+                        if (parsedCategory === 'Mystery Mode' || displayCategories.includes(parsedCategory)) {
+                            return parsedCategory;
+                        }
+                    }
+                    return 'Mystery Mode';
+                } catch {
+                    return 'Mystery Mode';
+                }
             });
             
             const [speakCategory, setSpeakCategory] = useState(() => {
@@ -2306,6 +2442,7 @@
                 } catch { return true; }
             });
             const [inspectedCategory, setInspectedCategory] = useState(null);
+            const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
             const [enableTwoImposters, setEnableTwoImposters] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_enableTwoImposters');
@@ -2330,12 +2467,10 @@
             const audioChunksRef = useRef([]);
             const micTooltipTimer = useRef(null);
 
-            const categoryLongPressTimerRef = useRef(null);
             const playerPressTimerRef = useRef(null);
             
             useEffect(() => { localStorage.setItem('imposter_players', JSON.stringify(players)); }, [players]);
             useEffect(() => { localStorage.setItem('imposter_category', JSON.stringify(selectedCategory)); }, [selectedCategory]);
-            useEffect(() => { localStorage.setItem('imposter_random_mode', JSON.stringify(isRandomMode)); }, [isRandomMode]);
             useEffect(() => { localStorage.setItem('imposter_speak_category', JSON.stringify(speakCategory)); }, [speakCategory]);
             useEffect(() => { localStorage.setItem('imposter_fake_word_mode', JSON.stringify(isFakeWordMode)); }, [isFakeWordMode]);
 			useEffect(() => { localStorage.setItem('imposter_timerEnabled', JSON.stringify(timerEnabled)); }, [timerEnabled]);
@@ -2352,6 +2487,7 @@
                 if (isRecording) {
                     mediaRecorderRef.current.stop();
                     setIsRecording(false);
+                    if (audioManager) audioManager.resumeAllMusic();
                 } else {
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -2373,6 +2509,7 @@
                             stream.getTracks().forEach(track => track.stop());
                         };
 
+                        if (audioManager) audioManager.pauseAllMusic();
                         mediaRecorder.start();
                         setIsRecording(true);
                         setRecordedAudioData(null);
@@ -2412,26 +2549,8 @@
             };
 
             const handleCategorySelect = (cat) => {
-                if (selectedCategory !== cat) {
-                    audioManager.playSound('selectCategory');
-                }
                 setSelectedCategory(cat);
                 if (navigator.vibrate) navigator.vibrate(5);
-            };
-            
-            const handleCategoryTouchStart = (cat) => {
-                categoryLongPressTimerRef.current = setTimeout(() => {
-                    setInspectedCategory(cat);
-                    audioManager.playSound('openInfo');
-                    if (navigator.vibrate) navigator.vibrate(30);
-                }, 600);
-            };
-
-            const handleCategoryTouchEnd = () => {
-                if (categoryLongPressTimerRef.current) {
-                    clearTimeout(categoryLongPressTimerRef.current);
-                    categoryLongPressTimerRef.current = null;
-                }
             };
             
             const handlePlayerPress = (player) => {
@@ -2460,18 +2579,14 @@
 
             const handleStartClick = () => {
                 if (players.length >= MIN_PLAYERS) {
+                    const isRandomMode = selectedCategory === 'Mystery Mode';
                     if (navigator.vibrate) navigator.vibrate(30);
                     audioManager.playSound(isRandomMode ? 'startRandomMission' : 'startMission');
                     onStartGame(players, isRandomMode ? [] : [selectedCategory], timerEnabled ? timerMinutes * 60 : null, isRandomMode, speakCategory, enableTwoImposters, isFakeWordMode);
                 }
             };
-            
-            const handleModeChange = (newModeIsRandom) => {
-                if (isRandomMode !== newModeIsRandom) {
-                    audioManager.playSound('toggleMode');
-                    setIsRandomMode(newModeIsRandom);
-                }
-            };
+
+            const displayIcon = selectedCategory === 'Mystery Mode' ? "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png" : CATEGORY_ICONS[selectedCategory];
 
             return (
                 <div className="flex flex-col h-[100dvh] relative z-10">
@@ -2480,7 +2595,20 @@
                             <i className="fa-solid fa-chevron-left"></i>
                         </button>
                     </div>
+                    
                     <CategoryInfoModal category={inspectedCategory} onClose={() => setInspectedCategory(null)} wordBank={wordBank} />
+                    
+                    <CategorySelectionModal 
+                        isOpen={isCategoryModalOpen}
+                        onClose={() => setIsCategoryModalOpen(false)}
+                        isOnline={false}
+                        displayCategories={displayCategories}
+                        onSelect={handleCategorySelect}
+                        currentSelection={selectedCategory}
+                        onInspect={setInspectedCategory}
+                        audioManager={audioManager}
+                        season={currentSeason}
+                    />
 
                     <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
                         <div className="max-w-lg mx-auto p-6 pt-28">
@@ -2547,7 +2675,11 @@
                                     {(playersExpanded ? players : players.slice(0, playerDisplayLimit)).map((p, i) => (
                                         <div
                                             key={i}
-                                            className="flex items-center min-w-0 gap-2 bg-white/5 border border-transparent px-3 py-2 rounded-xl animate-fadeIn transition-colors hover:bg-white/10"
+                                            className={`flex items-center min-w-0 gap-2 px-3 py-2 rounded-xl animate-fadeIn transition-all cursor-pointer border ${
+                                                p.audioData 
+                                                    ? 'bg-white/5 border-brand-500/50 hover:bg-brand-500/10' 
+                                                    : 'bg-white/5 border-transparent hover:bg-white/10'
+                                            }`}
                                             onMouseDown={() => handlePlayerPress(p)}
                                             onMouseUp={handlePlayerRelease}
                                             onMouseLeave={handlePlayerRelease}
@@ -2555,16 +2687,17 @@
                                             onTouchEnd={handlePlayerRelease}
                                         >
                                             <PlayerAvatar name={p.name} className="w-6 h-6 rounded-full flex-shrink-0" />
-                                            <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                                                {p.audioData && <i className="fa-solid fa-microphone text-brand-400/70 text-xs flex-shrink-0"></i>}
-                                                <span className="truncate block text-sm font-semibold text-slate-300">{p.name}</span>
+                                            <div className="flex-1 min-w-0 flex items-center">
+                                                <span className={`truncate block text-sm font-semibold ${p.audioData ? 'text-brand-200' : 'text-slate-300'}`}>
+                                                    {p.name}
+                                                </span>
                                             </div>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); removePlayer(i); }}
                                                 disabled={players.length <= MIN_PLAYERS}
                                                 className={`w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-full text-xs transition-colors
                                                     ${players.length > MIN_PLAYERS
-                                                        ? 'bg-white/5 text-white/40 hover:bg-red-500/20 hover:text-red-400'
+                                                        ? (p.audioData ? 'bg-brand-500/10 text-brand-300/70 hover:bg-red-500/20 hover:text-red-400' : 'bg-white/5 text-white/40 hover:bg-red-500/20 hover:text-red-400')
                                                         : 'opacity-20 cursor-not-allowed'
                                                     }`}
                                             >
@@ -2583,14 +2716,35 @@
                                 )}
                             </section>
 
-                            <section className="mb-6 glass-panel rounded-[2rem] p-6 space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="pr-4">
-                                        <h3 className="font-bold text-white/90 text-base flex items-center gap-3">
-                                            <i className="fa-solid fa-masks-theater text-yellow-400/80 w-5 text-center"></i>
-                                            <span>Fake Word Mode</span>
-                                        </h3>
-                                        <p className="text-white/40 text-xs mt-1 pl-8">One agent gets a different word. They don't know it's fake.</p>
+                            <section className="mb-6">
+                                <h2 className="text-sm font-bold tracking-widest text-brand-400 mb-4 flex items-center gap-2 uppercase">
+                                    <i class="fa-solid fa-gear"></i> Settings
+                                </h2>
+                                <button
+                                    onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
+                                    className="w-full glass-panel hover:bg-white/5 border border-white/10 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
+                                >
+                                    <div className="w-14 h-14 rounded-2xl bg-brand-500/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                                        <FaIcon name={displayIcon} sizeClass="text-3xl" className="text-brand-400 drop-shadow-md" />
+                                    </div>
+                                    <div className="text-left flex-1 min-w-0">
+                                        <h3 className="text-white font-display font-bold text-lg truncate">{selectedCategory}</h3>
+                                        <p className="text-white/40 text-xs mt-1">Tap to change</p>
+                                    </div>
+                                    <i className="fa-solid fa-chevron-right text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"></i>
+                                </button>
+                            </section>
+
+                            <section className="mb-6 space-y-3">
+                                <div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all">
+                                    <div className="flex items-center gap-4 pr-4">
+                                        <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
+                                            <i className="fa-solid fa-masks-theater text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
+                                            <p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
+                                        </div>
                                     </div>
                                     <button 
                                         onClick={() => {
@@ -2603,80 +2757,94 @@
                                         <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isFakeWordMode ? 'translate-x-5' : 'translate-x-0'}`} />
                                     </button>
                                 </div>
-                                
-                                <div className="h-px bg-white/10"></div>
 
                                 <div 
-									className={`flex items-center justify-between transition-opacity duration-300 ${players.length < 10 ? 'opacity-50' : ''}`}
-									title={players.length < 10 ? "Requires 10 or more players" : (isFakeWordMode ? "Add a second fake word card" : "Add a second spy to the mission")}
-								>
-                                    <div className="pr-4">
-                                        <h3 className="font-bold text-white/90 text-base flex items-center gap-3">
-                                            <i className="fa-solid fa-user-secret text-orange-400/80 w-5 text-center"></i>
-                                            <span>{isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</span>
-                                        </h3>
-                                        <p className="text-white/40 text-xs mt-1 pl-8">Adds a second rogue agent when 10 or more players are in the lobby.</p>
+                                    className={`flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all duration-300 ${players.length < 10 ? 'opacity-50' : ''}`}
+                                    title={players.length < 10 ? "Requires 10 or more players" : (isFakeWordMode ? "Add a second fake word card" : "Add a second spy to the mission")}
+                                >
+                                    <div className="flex items-center gap-4 pr-4">
+                                        <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
+                                            <i className="fa-solid fa-user-secret text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-white/90 text-sm">{isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
+                                            <p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10 or more players are in the lobby.</p>
+                                        </div>
                                     </div>
                                     <button 
-										onClick={() => {
-											if (players.length >= 10) {
-												setEnableTwoImposters(!enableTwoImposters);
-												audioManager.playSound(!enableTwoImposters ? 'switchOn' : 'switchOff');
-												if(navigator.vibrate) navigator.vibrate(10);
-											}
-										}}
-										disabled={players.length < 10}
-										className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${players.length < 10 ? 'cursor-not-allowed' : ''}`}
-									>
+                                        onClick={() => {
+                                            if (players.length >= 10) {
+                                                setEnableTwoImposters(!enableTwoImposters);
+                                                audioManager.playSound(!enableTwoImposters ? 'switchOn' : 'switchOff');
+                                                if(navigator.vibrate) navigator.vibrate(10);
+                                            }
+                                        }}
+                                        disabled={players.length < 10}
+                                        className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${players.length < 10 ? 'cursor-not-allowed' : ''}`}
+                                    >
                                         <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enableTwoImposters ? 'translate-x-5' : 'translate-x-0'}`} />
                                     </button>
                                 </div>
 
-                                <div className="h-px bg-white/10"></div>
-
-                                <div className={`flex items-center justify-between transition-all duration-300`}>
-                                     <div className="pr-4">
-                                        <h3 className="font-bold text-white/90 text-base flex items-center gap-3">
-                                            <i className="fa-solid fa-stopwatch text-sky-400/80 w-5 text-center"></i>
-                                            <span>Countdown Timer</span>
-                                        </h3>
-                                        <p className="text-white/40 text-xs mt-1 pl-8">Sets a time limit for discussion. When disabled, the game is untimed.</p>
+                                <div className={`flex flex-col bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all duration-300`}>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4 pr-4">
+                                            <div className="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400 flex-shrink-0">
+                                                <i className="fa-solid fa-stopwatch text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-white/90 text-sm">Countdown Timer</h3>
+                                                <p className="text-white/40 text-xs mt-1 leading-relaxed">Sets a time limit for discussion. When disabled, the game is untimed.</p>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                setTimerEnabled(!timerEnabled);
+                                                audioManager.playSound(!timerEnabled ? 'switchOn' : 'switchOff');
+                                                if(navigator.vibrate) navigator.vibrate(10);
+                                            }}
+                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${timerEnabled ? 'bg-sky-500/80' : 'bg-white/10'}`}
+                                        >
+                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${timerEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                                        </button>
                                     </div>
-                                    <button 
-                                        onClick={() => {
-                                            setTimerEnabled(!timerEnabled);
-                                            audioManager.playSound(!timerEnabled ? 'switchOn' : 'switchOff');
-                                            if(navigator.vibrate) navigator.vibrate(10);
-                                        }}
-                                        className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${timerEnabled ? 'bg-sky-500/80' : 'bg-white/10'}`}
-                                    >
-                                        <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${timerEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
-                                </div>
-                                <div className={`transition-all duration-300 overflow-hidden ${timerEnabled ? 'opacity-100 max-h-40 pt-4' : 'opacity-0 max-h-0'}`}>
-                                    <div className="flex justify-between items-end mb-2 px-1">
-                                        <span className="text-white/40 text-[10px] font-bold uppercase">Duration</span>
-                                        <span className="font-mono text-xl font-bold text-white">{timerMinutes} <span className="text-sm text-white/50">min</span></span>
+                                    <div className={`transition-all duration-300 overflow-hidden ${timerEnabled ? 'opacity-100 max-h-24 pt-4' : 'opacity-0 max-h-0'}`}>
+                                        <div className="flex items-center justify-between bg-black/20 rounded-xl p-2 border border-white/5 mx-1">
+                                            <button 
+                                                onClick={() => {
+                                                    setTimerMinutes(Math.max(1, timerMinutes - 1));
+                                                    if (audioManager) audioManager.playSound('uiClick');
+                                                }}
+                                                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white"
+                                            >
+                                                <i className="fa-solid fa-minus"></i>
+                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-mono text-2xl font-bold text-white">{timerMinutes}</span>
+                                                <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">MIN</span>
+                                            </div>
+                                            <button 
+                                                onClick={() => {
+                                                    setTimerMinutes(Math.min(15, timerMinutes + 1));
+                                                    if (audioManager) audioManager.playSound('uiClick');
+                                                }}
+                                                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white"
+                                            >
+                                                <i className="fa-solid fa-plus"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <input
-										type="range"
-										min="1"
-										max="15"
-										value={timerMinutes}
-										onChange={(e) => setTimerMinutes(parseInt(e.target.value))}
-										className="w-full h-7 appearance-none cursor-pointer timer-slider bg-transparent"
-									/>
                                 </div>
 
-                                <div className="h-px bg-white/10"></div>
-
-                                 <div className="flex items-center justify-between">
-                                    <div className="pr-4">
-                                        <h3 className="font-bold text-white/90 text-base flex items-center gap-3">
-                                            <i className="fa-solid fa-volume-high text-purple-400/80 w-5 text-center"></i>
-                                            <span>Speak Category</span>
-                                        </h3>
-                                        <p className="text-white/40 text-xs mt-1 pl-8">Announces the chosen category name when the mission begins.</p>
+                                <div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-2xl p-4 transition-all">
+                                    <div className="flex items-center gap-4 pr-4">
+                                        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                            <i className="fa-solid fa-volume-high text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
+                                            <p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
+                                        </div>
                                     </div>
                                     <button 
                                         onClick={() => {
@@ -2689,137 +2857,6 @@
                                         <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${speakCategory ? 'translate-x-5' : 'translate-x-0'}`} />
                                     </button>
                                 </div>
-                            </section>
-
-                            <section>
-                                <div className="flex items-center justify-between mb-4 px-2">
-                                    <h2 className="text-sm font-bold tracking-widest text-teal-400 flex items-center gap-2 uppercase">
-                                        <i className="fa-solid fa-layer-group"></i> Mission
-                                    </h2>
-                                    
-                                    <div className="relative flex bg-slate-950/50 p-1 rounded-lg border border-white/5 w-44">
-                                        <div className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md pointer-events-none transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform-gpu will-change-transform ${isRandomMode ? 'translate-x-full' : 'translate-x-0'}`}>
-                                            <div className={`absolute inset-0 rounded-md bg-white/15 transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isRandomMode ? 'opacity-0' : 'opacity-100'}`}></div>
-                                            <div className={`absolute inset-0 rounded-md bg-gradient-to-r from-brand-500 to-fuchsia-500 shadow-[0_2px_10px_rgba(139,92,246,0.3)] transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isRandomMode ? 'opacity-100' : 'opacity-0'}`}></div>
-                                        </div>
-                                        <button 
-                                            onClick={() => handleModeChange(false)}
-                                            className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${!isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
-                                        >
-                                            Select
-                                        </button>
-                                        <button 
-                                            onClick={() => handleModeChange(true)}
-                                            className={`relative z-10 flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${isRandomMode ? 'text-white drop-shadow-md' : 'text-white/40 hover:text-white/60'}`}
-                                        >
-                                            Random
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {isRandomMode ? (
-                                    <div className="glass-panel rounded-[2rem] p-8 text-center animate-fadeIn border border-brand-500/20 relative overflow-hidden group">
-                                        <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-fuchsia-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
-                                        <div className="relative z-10 py-8">
-                                            <div className="w-24 h-24 mx-auto bg-gradient-to-br from-brand-500 to-fuchsia-600 rounded-3xl rotate-12 flex items-center justify-center shadow-lg shadow-brand-900/40 mb-6 group-hover:rotate-[20deg] group-hover:scale-110 transition-transform duration-500">
-                                                <img src="https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png" alt="Dice" draggable="false" className="w-16 h-16 drop-shadow-md" />
-                                            </div>
-                                            <h3 className="text-2xl font-display font-bold text-white mb-2">Mystery Mode</h3>
-                                            <p className="text-white/50 text-sm max-w-[200px] mx-auto leading-relaxed">
-                                                The system will automatically select a random category for your mission.
-                                            </p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 animate-fadeIn">
-                                        {displayCategories.map(cat => {
-											const iconSource = CATEGORY_ICONS[cat];
-											const isSelected = selectedCategory === cat;
-											const isSupercell = cat === 'Supercell';
-											const isChristmas = cat === 'Christmas';
-											const isHalloween = cat === 'Halloween';
-											const isSeasonal = isChristmas || isHalloween;
-											
-											let cardClasses = `relative overflow-hidden flex flex-col items-center justify-center gap-3 p-4 rounded-[1.5rem] border transition-all duration-300 active:scale-95 group min-h-[110px] `;
-											let checkmarkBg = 'bg-teal-500 text-slate-900';
-
-											if (isChristmas) {
-												if (isSelected) {
-													cardClasses += 'border-red-400 bg-red-900/20 ring-red-500 shadow-lg shadow-red-900/40 text-white';
-													checkmarkBg = 'bg-red-500 text-white';
-												} else {
-													cardClasses += 'border-white/10 bg-slate-900/40 opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-												}
-											} else if (isHalloween) {
-												if (isSelected) {
-													cardClasses += 'border-orange-400 bg-orange-900/20 ring-orange-500 shadow-lg shadow-orange-900/40 text-white';
-													 checkmarkBg = 'bg-orange-500 text-white';
-												} else {
-													cardClasses += 'border-white/10 bg-slate-900/40 opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-												}
-											} else if (isSupercell) {
-												if (isSelected) {
-													cardClasses += 'border-blue-400 bg-blue-900/20 ring-blue-500 shadow-lg shadow-blue-900/40 text-white';
-													checkmarkBg = 'bg-blue-500 text-white';
-												} else {
-													cardClasses += 'border-white/10 bg-slate-900/40 opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-												}
-											} else {
-												if (isSelected) {
-													cardClasses += 'glass-panel bg-teal-500/10 border-teal-500/40 text-teal-100 shadow-[0_0_20px_rgba(20,184,166,0.1)]';
-												} else {
-													cardClasses += 'glass-panel-lighter border-white/5 text-slate-400 hover:bg-white/5 hover:border-white/10';
-												}
-											}
-
-											return (
-												<button
-													key={cat}
-													onClick={() => handleCategorySelect(cat)}
-													onMouseDown={() => handleCategoryTouchStart(cat)}
-													onMouseUp={handleCategoryTouchEnd}
-													onMouseLeave={handleCategoryTouchEnd}
-													onTouchStart={() => handleCategoryTouchStart(cat)}
-													onTouchEnd={handleCategoryTouchEnd}
-													onTouchMove={handleCategoryTouchEnd}
-													className={cardClasses}
-												>
-													{isSupercell && (
-														<div className="supercell-container pointer-events-none">
-															<div className="supercell-bg-1"></div>
-															<div className="supercell-bg-2"></div>
-														</div>
-													)}
-													{isSeasonal && (
-														<div 
-															className="absolute inset-0 bg-cover bg-center pointer-events-none"
-															style={{
-																backgroundImage: isChristmas 
-																	? `url("https://i.pinimg.com/736x/d5/fb/7f/d5fb7f4ce4b18b147fa210a5299ea66f.jpg")`
-																	: `url("https://picjumbo.com/wp-content/uploads/dark-halloween-background-with-glowing-halloween-pumpkins-free-image.jpeg")`
-															}}
-														></div>
-													)}
-
-													<div className="relative z-10 flex flex-col items-center gap-2">
-														<FaIcon 
-															name={iconSource} 
-															sizeClass="text-2xl" 
-															className={`transition-all duration-300 ${isSupercell || isSeasonal ? "drop-shadow-md brightness-125" : (isSelected ? "text-teal-400 scale-110" : "text-white/40 group-hover:text-white/70")}`} 
-														/>
-														<span className={`text-xs font-bold tracking-wide transition-colors ${isSupercell || isSeasonal ? 'text-white drop-shadow-md' : ''}`}>{cat}</span>
-													</div>
-
-													{isSelected && (
-														<div className={`absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-sm ${checkmarkBg}`}>
-															<i className="fa-solid fa-check"></i>
-														</div>
-													)}
-												</button>
-											)
-										})}
-                                    </div>
-                                )}
                             </section>
                         </div>
                     </div>
@@ -2996,18 +3033,6 @@
                                 </button>
                             </div>
                         )}
-                    </div>
-                </div>
-            );
-
-            return (
-                <div className="h-[100dvh] relative overflow-hidden">
-                    <div className="absolute inset-0 pointer-events-none">
-                         <div className="blob bg-brand-600 top-[-10%] left-[-10%] w-[50%] h-[50%]"></div>
-                         <div className="blob bg-cyan-600 bottom-[-10%] right-[-10%] w-[50%] h-[50%] animation-delay-2000"></div>
-                    </div>
-                    <div className="relative z-10 h-full">
-                        {step === 'handover' ? renderHandover() : renderFlipCard()}
                     </div>
                 </div>
             );
@@ -4300,8 +4325,8 @@
                 expiryDate.setDate(expiryDate.getDate() + 1);
                 
                 await lobbyRef.set({
-                    hostId: user.uid, password: newPassword, category: 'Movies',
-                    isRandomMode: false, speakCategory: false, gameState: 'waiting',
+                    hostId: user.uid, password: newPassword, category: 'Mystery Mode',
+                    isRandomMode: true, speakCategory: false, gameState: 'waiting',
                     isFakeWordMode: false,
                     enableTwoImposters: false, notifyImposterOnVote: false,
                     usedWords: [],
@@ -4371,11 +4396,29 @@
             
              const handleStartGameOnline = async () => {
                 if (lobbyPlayers.length < 3) return;
+
+                const voteCounts = {};
+                lobbyPlayers.forEach(p => {
+                    if (p.categoryVote) voteCounts[p.categoryVote] = (voteCounts[p.categoryVote] || 0) + 1;
+                });
+                const maxVotes = Math.max(0, ...Object.values(voteCounts));
+                const leaders = Object.keys(voteCounts).filter(k => voteCounts[k] === maxVotes);
                 
-                let finalCategory = lobbyData.category;
+                let finalCategory = 'Mystery Mode';
+                let isRandomMode = true;
+
+                if (maxVotes > 0) {
+                    if (leaders.length === 1) {
+                        finalCategory = leaders[0];
+                    } else {
+                        finalCategory = leaders[Math.floor(Math.random() * leaders.length)];
+                    }
+                    isRandomMode = finalCategory === 'Mystery Mode';
+                }
+
                 const validCategories = Object.keys(activeWordBank);
 
-                if (lobbyData.isRandomMode) {
+                if (isRandomMode) {
                     finalCategory = validCategories[Math.floor(Math.random() * validCategories.length)];
                 } 
                 else if (!activeWordBank[finalCategory]) {
@@ -4406,6 +4449,7 @@
                     secretWord,
                     turnOrder: turnOrderList.map(p => ({name: p.name, id: p.id})),
                     category: finalCategory, 
+                    isRandomMode: isRandomMode,
                     gameState: 'reveal',
                     usedWords: firebase.firestore.FieldValue.arrayUnion(secretWord),
                 };
