@@ -3036,6 +3036,18 @@
                     </div>
                 </div>
             );
+
+            return (
+                <div className="h-[100dvh] relative overflow-hidden">
+                    <div className="absolute inset-0 pointer-events-none">
+                         <div className="blob bg-brand-600 top-[-10%] left-[-10%] w-[50%] h-[50%]"></div>
+                         <div className="blob bg-cyan-600 bottom-[-10%] right-[-10%] w-[50%] h-[50%] animation-delay-2000"></div>
+                    </div>
+                    <div className="relative z-10 h-full">
+                        {step === 'handover' ? renderHandover() : renderFlipCard()}
+                    </div>
+                </div>
+            );
         };
 
         const TurnOrderScreen = ({ players, onStartMission, audioManager, isHost }) => {
