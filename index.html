@@ -1102,9 +1102,9 @@
                         </button>
                     </div>
                      <div className="absolute top-6 left-6 z-20 flex gap-3">
-                        <a href="https://discord.gg/m9WrJxGKtr" target="_blank" rel="noopener noreferrer" className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-90 transition-transform">
+                        <button onClick={() => window.open("https://discord.gg/m9WrJxGKtr", "_blank")} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-90 transition-transform">
                             <i className="fab fa-discord"></i>
-                        </a>
+                        </button>
                         {isAndroid && (
                             <button 
                                 onClick={handleDownloadApk} 
@@ -1161,7 +1161,7 @@
                         </section>
                     </div>
                     <div className="absolute bottom-6 left-0 right-0 text-center text-xs text-white/30 z-20">
-                        Game by <a href="https://fillabrona.github.io" target="_blank" rel="noopener noreferrer" className="font-bold text-white/50 hover:text-white/80 transition">Jandré du Preez</a>
+                        Game by <button onClick={() => window.open("https://fillabrona.github.io", "_blank")} className="font-bold text-white/50 hover:text-white/80 transition">Jandré du Preez</button>
                     </div>
                 </div>
             );
@@ -1480,12 +1480,12 @@
                         {/* App List - Mobile Horizontal Scroll, Desktop Grid */}
                         <div className="flex overflow-x-auto snap-x no-scrollbar gap-4 mb-5 pb-2 sm:pb-0 sm:grid sm:grid-cols-5 sm:gap-3 sm:overflow-visible relative">
                             {shareLinks.map(link => (
-                                <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 flex-shrink-0 snap-start group w-14 sm:w-auto">
+                                <button key={link.name} onClick={() => window.open(link.url, "_blank")} className="flex flex-col items-center gap-2 flex-shrink-0 snap-start group w-14 sm:w-auto outline-none">
                                     <div className={`w-12 h-12 rounded-[1rem] ${link.color} border flex items-center justify-center text-2xl transition-transform active:scale-90`}>
                                         <i className={link.icon}></i>
                                     </div>
                                     <span className="text-[10px] font-semibold text-white/50 group-hover:text-white/90">{link.name}</span>
-                                </a>
+                                </button>
                             ))}
                         </div>
 
