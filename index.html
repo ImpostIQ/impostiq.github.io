@@ -414,7 +414,7 @@
         
         .sleek-spinner circle {
             stroke: currentColor;
-            stroke-width: 6; /* Increased thickness */
+            stroke-width: 6; 
             stroke-dasharray: 1, 200;
             stroke-dashoffset: 0;
             animation: sleek-dash 1.5s ease-in-out infinite;
@@ -1234,9 +1234,9 @@
 										type="text"
 										value={username}
 										onChange={(e) => setUsername(e.target.value.slice(0, 25))}
-										placeholder="Enter codename..."
+										placeholder="Enter name..."
 										maxLength="25"
-										className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
+										className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
 									/>
                                     {username.trim() && <PlayerAvatar name={username} className="w-8 h-8 rounded-full" />}
                                 </div>
@@ -1248,7 +1248,7 @@
 											onChange={(e) => setLobbyId(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 6))}
 											placeholder="Lobby ID"
 											maxLength="6"
-											className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-all placeholder:text-white/20 font-mono text-lg tracking-widest text-white"
+											className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-all placeholder:text-white/20 font-display font-bold text-lg tracking-widest text-white uppercase"
 										/>
 										<input
 											type="text"
@@ -1256,7 +1256,7 @@
 											onChange={(e) => setPassword(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 4))}
 											placeholder="Password"
 											maxLength="4"
-											className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-all placeholder:text-white/20 font-mono text-lg tracking-widest text-white"
+											className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-all placeholder:text-white/20 font-display font-bold text-lg tracking-widest text-white uppercase"
 										/>
 									</>
 								)}
@@ -1362,6 +1362,127 @@
                         >
                             GOT IT
                         </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const CustomShareModal = ({ shareData, onClose, season }) => {
+            const [copied, setCopied] = useState(false);
+
+            const handleCopy = () => {
+                navigator.clipboard.writeText(shareData.url).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                });
+            };
+
+            // Detect if the user is on an iOS device (iPhone, iPad, iPod)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+
+            const encodedText = encodeURIComponent(shareData.text + ' ' + shareData.url);
+            const encodedUrl = encodeURIComponent(shareData.url);
+
+            const shareLinks = [
+                {
+                    name: 'WhatsApp',
+                    icon: 'fa-brands fa-whatsapp',
+                    color: 'bg-[#25D366] text-white border-transparent',
+                    url: `whatsapp://send?text=${encodedText}` // Bypasses browser, opens app directly
+                }
+            ];
+
+            // Add iOS-specific iMessage, or Android generic Messages
+            if (isIOS) {
+                shareLinks.push({
+                    name: 'iMessage',
+                    icon: 'fa-solid fa-comment',
+                    color: 'bg-[#34C759] text-white border-transparent', // Apple Green
+                    url: `sms:&body=${encodedText}` // iOS requires &body= instead of ?body=
+                });
+            } else {
+                shareLinks.push({
+                    name: 'Messages',
+                    icon: 'fa-solid fa-comment-sms',
+                    color: 'bg-[#007AFF] text-white border-transparent', // Generic Blue
+                    url: `sms:?body=${encodedText}`
+                });
+            }
+
+            // Push the rest of the direct-app links
+            shareLinks.push(
+                {
+                    name: 'Telegram',
+                    icon: 'fa-brands fa-telegram',
+                    color: 'bg-[#229ED9] text-white border-transparent',
+                    url: `tg://msg?text=${encodedText}` // Bypasses browser
+                },
+                {
+                    name: 'Messenger',
+                    icon: 'fa-brands fa-facebook-messenger',
+                    color: 'bg-[#A334FA] text-white border-transparent',
+                    url: `fb-messenger://share/?link=${encodedUrl}`
+                },
+                {
+                    name: 'Email',
+                    icon: 'fa-solid fa-envelope',
+                    color: 'bg-slate-700 text-white border-white/10',
+                    url: `mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodedText}`
+                }
+            );
+
+            let iconUrl = "https://impostiq.github.io/imageicon1024.png";
+            if (season === 'christmas') {
+                iconUrl = "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Snowman-3d-icon.png";
+            } else if (season === 'halloween') {
+                iconUrl = "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Jack-O-Lantern-3d-icon.png";
+            }
+
+            return (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 border border-white/10 animate-slide-up flex flex-col">
+                        
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-display font-bold text-white">Share Invite</h2>
+                            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
+                                <i className="fa-solid fa-xmark text-sm"></i>
+                            </button>
+                        </div>
+
+                        {/* Minimal Preview Box */}
+                        <div className="bg-white/5 border border-white/10 rounded-xl p-3 mb-5 flex gap-3 items-center">
+                            <img src={iconUrl} alt="Icon" className="w-10 h-10 rounded-lg flex-shrink-0 bg-black/20" />
+                            <div className="flex flex-col min-w-0">
+                                <h3 className="text-white font-bold text-sm truncate">{shareData.title}</h3>
+                                <p className="text-white/40 text-[10px] truncate">{shareData.text}</p>
+                            </div>
+                        </div>
+
+                        {/* App List - Mobile Horizontal Scroll, Desktop Grid */}
+                        <div className="flex overflow-x-auto snap-x no-scrollbar gap-4 mb-5 pb-2 sm:pb-0 sm:grid sm:grid-cols-5 sm:gap-3 sm:overflow-visible relative">
+                            {shareLinks.map(link => (
+                                <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 flex-shrink-0 snap-start group w-14 sm:w-auto">
+                                    <div className={`w-12 h-12 rounded-[1rem] ${link.color} border flex items-center justify-center text-2xl transition-transform active:scale-90`}>
+                                        <i className={link.icon}></i>
+                                    </div>
+                                    <span className="text-[10px] font-semibold text-white/50 group-hover:text-white/90">{link.name}</span>
+                                </a>
+                            ))}
+                        </div>
+
+                        {/* Minimal Copy Link Section */}
+                        <div className="flex items-center gap-2 bg-black/40 rounded-xl p-1.5 border border-white/5">
+                            <div className="flex-1 overflow-hidden px-3">
+                                <p className="text-white/40 text-[10px] truncate font-mono select-all">{shareData.url}</p>
+                            </div>
+                            <button 
+                                onClick={handleCopy} 
+                                className={`flex-shrink-0 px-4 py-2 rounded-lg font-bold text-[10px] tracking-wider transition-all active:scale-95 ${copied ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                            >
+                                {copied ? 'COPIED' : 'COPY'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
@@ -1609,10 +1730,11 @@
         const WaitingRoom = ({ lobbyData, lobbyPlayers, user, lobbyId, onStartGame, onStartMission, onLeaveLobby, audioManager, onConfusionVote, season, displayCategories, wordBank }) => {
             const isHost = user.uid === lobbyData.hostId;
             const MIN_PLAYERS = 3;
-            const [showCopied, setShowCopied] = useState(false);
             const [inspectedCategory, setInspectedCategory] = useState(null);
             const [showQRCode, setShowQRCode] = useState(false);
             const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+            const [showShareModal, setShowShareModal] = useState(false);
+            const [shareDataInfo, setShareDataInfo] = useState(null);
 
             const pollIsActive = lobbyData.gameState === 'reveal' && lobbyPlayers.some(p => p.status === 'confused');
             
@@ -1694,32 +1816,12 @@
 					shareText = `${inviterName} needs your help! 👻 Something is lurking in the shadows... Join my spooky Impostiq game and help us unmask the ghost... if you dare.`;
 				}
 
-				const shareData = {
-					title: shareTitle,
-					text: shareText,
-					url: inviteLink
-				};
-
-				if (window.median && window.median.share && window.median.share.sharePage) {
-					window.median.share.sharePage({
-						url: inviteLink,
-						title: shareTitle,
-						text: shareText
-					});
-				}
-				else if (navigator.share) {
-					try {
-						await navigator.share(shareData);
-					} catch (err) {
-						console.log('Share failed or canceled:', err);
-					}
-				} 
-				else {
-					navigator.clipboard.writeText(inviteLink).then(() => {
-						setShowCopied(true);
-						setTimeout(() => setShowCopied(false), 2000);
-					}).catch(err => console.error("Clipboard failed", err));
-				}
+                setShareDataInfo({
+                    title: shareTitle,
+                    text: shareText,
+                    url: inviteLink
+                });
+                setShowShareModal(true);
 			};
 
             const handleRemovePlayer = (playerId) => {
@@ -1774,6 +1876,13 @@
                     />
 
                     {showQRCode && <QRCodeModal lobbyId={lobbyId} password={lobbyData.password} onClose={() => setShowQRCode(false)} audioManager={audioManager} season={season} />}
+                    {showShareModal && shareDataInfo && (
+                        <CustomShareModal
+                            shareData={shareDataInfo}
+                            onClose={() => setShowShareModal(false)}
+                            season={season}
+                        />
+                    )}
                     {showConfusionPoll && <ConfusionPollModal onVote={onConfusionVote} />}
                     
                     <div className="absolute top-6 left-6 z-20">
@@ -1799,35 +1908,43 @@
                                 <p class="text-white/40 font-semibold tracking-wide">Mission Lobby • Waiting for agents</p>
 							</div>
                             
-							<section className="mb-6 glass-panel rounded-[2rem] p-6">
-								<div className="flex items-stretch gap-3 text-center">
-									<div className="flex-1 bg-black/20 rounded-xl p-3 border border-white/5">
-										<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Lobby ID</div>
-										<div className="font-mono text-2xl font-bold tracking-widest text-white">{lobbyId}</div>
-									</div>
-									<div className="flex-1 bg-black/20 rounded-xl p-3 border border-white/5">
-										<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Password</div>
-										<div className="font-mono text-2xl font-bold tracking-widest text-white">{lobbyData.password}</div>
-									</div>
-								</div>
-								<div className="flex items-center gap-4 mt-4">
-									<button onClick={() => { setShowQRCode(true); audioManager.playSound('uiClick'); }} className="relative flex-1 h-14 bg-white/10 rounded-xl flex items-center justify-center sm:gap-3 text-brand-400 hover:bg-brand-500/20 active:scale-95 transition font-bold text-sm">
-										<i className="fa-solid fa-qrcode text-xl"></i>
-										<span className="hidden sm:inline">SCAN QR</span>
-									</button>
-									<button onClick={handleCopyInvite} className="relative flex-1 h-14 bg-white/10 rounded-xl flex items-center justify-center sm:gap-3 text-brand-400 hover:bg-brand-500/20 active:scale-95 transition font-bold text-sm">
-										<i className={`fa-solid ${showCopied ? 'fa-check' : 'fa-share-nodes'} text-lg`}></i>
-										<span className="hidden sm:inline">{showCopied ? 'COPIED!' : 'SHARE LINK'}</span>
-									</button>
-								</div>
-							</section>
+							<section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                    <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                        <i className="fa-solid fa-users-rectangle text-brand-400 mr-1"></i> Lobby Details
+                                    </h2>
+                                </div>
+                                <div className="p-4">
+                                    <div className="flex items-stretch gap-3 text-center">
+                                        <div className="flex-1 bg-black/20 rounded-xl p-3 border border-white/5">
+                                            <div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Lobby ID</div>
+                                            <div className="font-mono text-2xl font-bold tracking-widest text-white">{lobbyId}</div>
+                                        </div>
+                                        <div className="flex-1 bg-black/20 rounded-xl p-3 border border-white/5">
+                                            <div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Password</div>
+                                            <div className="font-mono text-2xl font-bold tracking-widest text-white">{lobbyData.password}</div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-4">
+                                        <button onClick={() => { setShowQRCode(true); audioManager.playSound('uiClick'); }} className="relative flex-1 h-14 bg-white/10 rounded-xl flex items-center justify-center sm:gap-3 text-brand-400 hover:bg-brand-500/20 active:scale-95 transition font-bold text-sm">
+                                            <i className="fa-solid fa-qrcode text-xl"></i>
+                                            <span className="hidden sm:inline">SCAN QR</span>
+                                        </button>
+                                        <button onClick={handleCopyInvite} className="relative flex-1 h-14 bg-white/10 rounded-xl flex items-center justify-center sm:gap-3 text-brand-400 hover:bg-brand-500/20 active:scale-95 transition font-bold text-sm">
+                                            <i className="fa-solid fa-share-nodes text-lg"></i>
+                                            <span className="hidden sm:inline">SHARE INVITE</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
 
-                            <section className="mb-6 glass-panel rounded-[2rem] p-6">
-                                <h2 className="text-sm font-bold tracking-widest text-brand-400 mb-4 flex items-center gap-2 uppercase">
-                                    <i className="fa-solid fa-users"></i> Agents
-                                    <span className="ml-auto text-[10px] bg-white/5 px-2 py-1 rounded-md text-white/50">{lobbyPlayers.length}</span>
-                                </h2>
-                                <div className="flex flex-col gap-3">
+                            <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                    <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                        <i className="fa-solid fa-users text-brand-400 mr-1"></i> Agents
+                                    </h2>
+                                </div>
+                                <div className="p-4 flex flex-col gap-3">
                                     {lobbyPlayers.map(p => {
                                         const hasAcknowledgedCard = !!p.hasSeenCard;
 
@@ -1863,122 +1980,115 @@
                             </section>
                             
                             {lobbyData.gameState === 'waiting' && (
-                                <>
-                                <section className="mb-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-sm font-bold tracking-widest text-brand-400 flex items-center gap-2 uppercase">
-                                            <i class="fa-solid fa-gear"></i> Settings
+                                <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                    <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                        <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                            <i className="fa-solid fa-gear text-brand-400 mr-1"></i> Game Settings
                                         </h2>
-                                        {maxVotes > 0 && (
-                                            <span className="text-[10px] bg-brand-500/20 text-brand-300 px-2 py-1 rounded-md font-bold">
-                                                {maxVotes} VOTE{maxVotes !== 1 ? 'S' : ''} LEAD
-                                            </span>
-                                        )}
                                     </div>
-                                    <button
-                                        onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
-                                        className="w-full glass-panel hover:bg-white/5 border border-white/10 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
-                                    >
-                                        <div className="w-14 h-14 rounded-2xl bg-brand-500/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-                                            {isFaIcon ? (
-                                                <i className={`${displayIcon} text-2xl text-yellow-400 drop-shadow-md`}></i>
-                                            ) : (
-                                                displayTitle === 'Mystery Mode' || displayTitle === 'Mystery Mode (Default)' ? (
-                                                    <img src={displayIcon} alt="Random" className="w-8 h-8 drop-shadow-md" />
+                                    <div className="p-4 flex flex-col gap-3">
+                                        <button
+                                            onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
+                                            className="w-full bg-black/20 hover:bg-white/5 border border-white/5 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
+                                        >
+                                            <div className="w-14 h-14 rounded-2xl bg-brand-500/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                                                {isFaIcon ? (
+                                                    <i className={`${displayIcon} text-2xl text-yellow-400 drop-shadow-md`}></i>
                                                 ) : (
-                                                    <FaIcon name={displayIcon} sizeClass="text-3xl" className="text-brand-400 drop-shadow-md" />
-                                                )
-                                            )}
+                                                    displayTitle === 'Mystery Mode' || displayTitle === 'Mystery Mode (Default)' ? (
+                                                        <img src={displayIcon} alt="Random" className="w-8 h-8 drop-shadow-md" />
+                                                    ) : (
+                                                        <FaIcon name={displayIcon} sizeClass="text-3xl" className="text-brand-400 drop-shadow-md" />
+                                                    )
+                                                )}
+                                            </div>
+                                            <div className="text-left flex-1 min-w-0">
+                                                <h3 className="text-white font-display font-bold text-lg truncate">{displayTitle}</h3>
+                                                <p className="text-white/40 text-xs mt-1">{me?.categoryVote ? `You voted for: ${me.categoryVote}` : 'Tap to cast your vote'}</p>
+                                            </div>
+                                            <i className="fa-solid fa-chevron-right text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"></i>
+                                        </button>
+
+                                        <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all">
+                                            <div className="flex items-center gap-4 pr-4">
+                                                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
+                                                    <i className="fa-solid fa-masks-theater text-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
+                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => handleSettingChange('isFakeWordMode', lobbyData.isFakeWordMode)}
+                                                disabled={!isHost}
+                                                className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
+                                            >
+                                                <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.isFakeWordMode ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
                                         </div>
-                                        <div className="text-left flex-1 min-w-0">
-                                            <h3 className="text-white font-display font-bold text-lg truncate">{displayTitle}</h3>
-                                            <p className="text-white/40 text-xs mt-1">{me?.categoryVote ? `You voted for: ${me.categoryVote}` : 'Tap to cast your vote'}</p>
+
+                                        <div 
+                                            className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${(lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) ? 'opacity-50' : ''}`}
+                                            title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (lobbyPlayers.length < 10 ? "Requires 10 or more players" : "Add a second spy to the mission")}
+                                        >
+                                            <div className="flex items-center gap-4 pr-4">
+                                                <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
+                                                    <i className="fa-solid fa-user-secret text-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-white/90 text-sm">{lobbyData.isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
+                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10+ agents are in the lobby.</p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => handleSettingChange('enableTwoImposters', lobbyData.enableTwoImposters)}
+                                                disabled={!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode}
+                                                className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${(!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
+                                            >
+                                                <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.enableTwoImposters ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
                                         </div>
-                                        <i className="fa-solid fa-chevron-right text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"></i>
-                                    </button>
+
+                                        <div className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'opacity-50' : ''}`} title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : ""}>
+                                            <div className="flex items-center gap-4 pr-4">
+                                                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
+                                                    <i className="fa-solid fa-bell text-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-red-400/90 text-sm">Notify Imposter on Vote</h3>
+                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Shows a pop-up to the Imposter if an agent initiates a word-check.</p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => handleSettingChange('notifyImposterOnVote', lobbyData.notifyImposterOnVote)}
+                                                disabled={!isHost || lobbyData.isFakeWordMode}
+                                                className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.notifyImposterOnVote ? 'bg-red-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'opacity-50 cursor-not-allowed'}`}
+                                            >
+                                                <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.notifyImposterOnVote ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all">
+                                            <div className="flex items-center gap-4 pr-4">
+                                                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                                    <i className="fa-solid fa-volume-high text-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
+                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => handleSettingChange('speakCategory', lobbyData.speakCategory)}
+                                                disabled={!isHost}
+                                                className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.speakCategory ? 'bg-purple-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
+                                            >
+                                                <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.speakCategory ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                    </div>
                                 </section>
-
-								 <section className="mb-6 space-y-3">
-								 <div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all">
-										<div className="flex items-center gap-4 pr-4">
-											<div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
-												<i className="fa-solid fa-masks-theater text-lg"></i>
-											</div>
-											<div>
-												<h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
-												<p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
-											</div>
-										</div>
-										<button 
-											onClick={() => handleSettingChange('isFakeWordMode', lobbyData.isFakeWordMode)}
-											disabled={!isHost}
-											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
-										>
-											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.isFakeWordMode ? 'translate-x-5' : 'translate-x-0'}`} />
-										</button>
-									</div>
-
-									<div 
-										className={`flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${(lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) ? 'opacity-50' : ''}`}
-										title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (lobbyPlayers.length < 10 ? "Requires 10 or more players" : "Add a second spy to the mission")}
-									>
-										<div className="flex items-center gap-4 pr-4">
-											<div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
-												<i className="fa-solid fa-user-secret text-lg"></i>
-											</div>
-											<div>
-												<h3 className="font-bold text-white/90 text-sm">{lobbyData.isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
-												<p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10 or more agents are in the lobby.</p>
-											</div>
-										</div>
-										<button 
-											onClick={() => handleSettingChange('enableTwoImposters', lobbyData.enableTwoImposters)}
-											disabled={!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode}
-											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${(!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
-										>
-											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.enableTwoImposters ? 'translate-x-5' : 'translate-x-0'}`} />
-										</button>
-									</div>
-
-									 <div className={`flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'opacity-50' : ''}`} title={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : ""}>
-										<div className="flex items-center gap-4 pr-4">
-											<div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
-												<i className="fa-solid fa-bell text-lg"></i>
-											</div>
-											<div>
-												<h3 className="font-bold text-red-400/90 text-sm">Notify Imposter on Vote</h3>
-												<p className="text-white/40 text-xs mt-1 leading-relaxed">Shows a pop-up to the Imposter if an agent initiates a word-check.</p>
-											</div>
-										</div>
-										<button 
-											onClick={() => handleSettingChange('notifyImposterOnVote', lobbyData.notifyImposterOnVote)}
-											disabled={!isHost || lobbyData.isFakeWordMode}
-											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.notifyImposterOnVote ? 'bg-red-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'opacity-50 cursor-not-allowed'}`}
-										>
-											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.notifyImposterOnVote ? 'translate-x-5' : 'translate-x-0'}`} />
-										</button>
-									</div>
-
-									<div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all">
-										<div className="flex items-center gap-4 pr-4">
-											<div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
-												<i className="fa-solid fa-volume-high text-lg"></i>
-											</div>
-											<div>
-												<h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
-												<p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
-											</div>
-										</div>
-										<button 
-											onClick={() => handleSettingChange('speakCategory', lobbyData.speakCategory)}
-											disabled={!isHost}
-											className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${lobbyData.speakCategory ? 'bg-purple-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
-										>
-											<div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${lobbyData.speakCategory ? 'translate-x-5' : 'translate-x-0'}`} />
-										</button>
-									</div>
-								 </section>
-                                </>
                             )}
                         </div>
                     </div>
@@ -2187,7 +2297,7 @@
 										</div>
 									</div>
 									<p key={currentTipIndex} className="text-white/60 font-medium text-sm animate-fadeIn h-10">
-										<i className="fa-solid fa-lightbulb text-brand-400 mr-2"></i>
+										<i className="fa-solid fa-lightbulb text-brand-400 mr-1"></i>
 										{TIPS[currentTipIndex]}
 									</p>
 								</div>
@@ -2619,13 +2729,15 @@
 								</div>
 							</div>
 
-                            <section className="mb-6 glass-panel rounded-[2rem] p-6">
-                                <h2 className="text-sm font-bold tracking-widest text-brand-400 mb-4 flex items-center gap-2 uppercase">
-                                    <i className="fa-solid fa-users"></i> Agents
-                                    <span className="ml-auto text-[10px] bg-white/5 px-2 py-1 rounded-md text-white/50">{players.length} / {MIN_PLAYERS}+</span>
-                                </h2>
-                                <div className="flex flex-col gap-3 mb-4">
-                                    <div className="flex flex-col gap-2">
+                            <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                    <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                        <i className="fa-solid fa-user-plus text-brand-400 mr-1"></i> Add Players
+                                    </h2>
+                                </div>
+                                <div className="p-4">
+                                    <div className="flex flex-col gap-3 mb-4">
+                                        <div className="flex flex-col gap-2">
 										<div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-all pr-4">
 											<input
 												type="text"
@@ -2635,9 +2747,9 @@
 													if (playerError) setPlayerError('');
 												}}
 												onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
-												placeholder="Enter codename..."
+												placeholder="Enter name..."
 												maxLength="25"
-												className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-medium text-sm text-white min-w-0"
+												className="flex-1 bg-transparent px-5 py-4 outline-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
 											/>
 											{newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
 										</div>
@@ -2714,148 +2826,151 @@
                                         {playersExpanded ? 'Show Less' : `Show ${players.length - playerDisplayLimit} More...`}
                                     </button>
                                 )}
+                                </div>
                             </section>
 
-                            <section className="mb-6">
-                                <h2 className="text-sm font-bold tracking-widest text-brand-400 mb-4 flex items-center gap-2 uppercase">
-                                    <i class="fa-solid fa-gear"></i> Settings
-                                </h2>
-                                <button
-                                    onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
-                                    className="w-full glass-panel hover:bg-white/5 border border-white/10 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
-                                >
-                                    <div className="w-14 h-14 rounded-2xl bg-brand-500/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-                                        <FaIcon name={displayIcon} sizeClass="text-3xl" className="text-brand-400 drop-shadow-md" />
-                                    </div>
-                                    <div className="text-left flex-1 min-w-0">
-                                        <h3 className="text-white font-display font-bold text-lg truncate">{selectedCategory}</h3>
-                                        <p className="text-white/40 text-xs mt-1">Tap to change</p>
-                                    </div>
-                                    <i className="fa-solid fa-chevron-right text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"></i>
-                                </button>
-                            </section>
-
-                            <section className="mb-6 space-y-3">
-                                <div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all">
-                                    <div className="flex items-center gap-4 pr-4">
-                                        <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
-                                            <i className="fa-solid fa-masks-theater text-lg"></i>
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
-                                            <p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onClick={() => {
-                                            setIsFakeWordMode(!isFakeWordMode);
-                                            audioManager.playSound(!isFakeWordMode ? 'switchOn' : 'switchOff');
-                                            if(navigator.vibrate) navigator.vibrate(10);
-                                        }}
-                                        className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'}`}
-                                    >
-                                        <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isFakeWordMode ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
+                            <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                    <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                        <i className="fa-solid fa-gear text-brand-400 mr-1"></i> Game Settings
+                                    </h2>
                                 </div>
-
-                                <div 
-                                    className={`flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${players.length < 10 ? 'opacity-50' : ''}`}
-                                    title={players.length < 10 ? "Requires 10 or more players" : (isFakeWordMode ? "Add a second fake word card" : "Add a second spy to the mission")}
-                                >
-                                    <div className="flex items-center gap-4 pr-4">
-                                        <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
-                                            <i className="fa-solid fa-user-secret text-lg"></i>
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold text-white/90 text-sm">{isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
-                                            <p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10 or more players are in the lobby.</p>
-                                        </div>
-                                    </div>
-                                    <button 
-                                        onClick={() => {
-                                            if (players.length >= 10) {
-                                                setEnableTwoImposters(!enableTwoImposters);
-                                                audioManager.playSound(!enableTwoImposters ? 'switchOn' : 'switchOff');
-                                                if(navigator.vibrate) navigator.vibrate(10);
-                                            }
-                                        }}
-                                        disabled={players.length < 10}
-                                        className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${players.length < 10 ? 'cursor-not-allowed' : ''}`}
+                                <div className="p-4 flex flex-col gap-3">
+                                    <button
+                                        onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
+                                        className="w-full bg-black/20 hover:bg-white/5 border border-white/5 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
                                     >
-                                        <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enableTwoImposters ? 'translate-x-5' : 'translate-x-0'}`} />
+                                        <div className="w-14 h-14 rounded-2xl bg-brand-500/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                                            <FaIcon name={displayIcon} sizeClass="text-3xl" className="text-brand-400 drop-shadow-md" />
+                                        </div>
+                                        <div className="text-left flex-1 min-w-0">
+                                            <h3 className="text-white font-display font-bold text-lg truncate">{selectedCategory}</h3>
+                                            <p className="text-white/40 text-xs mt-1">Tap to change</p>
+                                        </div>
+                                        <i className="fa-solid fa-chevron-right text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"></i>
                                     </button>
-                                </div>
 
-                                <div className={`flex flex-col bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300`}>
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all">
                                         <div className="flex items-center gap-4 pr-4">
-                                            <div className="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400 flex-shrink-0">
-                                                <i className="fa-solid fa-stopwatch text-lg"></i>
+                                            <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
+                                                <i className="fa-solid fa-masks-theater text-lg"></i>
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-white/90 text-sm">Countdown Timer</h3>
-                                                <p className="text-white/40 text-xs mt-1 leading-relaxed">Sets a time limit for discussion. When disabled, the game is untimed.</p>
+                                                <h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
+                                                <p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
                                             </div>
                                         </div>
                                         <button 
                                             onClick={() => {
-                                                setTimerEnabled(!timerEnabled);
-                                                audioManager.playSound(!timerEnabled ? 'switchOn' : 'switchOff');
+                                                setIsFakeWordMode(!isFakeWordMode);
+                                                audioManager.playSound(!isFakeWordMode ? 'switchOn' : 'switchOff');
                                                 if(navigator.vibrate) navigator.vibrate(10);
                                             }}
-                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${timerEnabled ? 'bg-sky-500/80' : 'bg-white/10'}`}
+                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'}`}
                                         >
-                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${timerEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isFakeWordMode ? 'translate-x-5' : 'translate-x-0'}`} />
                                         </button>
                                     </div>
-                                    <div className={`transition-all duration-300 overflow-hidden ${timerEnabled ? 'opacity-100 max-h-24 pt-4' : 'opacity-0 max-h-0'}`}>
-                                        <div className="flex items-center justify-between bg-black/20 rounded-xl p-2 border border-white/5 mx-1">
-                                            <button 
-                                                onClick={() => {
-                                                    setTimerMinutes(Math.max(1, timerMinutes - 1));
-                                                    if (audioManager) audioManager.playSound('uiClick');
-                                                }}
-                                                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white"
-                                            >
-                                                <i className="fa-solid fa-minus"></i>
-                                            </button>
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-mono text-2xl font-bold text-white">{timerMinutes}</span>
-                                                <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">MIN</span>
+
+                                    <div 
+                                        className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${players.length < 10 ? 'opacity-50' : ''}`}
+                                        title={players.length < 10 ? "Requires 10 or more players" : (isFakeWordMode ? "Add a second fake word card" : "Add a second spy to the mission")}
+                                    >
+                                        <div className="flex items-center gap-4 pr-4">
+                                            <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
+                                                <i className="fa-solid fa-user-secret text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-white/90 text-sm">{isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
+                                                <p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10+ players are in the lobby.</p>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                if (players.length >= 10) {
+                                                    setEnableTwoImposters(!enableTwoImposters);
+                                                    audioManager.playSound(!enableTwoImposters ? 'switchOn' : 'switchOff');
+                                                    if(navigator.vibrate) navigator.vibrate(10);
+                                                }
+                                            }}
+                                            disabled={players.length < 10}
+                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${players.length < 10 ? 'cursor-not-allowed' : ''}`}
+                                        >
+                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enableTwoImposters ? 'translate-x-5' : 'translate-x-0'}`} />
+                                        </button>
+                                    </div>
+
+                                    <div className={`flex flex-col bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300`}>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4 pr-4">
+                                                <div className="w-10 h-10 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400 flex-shrink-0">
+                                                    <i className="fa-solid fa-stopwatch text-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-white/90 text-sm">Countdown Timer</h3>
+                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Sets a time limit for discussion. When disabled, the game is untimed.</p>
+                                                </div>
                                             </div>
                                             <button 
                                                 onClick={() => {
-                                                    setTimerMinutes(Math.min(15, timerMinutes + 1));
-                                                    if (audioManager) audioManager.playSound('uiClick');
+                                                    setTimerEnabled(!timerEnabled);
+                                                    audioManager.playSound(!timerEnabled ? 'switchOn' : 'switchOff');
+                                                    if(navigator.vibrate) navigator.vibrate(10);
                                                 }}
-                                                className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white"
+                                                className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${timerEnabled ? 'bg-sky-500/80' : 'bg-white/10'}`}
                                             >
-                                                <i className="fa-solid fa-plus"></i>
+                                                <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${timerEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                                             </button>
                                         </div>
+                                        <div className={`transition-all duration-300 overflow-hidden ${timerEnabled ? 'opacity-100 max-h-24 pt-4' : 'opacity-0 max-h-0'}`}>
+                                            <div className="flex items-center justify-between bg-black/20 rounded-xl p-2 border border-white/5 mx-1">
+                                                <button 
+                                                    onClick={() => {
+                                                        setTimerMinutes(Math.max(1, timerMinutes - 1));
+                                                        if (audioManager) audioManager.playSound('uiClick');
+                                                    }}
+                                                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white"
+                                                >
+                                                    <i className="fa-solid fa-minus"></i>
+                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-mono text-2xl font-bold text-white">{timerMinutes}</span>
+                                                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">MIN</span>
+                                                </div>
+                                                <button 
+                                                    onClick={() => {
+                                                        setTimerMinutes(Math.min(15, timerMinutes + 1));
+                                                        if (audioManager) audioManager.playSound('uiClick');
+                                                    }}
+                                                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white"
+                                                >
+                                                    <i className="fa-solid fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="flex items-center justify-between bg-slate-900/40 border border-white/5 rounded-[1.5rem] p-4 transition-all">
-                                    <div className="flex items-center gap-4 pr-4">
-                                        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
-                                            <i className="fa-solid fa-volume-high text-lg"></i>
+                                    <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all">
+                                        <div className="flex items-center gap-4 pr-4">
+                                            <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                                <i className="fa-solid fa-volume-high text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
+                                                <p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
-                                            <p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
-                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                setSpeakCategory(!speakCategory);
+                                                audioManager.playSound(!speakCategory ? 'switchOn' : 'switchOff');
+                                                if(navigator.vibrate) navigator.vibrate(10);
+                                            }}
+                                            className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${speakCategory ? 'bg-purple-500/80' : 'bg-white/10'}`}
+                                        >
+                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${speakCategory ? 'translate-x-5' : 'translate-x-0'}`} />
+                                        </button>
                                     </div>
-                                    <button 
-                                        onClick={() => {
-                                            setSpeakCategory(!speakCategory);
-                                            audioManager.playSound(!speakCategory ? 'switchOn' : 'switchOff');
-                                            if(navigator.vibrate) navigator.vibrate(10);
-                                        }}
-                                        className={`flex-shrink-0 w-12 h-7 rounded-full p-1 transition-all duration-300 ${speakCategory ? 'bg-purple-500/80' : 'bg-white/10'}`}
-                                    >
-                                        <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${speakCategory ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
                                 </div>
                             </section>
                         </div>
