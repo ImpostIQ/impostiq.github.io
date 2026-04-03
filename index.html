@@ -430,6 +430,28 @@
             100% { stroke-dasharray: 90, 200; stroke-dashoffset: -124px; }
         }
     </style>
+	
+	<script>
+		let wakeLock = null;
+		
+		const requestWakeLock = async () => {
+			if ('wakeLock' in navigator) {
+				try {
+					wakeLock = await navigator.wakeLock.request('screen');
+				} catch (err) { 
+					console.log("Wake Lock not supported/allowed."); 
+				}
+			}
+		};
+		document.addEventListener('visibilitychange', () => {
+			if (document.visibilityState === 'visible') {
+				requestWakeLock();
+			}
+		});
+		document.addEventListener('DOMContentLoaded', () => {
+			requestWakeLock();
+		});
+	</script>
 </head>
 <body class="select-none uninitialized">
     <div id="root"></div>
@@ -3969,6 +3991,43 @@
             useEffect(() => {
                 latestLobbyPlayers.current = lobbyPlayers;
             }, [lobbyPlayers]);
+
+            useEffect(() => {
+                const handleUnload = () => {
+                    if (gameMode === 'online' && lobbyId && user) {
+                        const currentLobbyData = latestLobbyData.current;
+                        if (currentLobbyData && currentLobbyData.hostId === user.uid) {
+                            db.collection('lobbies').doc(lobbyId).delete().catch(() => {});
+                        } else {
+                            db.collection('lobbies').doc(lobbyId).collection('players').doc(user.uid).delete().catch(() => {});
+                        }
+                    }
+                };
+
+                window.addEventListener('beforeunload', handleUnload);
+
+                let visibilityTimeout;
+                const handleVisibilityChange = () => {
+                    if (document.hidden) {
+                        // After 15 minutes of the app being minimized/hidden, automatically sever connections.
+                        visibilityTimeout = setTimeout(() => {
+                            if (gameMode === 'online' && lobbyId && user) {
+                                console.log("Inactive for too long, leaving lobby to save resources.");
+                                handleBackToHome(true);
+                            }
+                        }, 60 * 60 * 1000); 
+                    } else {
+                        if (visibilityTimeout) clearTimeout(visibilityTimeout);
+                    }
+                };
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+
+                return () => {
+                    window.removeEventListener('beforeunload', handleUnload);
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    if (visibilityTimeout) clearTimeout(visibilityTimeout);
+                };
+            }, [gameMode, lobbyId, user]);
             
             useEffect(() => {
                 if (audioManagerRef.current) return;
@@ -4242,7 +4301,10 @@
                     if (newPlayers.length > 0 && latestLobbyPlayers.current.length > 0) {
                         const wasIInLobby = latestLobbyPlayers.current.some(p => p.id === user.uid);
                         const amIStillInLobby = newPlayers.some(p => p.id === user.uid);
-                        if (wasIInLobby && !amIStillInLobby) setShowRemovedModal(true);
+                        if (wasIInLobby && !amIStillInLobby) {
+                            setShowRemovedModal(true);
+                            handleBackToHome(true);
+                        }
                     }
 
                     if (currentLobbyDoc?.notifyImposterOnVote && !currentLobbyDoc?.isFakeWordMode && currentLobbyDoc.imposterIds?.includes(user.uid)) {
@@ -4258,13 +4320,15 @@
                     
                     if (!currentLobbyDoc) return;
 
+                    if (newPlayers.length === 0 && previousPlayersRef.current.length > 0) {
+                        return; 
+                    }
+
                     const hostIsMissing = newPlayers.length > 0 && !newPlayers.some(p => p.id === currentLobbyDoc.hostId);
-                    if (hostIsMissing) {
-                        const newHost = newPlayers[0];
-                        if (newHost && newHost.id === user.uid) {
-                            console.log(`Host left. Promoting ${newHost.name} to new host.`);
-                            lobbyRef.update({ hostId: newHost.id });
-                        }
+                    if (hostIsMissing && currentLobbyDoc.hostId !== user.uid) {
+                        const hostPlayer = previousPlayersRef.current.find(p => p.id === currentLobbyDoc.hostId);
+                        setLobbyClosedInfo({ hostName: hostPlayer ? hostPlayer.name : 'The host' });
+                        handleBackToHome(true); 
                     }
 
                     const isHost = user.uid === currentLobbyDoc.hostId;
@@ -4882,11 +4946,9 @@
                     {showHowToPlay && <HowToPlayModal onClose={() => setShowHowToPlay(false)} />}
                     {showRemovedModal && <RemovedModal onClose={() => {
                         setShowRemovedModal(false);
-                        handleBackToHome(true);
                     }} />}
                     {lobbyClosedInfo && <LobbyClosedModal hostName={lobbyClosedInfo.hostName} onClose={() => {
                         setLobbyClosedInfo(null);
-                        handleBackToHome(true);
                     }} />}
                     {restartNotification && <RestartNotificationModal word={restartNotification} onClose={() => setRestartNotification(null)} />}
                     {showImposterVoteNotification && <ImposterVoteNotificationModal onClose={() => setShowImposterVoteNotification(false)} />}
