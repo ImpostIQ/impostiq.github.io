@@ -3072,16 +3072,19 @@
             // 1. Detect Touch Device (for physics)
             const [isTouchDevice] = useState(() => typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
             
-            // 2. Detect WebView / APK (Median.co)
+            // 2. FOOLPROOF MEDIAN.CO / APK DETECTION
             const [isWebView] = useState(() => {
                 if (typeof window === 'undefined') return false;
-                const ua = navigator.userAgent;
-                // Android WebView check
-                if (/wv/i.test(ua)) return true;
-                // iOS WebView check (Lacks standard Safari tag)
-                if (/iPhone|iPod|iPad/i.test(ua) && !/Safari/i.test(ua)) return true;
-                // Median.co specific fallback
-                if (/median/i.test(ua)) return true;
+                
+                // Median.co / GoNative injects these objects directly into the app wrapper. 
+                // If these exist, we are 100% inside your APK.
+                if (window.median || window.gonative) return true;
+                
+                const ua = navigator.userAgent.toLowerCase();
+                // Standard WebView fallbacks just in case
+                if (ua.includes('median') || ua.includes('gonative') || ua.includes('wv')) return true;
+                if (/iphone|ipod|ipad/.test(ua) && !ua.includes('safari')) return true;
+                
                 return false;
             });
 
@@ -3220,14 +3223,14 @@
                             whileHover={{ scale: isFlipped ? 1 : (isTouchDevice ? 1 : 1.02) }} 
                             whileTap={{ scale: isFlipped ? 1 : 0.98 }}
                         >
-                            {/* 3D Depth edges - Safely DISABLED for WebViews to prevent Z-fighting bugs */}
+                            {/* 3D Depth edges - Safely DISABLED for Median APKs to prevent glitching */}
                             {!isWebView && [...Array(6)].map((_, i) => (
                                 <div key={i} className="absolute inset-0 rounded-[2rem] bg-slate-800 border border-slate-700/20 backface-hidden" style={{ transform: `translateZ(${-i}px)`, WebkitBackfaceVisibility: 'hidden' }} />
                             ))}
 
                             {/* Front (TOP SECRET) */}
                             <div className="absolute inset-0 backface-hidden rounded-[2rem] shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] bg-slate-900 border border-white/10 flex flex-col items-center justify-center p-8 overflow-hidden" 
-                                 style={{ transform: isWebView ? 'rotateY(0deg)' : 'translateZ(1px)', WebkitBackfaceVisibility: 'hidden' }}>
+                                 style={{ transform: isWebView ? 'translateZ(0px)' : 'translateZ(1px)', WebkitBackfaceVisibility: 'hidden' }}>
                                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
 
                                 <div className="w-24 h-24 flex items-center justify-center mb-8">
@@ -3244,7 +3247,7 @@
                                     ? 'bg-gradient-to-br from-red-950 to-slate-950 border-[#020617]' 
                                     : 'bg-gradient-to-br from-teal-950 to-slate-950 border-[#020617]'
                             }`} 
-                                 style={{ transform: isWebView ? 'rotateY(180deg)' : 'translateZ(-6px) rotateY(180deg)', WebkitBackfaceVisibility: 'hidden' }}>
+                                 style={{ transform: isWebView ? 'rotateY(180deg) translateZ(0px)' : 'translateZ(-6px) rotateY(180deg)', WebkitBackfaceVisibility: 'hidden' }}>
                                 
                                 <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
                                      <div className="absolute w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
