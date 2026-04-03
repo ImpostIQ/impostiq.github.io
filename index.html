@@ -541,6 +541,7 @@
         };
 
         const AUDIO_URLS = {
+            cardFlip: "https://impostiq.github.io/sound/cardflip.mp3",
             startMission: "https://impostiq.github.io/sound/startmiss.mp3",
             startRandomMission: "https://impostiq.github.io/sound/startrandmiss.mp3",
             selectCategory: "https://impostiq.github.io/sound/selectcat.mp3",
@@ -3069,28 +3070,35 @@
             const targetRotX = useMotionValue(0);
             const targetRotY = useMotionValue(0);
             
-            // Restored your EXACT original smooth bouncy spring settings
+            // YOUR EXACT SPRINGS (Keeps the original buttery smooth feel)
             const springConfig = { damping: 16, stiffness: 52, mass: 1.6 };
             const rotX = useSpring(targetRotX, springConfig);
             const rotY = useSpring(targetRotY, springConfig);
             const velX = useVelocity(rotX);
             const velY = useVelocity(rotY);
             
-            // Restored your exact original skew values
-            const skewX = useTransform(velY, [-1000, 1000], [-12, 12]);
-            const skewY = useTransform(velX, [-1000, 1000], [12, -12]);
+            // Reduced max skew to stop mobile GPUs from tearing the 3D matrix on fast flips
+            const skewX = useTransform(velY, [-1000, 1000], [-3, 3]);
+            const skewY = useTransform(velX, [-1000, 1000], [3, -3]);
             
-            const rotZ = useTransform(() => (velX.get() - velY.get()) / 44);
+            // Capped Z-rotation so the corners don't whip wildly into the button area
+            const rotZ = useTransform(() => {
+                const val = (velX.get() - velY.get()) / 44;
+                return Math.max(-5, Math.min(5, val)); 
+            });
+            
+            // THE UNIVERSAL MOBILE FIX: Cap Z-depth at 80 (was 400).
+            // Stops the 3D layer from physically colliding with the button layer.
             const z = useTransform(() => {
                 const vx = velX.get();
                 const vy = velY.get();
                 const speed = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
-                // FIX: Capped the Z-depth pop-out to 120px (was 400px). 
-                // This stops the card from physically crashing into the button on mobile.
-                return Math.min(speed / 6.4, 120);
+                return Math.min(speed / 6.4, 80);
             });
-            // FIX: Adjusted scale to match the new 120px Z-depth, keeping your visual 1.15x zoom!
-            const scale = useTransform(z, [0, 120], [1, 1.15]);
+            
+            // Adjust the scale to match the new depth. 
+            // It still visually zooms 1.15x, keeping the awesome "pop-out" illusion!
+            const scale = useTransform(z, [0, 80], [1, 1.15]);
             
             const mouseX = useMotionValue(0);
             const mouseY = useMotionValue(0);
@@ -3138,7 +3146,7 @@
                 if (!isFlipped) {
                     setIsFlipped(true);
                     targetRotY.set(targetRotY.get() + 180); 
-                    audioManager.playSound('uiClick');
+                    audioManager.playSound('cardFlip');
                     if (navigator.vibrate) navigator.vibrate(30);
                     resetMouse();
                 }
@@ -3954,6 +3962,7 @@
             });
 
             essentialAudioUrls.add(AUDIO_URLS.uiClick);
+            essentialAudioUrls.add(AUDIO_URLS.cardFlip);
             essentialAudioUrls.add(AUDIO_URLS.startMission);
             essentialAudioUrls.add(AUDIO_URLS.mainMenuMusic);
             
