@@ -2479,7 +2479,7 @@
                         <div className="flex-1 overflow-y-auto no-scrollbar space-y-3">
                             {players.map((player, index) => (
                                 <div key={player.id || index} className="flex items-center gap-3 bg-white/5 p-3 rounded-lg">
-                                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-sky-900/50 text-sky-400 font-mono font-bold text-sm rounded-md border border-sky-400/20">{index + 1}</div>
+                                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-brand-500/20 text-brand-400 font-mono font-bold text-sm rounded-lg border border-brand-500/20">{index + 1}</div>
                                     <PlayerAvatar name={player.name} className="w-6 h-6 rounded-full" />
                                     <div className="font-semibold text-white/90 truncate">{player.name}</div>
                                 </div>
@@ -3206,61 +3206,66 @@
         };
 
         const TurnOrderScreen = ({ players, onStartMission, audioManager, isHost }) => {
-    
-    useEffect(() => {
-        if (audioManager) {
-            audioManager.playSound('turnOrderReveal');
-        }
-        return () => {
-            if (audioManager) {
-                audioManager.stopSound('turnOrderReveal');
-            }
-        };
-    }, [audioManager]);
+            useEffect(() => {
+                if (audioManager) {
+                    audioManager.playSound('turnOrderReveal');
+                }
+                return () => {
+                    if (audioManager) {
+                        audioManager.stopSound('turnOrderReveal');
+                    }
+                };
+            }, [audioManager]);
 
-    return (
-        <div className="h-[100dvh] flex flex-col items-center p-6 text-center relative overflow-hidden animate-fadeIn">
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="blob bg-teal-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
-                <div className="blob bg-sky-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
-            </div>
-
-            <div className="w-full max-w-sm pt-12">
-                <h1 className="text-4xl font-display font-bold text-white mb-4">Turn Order</h1>
-                <p className="text-white/60 mb-8 max-w-xs mx-auto">The mission will proceed in this sequence.</p>
-            </div>
-
-            <div className="flex-1 w-full max-w-sm my-4 flex flex-col min-h-0">
-                <div className="w-full glass-panel rounded-2xl p-6 overflow-y-auto no-scrollbar">
-                    <div className="space-y-4">
-                        {players.map((player, index) => (
-                            <div key={index} className="flex items-center gap-3">
-                                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-sky-900/50 text-sky-400 font-mono font-bold text-sm rounded-lg border border-sky-400/20">{index + 1}</div>
-                                <PlayerAvatar name={player.name} className="w-6 h-6 rounded-full" />
-                                <div className="text-left font-display font-semibold text-lg text-white/90 truncate">{player.name}</div>
+            return (
+                <div className="flex flex-col h-[100dvh] relative z-10 animate-fadeIn">
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+                        <div className="max-w-lg mx-auto p-6 pt-24">
+                            <div className="mb-8 text-center">
+                                <h1 className="text-4xl font-display font-black text-white mb-2 drop-shadow-lg tracking-tight">Turn Order</h1>
+                                <p className="text-white/40 font-semibold tracking-wide">The mission will proceed in this sequence.</p>
                             </div>
-                        ))}
+
+                            <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                    <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                        <i className="fa-solid fa-list-ol text-brand-400 mr-1"></i> Mission Sequence
+                                    </h2>
+                                </div>
+                                <div className="p-4 flex flex-col gap-3">
+                                    {players.map((player, index) => (
+                                        <div key={index} className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl border border-transparent">
+                                            <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-brand-500/20 text-brand-400 font-mono font-bold text-sm rounded-lg border border-brand-500/20">
+                                                {index + 1}
+                                            </div>
+                                            <PlayerAvatar name={player.name} className="w-7 h-7 rounded-full flex-shrink-0" />
+                                            <span className="font-bold text-white/80 truncate">{player.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                    <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#020617] via-[#020617] to-transparent z-50">
+                        <div className="max-w-lg mx-auto pb-[env(safe-area-inset-bottom)]">
+                            {isHost ? (
+                                <button 
+                                    onClick={onStartMission}
+                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                >
+                                    <i className="fa-solid fa-play text-sm"></i> START MISSION
+                                </button>
+                            ) : (
+                                <div className="w-full bg-white/5 text-white/40 font-display font-bold text-lg py-5 rounded-[1.5rem] border border-white/10 flex items-center justify-center gap-3">
+                                    WAITING FOR HOST...
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div className="w-full max-w-sm pb-8">
-                {isHost ? (
-                    <button 
-                        onClick={onStartMission}
-                        className="w-full bg-white hover:bg-slate-200 text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] active:scale-95 transition-all flex items-center justify-center gap-3"
-                    >
-                        <i className="fa-solid fa-rocket text-sky-500"></i> START MISSION
-                    </button>
-                ) : (
-                    <div className="w-full bg-white/5 text-white/40 font-display font-bold text-lg py-5 rounded-[1.5rem] border border-white/10 flex items-center justify-center gap-3">
-                        WAITING FOR HOST...
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
+            );
+        };
 
         const GameTimerScreen = ({ lobbyData, onEndGame, firstPlayer, audioManager, isHost, lobbyId }) => {
             const [showTurnOrder, setShowTurnOrder] = useState(false);
@@ -3333,90 +3338,93 @@
             };
 
             const progress = duration ? timeLeft / duration : 0;
-            const strokeDasharray = 2 * Math.PI * 120;
+            const strokeDasharray = 2 * Math.PI * 100;
             const strokeDashoffset = strokeDasharray * (1 - progress);
             const isActive = duration && timeLeft > 0;
 
             return (
-                <div className="h-[100dvh] flex flex-col items-center justify-between p-6 relative overflow-hidden">
+                <div className="flex flex-col h-[100dvh] relative z-10 animate-fadeIn">
                     {showTurnOrder && <TurnOrderReviewModal players={turnOrder} onClose={() => setShowTurnOrder(false)} />}
+                    
                     <div className="absolute inset-0 pointer-events-none">
                         <div className={`absolute inset-0 bg-red-600/10 transition-opacity duration-1000 ${timeLeft < 30 && isActive ? 'opacity-100 animate-pulse' : 'opacity-0'}`}></div>
-                        <div className="blob bg-brand-900/30 top-0 left-0 w-full h-full"></div>
                     </div>
-
-                    <div className="w-full mt-8 glass-panel p-4 rounded-[1.5rem] flex items-center justify-between gap-4 z-10">
-                        <div className="flex items-center gap-4 min-w-0">
-                            <div className="bg-brand-500/20 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i className="fa-solid fa-comments text-brand-300"></i>
-                            </div>
-                            <div className="min-w-0">
-                                <p className="text-brand-300/70 text-[10px] uppercase font-bold tracking-widest mb-1">First Questioner</p>
-                                <div className="flex items-center gap-3">
-                                    <PlayerAvatar name={firstPlayer} className="w-6 h-6 rounded-full"/>
-                                    <p className="text-white font-display font-bold text-xl tracking-wide truncate">{firstPlayer}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={() => {
-                                setShowTurnOrder(true);
-                                audioManager.playSound('uiClick');
-                            }}
-                            className="w-12 h-12 flex-shrink-0 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white transition-colors active:scale-90"
-                            aria-label="Review turn order"
-                        >
-                            <i className="fa-solid fa-list-ol"></i>
-                        </button>
-                    </div>
-
-                    <div className="flex-1 flex flex-col items-center justify-center z-10 w-full relative">
-                        {duration ? (
-                            <div className="relative transform scale-90 sm:scale-100 transition-transform">
-                                <div className={`absolute inset-0 rounded-full blur-[100px] transition-all duration-1000 ${timeLeft < 30 ? 'bg-red-500/20' : 'bg-brand-500/10'}`}></div>
-                                <div className="relative">
-                                    <svg className="w-72 h-72 transform -rotate-90">
-                                        <circle cx="144" cy="144" r="120" stroke="rgba(255,255,255,0.05)" strokeWidth="8" fill="transparent" />
-                                        <circle 
-                                            cx="144" cy="144" r="120" stroke="currentColor" strokeWidth="8" fill="transparent" 
-                                            className={`${timeLeft < 30 ? 'text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]' : 'text-brand-500 shadow-[0_0_20px_rgba(139,92,246,0.5)]'} transition-all duration-1000 drop-shadow-xl`}
-                                            strokeDasharray={strokeDasharray}
-                                            strokeDashoffset={strokeDashoffset}
-                                            strokeLinecap="round"
-                                        />
-                                    </svg>
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className={`text-7xl font-mono font-bold tracking-tighter tabular-nums ${timeLeft < 30 && isActive ? 'text-red-500 animate-pulse' : 'text-white'}`}>
-                                            {formatTime(timeLeft)}
-                                        </span>
-                                        <span className="text-white/30 text-[10px] font-bold uppercase tracking-[0.4em] mt-4 ml-1">
-                                            {timeLeft === 0 ? "TIME'S UP" : "REMAINING"}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="text-center py-16 px-8 glass-panel rounded-[2.5rem] border border-white/5">
-                                <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8 ring-1 ring-white/10">
-                                    <i className="fa-solid fa-infinity text-white/50 text-4xl"></i>
-                                </div>
-                                <h2 className="text-3xl font-display font-bold mb-4 text-white">Untimed Mode</h2>
-                                <p className="text-white/40 text-sm font-medium leading-relaxed max-w-xs mx-auto">
-                                    Analyze behavior. Watch for nervous ticks. Take your time to find the spy.
+					
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+                        <div className="max-w-lg mx-auto p-6 pt-24 sm:pt-28">
+                             <div className="mb-10 text-center">
+								<h1 className="text-5xl font-display font-black text-white mb-2 drop-shadow-lg tracking-tight">
+                                    Active Mission
+                                </h1>
+                                <p className="text-white/40 font-semibold tracking-wide">
+                                    Find the spy before time runs out.
                                 </p>
-                            </div>
-                        )}
+							</div>
+
+                            <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                    <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                        <i className="fa-solid fa-stopwatch text-brand-400 mr-1"></i> {duration ? 'Mission Timer' : 'Mission Status'}
+                                    </h2>
+                                </div>
+                                <div className="p-8 flex flex-col items-center justify-center min-h-[320px]">
+                                    {duration ? (
+                                        <div className="relative transform scale-90 sm:scale-100 transition-transform">
+                                            <div className={`absolute inset-0 rounded-full blur-[80px] transition-all duration-1000 ${timeLeft < 30 ? 'bg-red-500/20' : 'bg-brand-500/10'}`}></div>
+                                            <div className="relative">
+                                                <svg className="w-64 h-64 transform -rotate-90">
+                                                    <circle cx="128" cy="128" r="100" stroke="rgba(255,255,255,0.05)" strokeWidth="8" fill="transparent" />
+                                                    <circle 
+                                                        cx="128" cy="128" r="100" stroke="currentColor" strokeWidth="8" fill="transparent" 
+                                                        className={`${timeLeft < 30 ? 'text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]' : 'text-brand-500 shadow-[0_0_20px_rgba(139,92,246,0.5)]'} transition-all duration-1000 drop-shadow-xl`}
+                                                        strokeDasharray={strokeDasharray}
+                                                        strokeDashoffset={strokeDashoffset}
+                                                        strokeLinecap="round"
+                                                    />
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className={`text-6xl font-mono font-bold tracking-tighter tabular-nums ${timeLeft < 30 && isActive ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                                                        {formatTime(timeLeft)}
+                                                    </span>
+                                                    <span className="text-white/30 text-[10px] font-bold uppercase tracking-[0.4em] mt-3 ml-1">
+                                                        {timeLeft === 0 ? "TIME'S UP" : "REMAINING"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center">
+                                            <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-white/10">
+                                                <i className="fa-solid fa-infinity text-white/50 text-4xl"></i>
+                                            </div>
+                                            <h2 className="text-2xl font-display font-bold mb-3 text-white">Untimed Mode</h2>
+                                            <p className="text-white/40 text-sm font-medium leading-relaxed max-w-[220px] mx-auto">
+                                                Analyze behavior. Watch for nervous ticks. Take your time to find the spy.
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="text-center py-3 bg-black/50 border-t border-white/5">
+                                    <button onClick={() => { setShowTurnOrder(true); audioManager.playSound('uiClick'); }} className="text-white/50 font-semibold hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto text-sm">
+                                        <i className="fa-solid fa-list-ol text-brand-400"></i>
+                                        <span>View Turn Order</span>
+                                    </button>
+                                </div>
+                            </section>
+                        </div>
                     </div>
 
-                    <div className="w-full z-10 pb-[env(safe-area-inset-bottom)] mb-8">
-                        <button 
-                            onClick={handleIdentifyImposter}
-                            disabled={lobbyId && !isHost}
-                            className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_40px_rgba(220,38,38,0.4)] hover:shadow-[0_0_55px_rgba(234,88,12,0.5)] transition-all duration-300 ease-out active:scale-[0.98] hover:scale-[1.01] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <i className="fa-solid fa-user-secret text-xl"></i>
-                            {duration && timeLeft === 0 && !lobbyId ? 'REVEAL IMPOSTER' : 'IDENTIFY IMPOSTER'}
-                        </button>
+                    <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#020617] via-[#020617] to-transparent z-50">
+                        <div className="max-w-lg mx-auto pb-[env(safe-area-inset-bottom)]">
+                            <button
+                                onClick={handleIdentifyImposter}
+                                disabled={lobbyId && !isHost}
+                                className="w-full h-[68px] bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                            >
+                                <i className="fa-solid fa-user-secret text-lg"></i>
+                                {duration && timeLeft === 0 && !lobbyId ? 'REVEAL IMPOSTER' : 'IDENTIFY IMPOSTER'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
@@ -3452,93 +3460,120 @@
             
             const VotedForName = ({ playerId }) => {
                 const player = lobbyPlayers.find(p => p.id === playerId);
-                if (!player) return <span className="flex-1 text-right font-bold text-white truncate">Unknown</span>;
-
+                if (!player) return <span className="font-bold text-white truncate">Unknown</span>;
                 return (
-                    <div className="flex items-center justify-end gap-2">
-                        <span className="flex-1 text-right font-bold text-white truncate">{player.name}</span>
-                        <PlayerAvatar name={player.name} className="w-5 h-5 rounded-full" />
+                    <div className="flex items-center gap-3">
+                        <PlayerAvatar name={player.name} className="w-6 h-6 rounded-full" />
+                        <span className="font-bold text-white truncate text-lg">{player.name}</span>
                     </div>
                 );
             };
             
             const renderVotingRecord = (player) => {
                 if (!player.votedFor || !Array.isArray(player.votedFor) || player.votedFor.length === 0) {
-                     return <i className="fa-solid fa-ellipsis text-white/40"></i>;
+                     return <i className="fa-solid fa-ellipsis text-white/30 text-lg"></i>;
                 }
-                return <i className="fa-solid fa-check text-green-400 animate-fadeIn"></i>;
+                return <i className="fa-solid fa-check-circle text-green-400 text-xl animate-fadeIn"></i>;
             }
 
             return (
-                <div className="h-[100dvh] flex flex-col items-center justify-start pt-16 p-6 text-center overflow-y-auto no-scrollbar relative animate-fadeIn">
-                     <div className="absolute inset-0 pointer-events-none">
-                        <div className="blob bg-red-600/20 top-0 left-0 w-full h-full"></div>
-                    </div>
-                    
-                    <div className="relative z-10 w-full max-w-sm">
-                        <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 relative mx-auto">
-                            <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full animate-pulse-slow"></div>
-                            <div className="glass-panel w-full h-full rounded-full flex items-center justify-center border border-white/10">
-                               <i className={`fa-solid ${isFakeWordMode ? 'fa-question' : 'fa-user-secret'} text-red-400 text-4xl`}></i>
+                <div className="flex flex-col h-[100dvh] relative z-10 animate-fadeIn">
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+                        <div className="max-w-lg mx-auto p-6 pt-24">
+                            <div className="mb-8 text-center">
+                                <h1 className="text-4xl font-display font-black text-white mb-2 drop-shadow-lg tracking-tight">
+                                    {isFakeWordMode ? 'Who Has the Fake Word?' : 'Who is the Imposter?'}
+                                </h1>
+                                <p className="text-white/40 font-semibold tracking-wide">
+                                    {numImposters > 1 ? `Select the ${numImposters} agents you believe are suspicious.` : "Cast your vote."}
+                                </p>
                             </div>
-                        </div>
-                        <h1 className="text-4xl font-display font-bold text-white mb-4">{isFakeWordMode ? 'Who Has the Fake Word?' : 'Who is the Imposter?'}</h1>
-                        <p className="text-white/60 mb-10">{numImposters > 1 ? `Select the ${numImposters} agents you believe are suspicious.` : "Cast your vote. The agent with the most votes will be revealed."}</p>
 
-                        {me?.votedFor && me.votedFor.length > 0 ? (
-                             <div className="w-full max-w-sm">
-                                <div className="glass-panel p-8 rounded-2xl mb-6 text-center">
-                                    <i className="fa-solid fa-check-circle text-green-400 text-4xl mb-4"></i>
-                                    <h3 className="text-xl font-bold text-white mb-2">Vote Cast!</h3>
-                                    <p className="text-white/50 text-sm mb-4">You voted for:</p>
-                                    <div className="flex flex-col gap-2 items-center">
-                                        {me.votedFor.map(voteId => <VotedForName key={voteId} playerId={voteId} />)}
-                                    </div>
-                                    <hr className="border-white/10 my-4" />
-                                    <p className="text-white/50 text-sm">Waiting for other agents to vote.</p>
-                                </div>
-                                <div className="glass-panel p-6 rounded-2xl">
-                                    <h4 className="text-sm font-bold tracking-widest text-brand-400 mb-4 uppercase">Voting Status</h4>
-                                    <div className="space-y-3">
-                                        {lobbyPlayers.map(player => (
-                                            <div key={player.id} className="flex items-center justify-between bg-white/5 px-4 py-3 rounded-lg">
-                                                <div className="flex items-center gap-3 truncate">
-                                                    <PlayerAvatar name={player.name} className="w-6 h-6 rounded-full"/>
-                                                    <span className="font-semibold text-white/90 truncate">{player.name}</span>
-                                                </div>
-                                                {renderVotingRecord(player)}
+                            {me?.votedFor && me.votedFor.length > 0 ? (
+                                <>
+                                    <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                        <div className="text-center py-6 bg-black/40 border-b border-white/5 flex flex-col items-center justify-center">
+                                            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-3">
+                                                <i className="fa-solid fa-check text-2xl text-green-400"></i>
                                             </div>
+                                            <h3 className="text-xl font-display font-bold text-white mb-1">Vote Locked In</h3>
+                                            <p className="text-white/50 text-xs font-medium px-4">Waiting for remaining agents to cast their votes.</p>
+                                        </div>
+                                        <div className="p-4 bg-black/20">
+                                            <p className="text-center text-white/40 text-[10px] uppercase font-bold tracking-widest mb-3">
+                                                {numImposters === 1 ? 'Your Suspect' : 'Your Suspects'}
+                                            </p>
+                                            <div className="flex flex-col gap-2">
+                                                {me.votedFor.map(voteId => (
+                                                    <div key={voteId} className="flex items-center justify-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
+                                                        <VotedForName playerId={voteId} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                        <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                            <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                                <i className="fa-solid fa-users text-brand-400 mr-1"></i> Voting Status
+                                            </h2>
+                                        </div>
+                                        <div className="p-4 flex flex-col gap-3">
+                                            {lobbyPlayers.map(player => (
+                                                <div key={player.id} className="flex items-center justify-between bg-white/5 px-4 py-3 rounded-xl border border-transparent">
+                                                    <div className="flex items-center gap-3 truncate">
+                                                        <PlayerAvatar name={player.name} className="w-7 h-7 rounded-full flex-shrink-0"/>
+                                                        <span className="font-bold text-white/80 truncate">{player.name}</span>
+                                                    </div>
+                                                    <div className="flex items-center justify-center flex-shrink-0">
+                                                        {renderVotingRecord(player)}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </>
+                            ) : (
+                                <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                    <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                        <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                            <i className="fa-solid fa-crosshairs text-brand-400 mr-1"></i> Select Suspects
+                                        </h2>
+                                    </div>
+                                    <div className="p-4 flex flex-col gap-3">
+                                        {lobbyPlayers.filter(p => p.id !== user.uid).map(player => (
+                                            <button 
+                                                key={player.id} 
+                                                onClick={() => handleSelectPlayer(player.id)}
+                                                className={`w-full text-left p-4 rounded-xl transition-all flex items-center gap-4 active:scale-95 border ${selectedVotes.includes(player.id) ? 'bg-brand-500/20 border-brand-500 shadow-[inset_0_0_0_1px_rgba(139,92,246,1)]' : 'bg-white/5 hover:bg-white/10 border-transparent'}`}
+                                            >
+                                                <div className={`w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center border-2 transition-colors ${selectedVotes.includes(player.id) ? 'bg-brand-500 border-brand-500' : 'border-white/20'}`}>
+                                                    {selectedVotes.includes(player.id) && <i className="fa-solid fa-check text-xs text-white"></i>}
+                                                </div>
+                                                <PlayerAvatar name={player.name} className="w-8 h-8 rounded-full flex-shrink-0" />
+                                                <span className={`font-bold text-lg truncate ${selectedVotes.includes(player.id) ? 'text-white' : 'text-white/80'}`}>{player.name}</span>
+                                            </button>
                                         ))}
                                     </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="w-full flex flex-col gap-3">
-                                    {lobbyPlayers.filter(p => p.id !== user.uid).map(player => (
-                                        <button 
-                                            key={player.id} 
-                                            onClick={() => handleSelectPlayer(player.id)}
-                                            className={`w-full text-left p-4 rounded-xl transition-all flex items-center gap-4 active:scale-95 border ${selectedVotes.includes(player.id) ? 'bg-brand-500/20 border-brand-400' : 'bg-white/5 hover:bg-white/10 border-transparent'}`}
-                                        >
-                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${selectedVotes.includes(player.id) ? 'bg-brand-500 border-brand-400' : 'border-white/20'}`}>
-                                                {selectedVotes.includes(player.id) && <i className="fa-solid fa-check text-xs text-white"></i>}
-                                            </div>
-                                            <PlayerAvatar name={player.name} className="w-8 h-8 rounded-full" />
-                                            <span className="font-bold text-lg truncate">{player.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
+                                </section>
+                            )}
+                        </div>
+                    </div>
+
+                    {!me?.votedFor && (
+                        <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#020617] via-[#020617] to-transparent z-50">
+                            <div className="max-w-lg mx-auto pb-[env(safe-area-inset-bottom)]">
                                 <button
                                     onClick={handleConfirmVote}
                                     disabled={selectedVotes.length !== numImposters}
-                                    className="w-full mt-6 bg-red-600 text-white font-display font-bold text-lg py-4 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.3)] transition-all active:scale-95 disabled:opacity-50 disabled:shadow-none"
+                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                 >
-                                    Confirm Vote ({selectedVotes.length}/{numImposters})
+                                    <i className="fa-solid fa-check-double text-sm"></i> CONFIRM VOTE ({selectedVotes.length}/{numImposters})
                                 </button>
-                            </>
-                        )}
-                    </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )
         };
@@ -3588,132 +3623,141 @@
                 };
             }, [audioManager, gameResult, isLocal]);
 
-
-            const renderResultContent = () => {
-                if (!gameResult) {
-                    return <p>Calculating results...</p>;
-                }
-
-                const title = isFakeWordMode ? `The Player with the Fake Word Was...` : (roguePlayers.length > 1 ? `The Imposters Were...` : `The Imposter Was...`);
-
-                if (isLocal) {
-                    return (
-                        <>
-                            <div className="w-28 h-28 bg-gradient-to-br from-red-500/20 to-transparent rounded-full flex items-center justify-center mx-auto mb-8 ring-1 ring-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.2)] overflow-hidden">
-                                <img src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" alt="Ninja" draggable="false" className="w-30 h-30 drop-shadow-lg relative top-3" />
-                            </div>
-                            <h2 className="text-3xl font-display font-bold text-white mb-2">{title}</h2>
-                            <p className="text-4xl font-black text-red-400 tracking-tight drop-shadow-sm w-full truncate">{roguePlayerNames}</p>
-                        </>
-                    );
-                }
-                
-                if (gameResult.winner === 'imposter' || gameResult.winner === 'fakeWordPlayer') {
-                    const winnerName = isFakeWordMode ? "FAKE WORD PLAYER WINS" : "IMPOSTER WINS";
-                    return (
-                        <>
-                         <div className="w-28 h-28 bg-gradient-to-br from-red-500/20 to-transparent rounded-full flex items-center justify-center mx-auto mb-8 ring-1 ring-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.2)] overflow-hidden">
-                            <img src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" alt="Ninja" draggable="false" className="w-30 h-30 drop-shadow-lg relative top-3" />
-                        </div>
-                        <h2 className="text-3xl font-display font-bold text-red-400 mb-2">{winnerName}</h2>
-                        <p className="text-white/60 mb-6 max-w-xs mx-auto">
-                            {gameResult.reason === 'tie'
-                                ? "The agents couldn't agree on a suspect, allowing the rogue agent to escape!"
-                                : `The agents incorrectly accused ${gameResult.accusedName}, allowing the real rogue agent to win!`}
-                        </p>
-                        <p className="text-white">{title.replace('...', '')} <span className="font-bold text-red-400">{roguePlayerNames}</span></p>
-                        </>
-                    );
-                } else {
-                     return (
-                        <>
-                         <div className="w-28 h-28 bg-gradient-to-br from-teal-500/20 to-transparent rounded-full flex items-center justify-center mx-auto mb-8 ring-1 ring-teal-500/40 shadow-[0_0_40px_rgba(20,184,166,0.1)] overflow-hidden">
-                            <img src="https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png" alt="Detective" draggable="false" className="w-35 h-35 drop-shadow-lg relative top-3" />
-                        </div>
-                        <h2 className="text-3xl font-display font-bold text-teal-400 mb-2">AGENTS WIN</h2>
-                        <p className="text-white/60 mb-6 max-w-xs mx-auto">
-                           The agents successfully identified a rogue element!
-                        </p>
-                        <p className="text-white">{title.replace('...', '')} <span className="font-bold text-teal-400">{roguePlayerNames}</span></p>
-                        </>
-                    );
-                }
-            };
+            const isImposterWin = gameResult?.winner === 'imposter' || gameResult?.winner === 'fakeWordPlayer';
+            const isAgentWin = gameResult?.winner === 'agents';
+            
+            let titleImg = "https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png";
+            let titleColor = "text-red-400";
+            let titleBg = "bg-red-500/10";
+            let titleText = isFakeWordMode ? "FAKE WORD PLAYER WINS" : "IMPOSTER WINS";
+            let subtitleText = gameResult?.reason === 'tie' ? "The agents couldn't agree on a suspect." : `Agents incorrectly accused ${gameResult?.accusedName}.`;
+            let ambientBgClass = "bg-red-500/5"; // Very subtle sleek background tint
+            
+            if (isLocal) {
+                 titleText = isFakeWordMode ? "FAKE WORD PLAYER" : (roguePlayers.length > 1 ? "IMPOSTERS" : "IMPOSTER");
+                 subtitleText = "The truth is revealed.";
+                 titleColor = "text-brand-400";
+                 titleBg = "bg-brand-500/10";
+                 ambientBgClass = "bg-brand-500/5";
+            } else if (isAgentWin) {
+                 titleText = "AGENTS WIN";
+                 subtitleText = "The rogue element was successfully identified!";
+                 titleColor = "text-teal-400";
+                 titleBg = "bg-teal-500/10";
+                 titleImg = "https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png";
+                 ambientBgClass = "bg-teal-500/5";
+            }
 
             return (
-                <div className="h-[100dvh] flex flex-col items-center p-6 text-center overflow-y-auto no-scrollbar">
-                    <div className="absolute inset-0 pointer-events-none">
-                        <div className={`blob ${ (gameResult?.winner !== 'agents' && !isLocal) || isLocal ? 'bg-red-600/20' : 'bg-teal-600/20'} top-0 left-0 w-full h-full`}></div>
-                    </div>
-                    
-                    <div className="relative my-8 w-full max-w-sm z-10">
-                        <div className={`absolute inset-0 ${ (gameResult?.winner !== 'agents' && !isLocal) || isLocal ? 'bg-red-500' : 'bg-teal-500'} rounded-[2.5rem] blur-[50px] opacity-20`}></div>
-                        <div className={`relative glass-panel p-10 rounded-[2.5rem] border ${ (gameResult?.winner !== 'agents' && !isLocal) || isLocal ? 'border-red-500/30' : 'border-teal-500/30'}`}>
-                           {renderResultContent()}
-                        </div>
-                    </div>
-
-                    <div className="glass-panel p-6 rounded-[2rem] w-full max-w-sm mb-8 border border-white/5 z-10">
-                        <p className="text-slate-500 text-[10px] uppercase tracking-widest font-bold mb-3">{isFakeWordMode ? 'The Real Word' : 'The Secret Word'}</p>
-                        <p className="text-3xl font-display font-bold text-teal-400 tracking-wide">{secretWord}</p>
-                         {isFakeWordMode && fakeWord && (
-                            <>
-                                <div className="h-px bg-white/10 my-4"></div>
-                                <p className="text-slate-500 text-[10px] uppercase tracking-widest font-bold mb-3">The Fake Word</p>
-                                <p className="text-3xl font-display font-bold text-yellow-400 tracking-wide">{fakeWord}</p>
-                            </>
-                         )}
-                    </div>
-
-                    {!isLocal && lobbyData.votingRecord && (
-                        <div className="glass-panel p-6 rounded-[2rem] w-full max-w-sm mb-8 border border-white/5 z-10 animate-fadeIn">
-                            <h3 className="text-sm font-bold tracking-widest text-brand-400 mb-4 uppercase">Voting Record</h3>
-                            <div className="space-y-2 text-left">
-                                {lobbyData.votingRecord.map((record, index) => (
-                                    <div key={index} className="flex items-center text-sm bg-white/5 px-3 py-2 rounded-lg">
-                                        <div className="flex-1 flex items-center gap-2 min-w-0">
-                                            <PlayerAvatar name={record.voterName} className="w-5 h-5 rounded-full" />
-                                            <span className="font-semibold text-white/80 truncate">{record.voterName}</span>
-                                        </div>
-                                        <i className="fa-solid fa-arrow-right text-white/30 mx-2 flex-shrink-0"></i>
-                                        <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
-                                            <span className="font-bold text-white truncate">{record.votedForName}</span>
-                                            {record.votedForName !== 'No Vote' && <PlayerAvatar name={record.votedForName} className="w-5 h-5 rounded-full" />}
-                                        </div>
-                                    </div>
-                                ))}
+                <div className={`flex flex-col h-[100dvh] relative z-10 animate-fadeIn ${ambientBgClass} transition-colors duration-1000`}>
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-40">
+                        <div className="max-w-lg mx-auto p-6 pt-16">
+                            <div className="mb-8 text-center">
+                                <h1 className="text-4xl font-display font-black text-white mb-2 drop-shadow-lg tracking-tight">Mission Report</h1>
+                                <p className="text-white/40 font-semibold tracking-wide">The dust has settled.</p>
                             </div>
+
+                            {!gameResult ? (
+                                <p className="text-center text-white/60">Calculating results...</p>
+                            ) : (
+                                <>
+                                    <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                        <div className="text-center py-8 bg-black/40 border-b border-white/5 flex flex-col items-center justify-center px-4">
+                                            <div className={`w-24 h-24 ${titleBg} rounded-full flex items-center justify-center mb-4 ring-1 ring-white/5 overflow-hidden`}>
+                                                <img src={titleImg} alt="Result Icon" className="w-22 h-22 drop-shadow-lg relative top-2" draggable="false" />
+                                            </div>
+                                            <h2 className={`text-2xl sm:text-3xl font-display font-black ${titleColor} mb-2 uppercase tracking-wide`}>{titleText}</h2>
+                                            <p className="text-white/60 text-sm max-w-[280px]">{subtitleText}</p>
+                                        </div>
+                                        <div className="p-5 flex flex-col items-center justify-center bg-black/20">
+                                            <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-2">{isFakeWordMode ? 'The Fake Word Player Was' : (roguePlayers.length > 1 ? 'The Spies Were' : 'The Imposter Was')}</p>
+                                            <p className="text-2xl font-bold text-white text-center break-words">{roguePlayerNames}</p>
+                                        </div>
+                                    </section>
+
+                                    <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                        <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                            <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                                <i className="fa-solid fa-key text-brand-400 mr-1"></i> Classified Intel
+                                            </h2>
+                                        </div>
+                                        <div className="p-4 flex gap-3">
+                                            <div className="flex-1 bg-black/20 rounded-xl p-4 border border-white/5 text-center">
+                                                <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-2">
+                                                    {isFakeWordMode ? 'Real Word' : 'Secret Word'}
+                                                </p>
+                                                <p className="text-xl font-display font-bold text-white break-words">{secretWord}</p>
+                                            </div>
+                                            {isFakeWordMode && fakeWord && (
+                                                <div className="flex-1 bg-black/20 rounded-xl p-4 border border-white/5 text-center">
+                                                    <p className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-2">Fake Word</p>
+                                                    <p className="text-xl font-display font-bold text-white break-words">{fakeWord}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </section>
+
+                                    {!isLocal && lobbyData.votingRecord && (
+                                        <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg animate-fadeIn">
+                                            <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                                <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                                    <i className="fa-solid fa-check-to-slot text-brand-400 mr-1"></i> Voting Record
+                                                </h2>
+                                            </div>
+                                            <div className="p-4 flex flex-col gap-3">
+                                                {lobbyData.votingRecord.map((record, index) => (
+                                                    <div key={index} className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 bg-white/5 px-4 py-3 rounded-xl border border-transparent">
+                                                        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                                            <PlayerAvatar name={record.voterName} className="w-7 h-7 rounded-full flex-shrink-0" />
+                                                            <span className="font-bold text-white/80 truncate text-sm">{record.voterName}</span>
+                                                        </div>
+                                                        <div className="text-white/30 text-sm flex-shrink-0 flex items-center justify-center px-1">
+                                                            <i className="fa-solid fa-arrow-right"></i>
+                                                        </div>
+                                                        <div className="flex items-center justify-end gap-2 sm:gap-3 min-w-0">
+                                                            <span className={`font-bold truncate text-sm text-right ${record.votedForName === 'No Vote' ? 'text-white/40' : 'text-white'}`}>{record.votedForName}</span>
+                                                            {record.votedForName !== 'No Vote' && <PlayerAvatar name={record.votedForName} className="w-7 h-7 rounded-full flex-shrink-0" />}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    )}
+                                </>
+                            )}
                         </div>
-                    )}
-                    
-                    <div className="w-full max-w-sm z-10 flex flex-col gap-3 pb-[env(safe-area-inset-bottom)] mb-8">
-                         {isHost ? (
+                    </div>
+
+                    <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#020617] via-[#020617] to-transparent z-50">
+                        <div className="max-w-lg mx-auto pb-[env(safe-area-inset-bottom)] flex flex-col gap-3">
+                            {isHost ? (
+                                <button 
+                                    onClick={() => {
+                                        if(navigator.vibrate) navigator.vibrate(20);
+                                        onRestart();
+                                    }}
+                                    disabled={notAllPlayersPresent}
+                                    className="w-full bg-white text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg shadow-[0_0_30px_rgba(255,255,255,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                                >
+                                    <i className="fa-solid fa-rotate-right text-lg"></i>
+                                    {notAllPlayersPresent ? 'WAITING FOR PLAYERS' : 'PLAY AGAIN'}
+                                </button>
+                            ) : (
+                                <button
+                                    disabled={true}
+                                    className="w-full bg-white/10 text-white/50 py-5 rounded-[1.5rem] font-display font-bold text-lg cursor-not-allowed flex items-center justify-center gap-3 border border-white/5"
+                                >
+                                    <i className="fa-solid fa-hourglass-half text-lg"></i>
+                                    WAITING FOR HOST
+                                </button>
+                            )}
                             <button 
-                                onClick={() => {
-                                    if(navigator.vibrate) navigator.vibrate(20);
-                                    onRestart();
-                                }}
-                                disabled={notAllPlayersPresent}
-                                className="w-full bg-white text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg shadow-[0_0_30px_rgba(255,255,255,0.15)] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                                onClick={isHost ? onBackToHome : onConfirmExit}
+                                className="w-full bg-white/5 hover:bg-white/10 text-white/70 py-5 rounded-[1.5rem] font-display font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-3"
                             >
-                                <i className="fa-solid fa-rotate-right text-lg"></i>
-                                {notAllPlayersPresent ? 'WAITING FOR PLAYERS' : 'PLAY AGAIN'}
+                                <i className="fa-solid fa-door-open text-sm"></i> BACK TO HOME
                             </button>
-                        ) : (
-                             <button
-                                disabled={true}
-                                className="w-full bg-white text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg opacity-50 cursor-not-allowed flex items-center justify-center gap-3"
-                            >
-                                <i className="fa-solid fa-hourglass-half text-lg"></i>
-                                WAITING FOR HOST
-                            </button>
-                        )}
-                        <button 
-                            onClick={isHost ? onBackToHome : onConfirmExit}
-                            className="w-full bg-white/5 hover:bg-white/10 text-white/70 py-5 rounded-[1.5rem] font-display font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-3"
-                        >
-                            <i className="fa-solid fa-house text-sm"></i> BACK TO HOME
-                        </button>
+                        </div>
                     </div>
                 </div>
             );
@@ -4298,6 +4342,10 @@
                     const newPlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     const currentLobbyDoc = latestLobbyData.current;
 
+                    if (newPlayers.length === 0 && latestLobbyPlayers.current.length > 0) {
+                        return; 
+                    }
+
                     if (newPlayers.length > 0 && latestLobbyPlayers.current.length > 0) {
                         const wasIInLobby = latestLobbyPlayers.current.some(p => p.id === user.uid);
                         const amIStillInLobby = newPlayers.some(p => p.id === user.uid);
@@ -4319,10 +4367,6 @@
                     previousPlayersRef.current = newPlayers;
                     
                     if (!currentLobbyDoc) return;
-
-                    if (newPlayers.length === 0 && previousPlayersRef.current.length > 0) {
-                        return; 
-                    }
 
                     const hostIsMissing = newPlayers.length > 0 && !newPlayers.some(p => p.id === currentLobbyDoc.hostId);
                     if (hostIsMissing && currentLobbyDoc.hostId !== user.uid) {
