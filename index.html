@@ -255,7 +255,10 @@
 
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
+        .backface-hidden { 
+			backface-visibility: hidden; 
+			-webkit-backface-visibility: hidden; 
+		}
         .rotate-y-180 { transform: rotateY(180deg); }
         .rotate-y-0 { transform: rotateY(0deg); }
 
@@ -3065,47 +3068,38 @@
         const CardRevealScreen = ({ player, word, onNext, isLastPlayer, audioManager, onAcknowledge, isOnline, onConfused }) => {
             const [step, setStep] = useState(isOnline ? 'reveal' : 'handover'); 
             const [isFlipped, setIsFlipped] = useState(false);
+            
+            // Detect if the user is on a mobile/touch device
+            const [isTouchDevice] = useState(() => typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
 
-            // Framer Motion Physics - Safely formatted to prevent unmount crashes
+            // Framer Motion Physics
             const targetRotX = useMotionValue(0);
             const targetRotY = useMotionValue(0);
             
-            // YOUR EXACT SPRINGS (Keeps the original buttery smooth feel)
             const springConfig = { damping: 16, stiffness: 52, mass: 1.6 };
             const rotX = useSpring(targetRotX, springConfig);
             const rotY = useSpring(targetRotY, springConfig);
             const velX = useVelocity(rotX);
             const velY = useVelocity(rotY);
             
-            // Reduced max skew to stop mobile GPUs from tearing the 3D matrix on fast flips
+            // Desktop-only dynamic transforms
             const skewX = useTransform(velY, [-1000, 1000], [-3, 3]);
             const skewY = useTransform(velX, [-1000, 1000], [3, -3]);
-            
-            // Capped Z-rotation so the corners don't whip wildly into the button area
             const rotZ = useTransform(() => {
                 const val = (velX.get() - velY.get()) / 44;
                 return Math.max(-5, Math.min(5, val)); 
             });
-            
-            // FIX: The original translateZ value went up to 400px, causing rendering glitches on mobile.
-            // By capping the max depth at a much lower value (80px), we prevent the 3D element from
-            // being clipped or torn by the browser's rendering engine.
             const z = useTransform(() => {
                 const vx = velX.get();
                 const vy = velY.get();
                 const speed = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
                 return Math.min(speed / 6.4, 80);
             });
-            
-            // FIX: To preserve the visual "pop-out" effect, the scale transform's input range
-            // is adjusted to match the new, smaller Z-depth range. It now scales from 1 to 1.15
-            // over a depth of 0-80 instead of 0-400.
             const scale = useTransform(z, [0, 80], [1, 1.15]);
             
             const mouseX = useMotionValue(0);
             const mouseY = useMotionValue(0);
             
-            // Map mouse position to tilt degrees
             const mappedTiltX = useTransform(mouseY, [-0.5, 0.5], [15, -15]);
             const mappedTiltY = useTransform(mouseX, [-0.5, 0.5], [-15, 15]);
             const tiltX = useSpring(mappedTiltX, { damping: 20, stiffness: 150 });
@@ -3115,14 +3109,16 @@
             const finalRotY = useTransform(() => rotY.get() + tiltY.get());
 
             const handleMouseMove = (e) => {
+                if (isTouchDevice) return; // Prevent massive velocity spikes from jumpy touch points
                 const rect = e.currentTarget.getBoundingClientRect();
-                const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+                const clientX = e.clientX;
+                const clientY = e.clientY;
                 mouseX.set((clientX - rect.left) / rect.width - 0.5);
                 mouseY.set((clientY - rect.top) / rect.height - 0.5);
             };
 
             const resetMouse = () => { 
+                if (isTouchDevice) return;
                 mouseX.set(0); 
                 mouseY.set(0); 
             };
@@ -3202,22 +3198,23 @@
                     <div className="relative w-full max-w-xs aspect-[3/4] z-10 perspective-1000">
                         <motion.div
                             className="relative w-full h-full cursor-pointer transform-style-3d z-10"
-                            style={{ rotateX: finalRotX, rotateY: finalRotY, rotateZ: rotZ, z, scale, skewX, skewY }}
-                            onMouseMove={handleMouseMove} 
-                            onTouchMove={handleMouseMove}
-                            onMouseLeave={resetMouse} 
-                            onTouchEnd={resetMouse}
+                            style={isTouchDevice 
+                                ? { rotateY: rotY } // Mobile purely rotates Y, no skew/scale/z-depth tearing.
+                                : { rotateX: finalRotX, rotateY: finalRotY, rotateZ: rotZ, z, scale, skewX, skewY }
+                            }
+                            onMouseMove={!isTouchDevice ? handleMouseMove : undefined} 
+                            onMouseLeave={!isTouchDevice ? resetMouse : undefined} 
                             onClick={handleReveal}
-                            whileHover={{ scale: isFlipped ? 1 : 1.02 }} 
+                            whileHover={{ scale: isFlipped ? 1 : (isTouchDevice ? 1 : 1.02) }} 
                             whileTap={{ scale: isFlipped ? 1 : 0.98 }}
                         >
-                            {/* Layered 3D Depth edges */}
-                            {[...Array(6)].map((_, i) => (
+                            {/* Layered 3D Depth edges - Safely disabled on mobile */}
+                            {!isTouchDevice && [...Array(6)].map((_, i) => (
                                 <div key={i} className="absolute inset-0 rounded-[2rem] bg-slate-800 border border-slate-700/20" style={{ transform: `translateZ(${-i}px)` }} />
                             ))}
 
                             {/* Front (TOP SECRET) */}
-                            <div className="absolute inset-0 backface-hidden rounded-[2rem] shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] bg-slate-900 border border-white/10 flex flex-col items-center justify-center p-8 overflow-hidden" style={{ transform: 'translateZ(1px)' }}>
+                            <div className="absolute inset-0 backface-hidden rounded-[2rem] shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] bg-slate-900 border border-white/10 flex flex-col items-center justify-center p-8 overflow-hidden" style={{ transform: isTouchDevice ? 'rotateY(0deg)' : 'translateZ(1px)' }}>
                                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
 
                                 <div className="w-24 h-24 flex items-center justify-center mb-8">
@@ -3225,7 +3222,7 @@
                                 </div>
                                 <h3 className="text-white font-display font-bold text-2xl mb-2">TOP SECRET</h3>
                                 <p className="text-white/40 font-medium text-sm text-center tracking-wide">Tap to turn</p>
-                                <Glare tiltX={tiltX} tiltY={tiltY} velX={velX} velY={velY} />
+                                {!isTouchDevice && <Glare tiltX={tiltX} tiltY={tiltY} velX={velX} velY={velY} />}
                             </div>
 
                             {/* Back (REVEAL) */}
@@ -3233,7 +3230,7 @@
                                  word === "IMPOSTER" 
                                     ? 'bg-gradient-to-br from-red-950 to-slate-950 border-[#020617]' 
                                     : 'bg-gradient-to-br from-teal-950 to-slate-950 border-[#020617]'
-                            }`} style={{ transform: 'translateZ(-6px) rotateY(180deg)' }}>
+                            }`} style={{ transform: isTouchDevice ? 'rotateY(180deg)' : 'translateZ(-6px) rotateY(180deg)' }}>
                                 
                                 <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
                                      <div className="absolute w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
@@ -3260,7 +3257,7 @@
                                         </>
                                     )}
                                 </div>
-                                <Glare tiltX={tiltX} tiltY={tiltY} velX={velX} velY={velY} isBack />
+                                {!isTouchDevice && <Glare tiltX={tiltX} tiltY={tiltY} velX={velX} velY={velY} isBack />}
                             </div>
 
                         </motion.div>
