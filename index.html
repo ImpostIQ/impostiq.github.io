@@ -3087,8 +3087,9 @@
                 return Math.max(-5, Math.min(5, val)); 
             });
             
-            // THE UNIVERSAL MOBILE FIX: Cap Z-depth at 80 (was 400).
-            // Stops the 3D layer from physically colliding with the button layer.
+            // FIX: The original translateZ value went up to 400px, causing rendering glitches on mobile.
+            // By capping the max depth at a much lower value (80px), we prevent the 3D element from
+            // being clipped or torn by the browser's rendering engine.
             const z = useTransform(() => {
                 const vx = velX.get();
                 const vy = velY.get();
@@ -3096,8 +3097,9 @@
                 return Math.min(speed / 6.4, 80);
             });
             
-            // Adjust the scale to match the new depth. 
-            // It still visually zooms 1.15x, keeping the awesome "pop-out" illusion!
+            // FIX: To preserve the visual "pop-out" effect, the scale transform's input range
+            // is adjusted to match the new, smaller Z-depth range. It now scales from 1 to 1.15
+            // over a depth of 0-80 instead of 0-400.
             const scale = useTransform(z, [0, 80], [1, 1.15]);
             
             const mouseX = useMotionValue(0);
