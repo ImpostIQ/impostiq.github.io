@@ -3069,12 +3069,14 @@
             const targetRotX = useMotionValue(0);
             const targetRotY = useMotionValue(0);
             
+            // Restored your EXACT original smooth bouncy spring settings
             const springConfig = { damping: 16, stiffness: 52, mass: 1.6 };
             const rotX = useSpring(targetRotX, springConfig);
             const rotY = useSpring(targetRotY, springConfig);
             const velX = useVelocity(rotX);
             const velY = useVelocity(rotY);
             
+            // Restored your exact original skew values
             const skewX = useTransform(velY, [-1000, 1000], [-12, 12]);
             const skewY = useTransform(velX, [-1000, 1000], [12, -12]);
             
@@ -3083,9 +3085,12 @@
                 const vx = velX.get();
                 const vy = velY.get();
                 const speed = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
-                return Math.min(speed / 6.4, 400);
+                // FIX: Capped the Z-depth pop-out to 120px (was 400px). 
+                // This stops the card from physically crashing into the button on mobile.
+                return Math.min(speed / 6.4, 120);
             });
-            const scale = useTransform(z, [0, 400], [1, 1.15]);
+            // FIX: Adjusted scale to match the new 120px Z-depth, keeping your visual 1.15x zoom!
+            const scale = useTransform(z, [0, 120], [1, 1.15]);
             
             const mouseX = useMotionValue(0);
             const mouseY = useMotionValue(0);
