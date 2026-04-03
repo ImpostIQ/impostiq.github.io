@@ -118,6 +118,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+	
+	<script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -458,6 +460,7 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+        const { motion, useMotionValue, useSpring, useTransform, useVelocity } = window.Motion || {};
 
         const firebaseConfig1 = {
           apiKey: "AIzaSyCebdOffzrb0D2efbgC9eDPRAr-hYgIXS8",
@@ -2381,6 +2384,30 @@
             }
             return <i className={`fa-solid ${name} ${sizeClass} ${className}`}></i>;
         };
+		
+		const Glare = ({ tiltX, tiltY, velX, velY, isBack = false }) => {
+            const opacity = useTransform(() => {
+                const vx = Math.abs(velX.get());
+                const vy = Math.abs(velY.get());
+                const speed = Math.sqrt(vx * vx + vy * vy);
+                return Math.min(speed / 400, 0.5) + 0.15; 
+            });
+            
+            const background = useTransform(() => {
+                const tx = isBack ? -tiltX.get() : tiltX.get();
+                const ty = isBack ? -tiltY.get() : tiltY.get();
+                const x = (ty / 20) * 100 + 50;
+                const y = (tx / 20) * 100 + 50;
+                return `radial-gradient(circle at ${x}% ${y}%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%)`;
+            });
+
+            return (
+                <motion.div 
+                    className="absolute inset-0 rounded-[2rem] pointer-events-none mix-blend-overlay z-50"
+                    style={{ background, opacity }}
+                />
+            );
+        };
 
         const CategoryInfoModal = ({ category, onClose, wordBank }) => {
             if (!category || !wordBank) return null;
@@ -3037,15 +3064,63 @@
         const CardRevealScreen = ({ player, word, onNext, isLastPlayer, audioManager, onAcknowledge, isOnline, onConfused }) => {
             const [step, setStep] = useState(isOnline ? 'reveal' : 'handover'); 
             const [isFlipped, setIsFlipped] = useState(false);
+
+            // Framer Motion Physics - Safely formatted to prevent unmount crashes
+            const targetRotX = useMotionValue(0);
+            const targetRotY = useMotionValue(0);
+            
+            const springConfig = { damping: 16, stiffness: 52, mass: 1.6 };
+            const rotX = useSpring(targetRotX, springConfig);
+            const rotY = useSpring(targetRotY, springConfig);
+            const velX = useVelocity(rotX);
+            const velY = useVelocity(rotY);
+            
+            const skewX = useTransform(velY, [-1000, 1000], [-12, 12]);
+            const skewY = useTransform(velX, [-1000, 1000], [12, -12]);
+            
+            const rotZ = useTransform(() => (velX.get() - velY.get()) / 44);
+            const z = useTransform(() => {
+                const vx = velX.get();
+                const vy = velY.get();
+                const speed = Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
+                return Math.min(speed / 6.4, 400);
+            });
+            const scale = useTransform(z, [0, 400], [1, 1.15]);
+            
+            const mouseX = useMotionValue(0);
+            const mouseY = useMotionValue(0);
+            
+            // Map mouse position to tilt degrees
+            const mappedTiltX = useTransform(mouseY, [-0.5, 0.5], [15, -15]);
+            const mappedTiltY = useTransform(mouseX, [-0.5, 0.5], [-15, 15]);
+            const tiltX = useSpring(mappedTiltX, { damping: 20, stiffness: 150 });
+            const tiltY = useSpring(mappedTiltY, { damping: 20, stiffness: 150 });
+            
+            const finalRotX = useTransform(() => rotX.get() + tiltX.get());
+            const finalRotY = useTransform(() => rotY.get() + tiltY.get());
+
+            const handleMouseMove = (e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+                mouseX.set((clientX - rect.left) / rect.width - 0.5);
+                mouseY.set((clientY - rect.top) / rect.height - 0.5);
+            };
+
+            const resetMouse = () => { 
+                mouseX.set(0); 
+                mouseY.set(0); 
+            };
             
             useEffect(() => {
                 if(!isOnline) {
                     setStep('handover');
                     setIsFlipped(false);
+                    targetRotY.set(0); 
                 } else {
                     setStep('reveal');
                 }
-            }, [player, isOnline]);
+            }, [player, isOnline, targetRotY]);
             
             useEffect(() => {
                 if (step === 'handover' && player.audioData) {
@@ -3057,8 +3132,10 @@
             const handleReveal = () => {
                 if (!isFlipped) {
                     setIsFlipped(true);
+                    targetRotY.set(targetRotY.get() + 180); 
                     audioManager.playSound('uiClick');
-                    if (navigator.vibrate) navigator.vibrate();
+                    if (navigator.vibrate) navigator.vibrate(30);
+                    resetMouse();
                 }
             };
             
@@ -3082,11 +3159,11 @@
                     </div>
                     
                     <h2 className="text-xl font-display text-white/60 font-bold tracking-wide mb-1">
-						Pass the device to
-					</h2>
-					<h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
-						{player.name}
-					</h1>
+                        Pass the device to
+                    </h2>
+                    <h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
+                        {player.name}
+                    </h1>
                     
                     <div className="w-full max-w-sm">
                         <button 
@@ -3107,60 +3184,75 @@
                 <div className="flex flex-col items-center justify-center h-full w-full p-6 relative">
                     <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-0"></div>
 
-                    <div className="relative w-full max-w-xs aspect-[3/4] perspective-1000 z-10 cursor-pointer" onClick={handleReveal}>
-                        <div className={`relative w-full h-full transition-transform duration-700 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
-                            
-                            <div className="absolute inset-0 backface-hidden">
-                                <div className="w-full h-full bg-slate-900 rounded-[2rem] border border-white/10 shadow-2xl flex flex-col items-center justify-center p-8 relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+                    <div className="relative w-full max-w-xs aspect-[3/4] z-10 perspective-1000">
+                        <motion.div
+                            className="relative w-full h-full cursor-pointer transform-style-3d z-10"
+                            style={{ rotateX: finalRotX, rotateY: finalRotY, rotateZ: rotZ, z, scale, skewX, skewY }}
+                            onMouseMove={handleMouseMove} 
+                            onTouchMove={handleMouseMove}
+                            onMouseLeave={resetMouse} 
+                            onTouchEnd={resetMouse}
+                            onClick={handleReveal}
+                            whileHover={{ scale: isFlipped ? 1 : 1.02 }} 
+                            whileTap={{ scale: isFlipped ? 1 : 0.98 }}
+                        >
+                            {/* Layered 3D Depth edges */}
+                            {[...Array(6)].map((_, i) => (
+                                <div key={i} className="absolute inset-0 rounded-[2rem] bg-slate-800 border border-slate-700/20" style={{ transform: `translateZ(${-i}px)` }} />
+                            ))}
 
-                                    <div className="w-24 h-24 flex items-center justify-center mb-8">
-                                        <img src="https://em-content.zobj.net/source/microsoft-teams/337/locked_1f512.png" alt="Locked" draggable="false" className="w-20 h-20" />
-                                    </div>
-                                    <h3 className="text-white font-display font-bold text-2xl mb-2">TOP SECRET</h3>
-                                    <p className="text-white/40 font-medium text-sm text-center tracking-wide">Tap to turn</p>
+                            {/* Front (TOP SECRET) */}
+                            <div className="absolute inset-0 backface-hidden rounded-[2rem] shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] bg-slate-900 border border-white/10 flex flex-col items-center justify-center p-8 overflow-hidden" style={{ transform: 'translateZ(1px)' }}>
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+
+                                <div className="w-24 h-24 flex items-center justify-center mb-8">
+                                    <img src="https://em-content.zobj.net/source/microsoft-teams/337/locked_1f512.png" alt="Locked" draggable="false" className="w-20 h-20" />
                                 </div>
+                                <h3 className="text-white font-display font-bold text-2xl mb-2">TOP SECRET</h3>
+                                <p className="text-white/40 font-medium text-sm text-center tracking-wide">Tap to turn</p>
+                                <Glare tiltX={tiltX} tiltY={tiltY} velX={velX} velY={velY} />
                             </div>
 
-                            <div className="absolute inset-0 rotate-y-180 backface-hidden">
-                                <div className={`w-full h-full rounded-[2rem] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden shadow-2xl border ${
-                                     word === "IMPOSTER" 
-                                        ? 'bg-gradient-to-br from-red-950 to-slate-950 border-[#020617]' 
-                                        : 'bg-gradient-to-br from-teal-950 to-slate-950 border-[#020617]'
-                                }`}>
-                                    
-                                    <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
-                                         <div className="absolute w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
-                                    </div>
-
-                                    <div className={`absolute top-[-50%] w-full h-full opacity-30 blur-[100px] z-0 ${word === 'IMPOSTER' ? 'bg-red-600' : 'bg-teal-500'}`}></div>
-
-                                    <div className="relative z-10 flex flex-col items-center justify-center h-full">
-                                        {word === "IMPOSTER" ? (
-                                            <>
-                                                <div className="w-28 h-28 flex items-center justify-center mb-6">
-                                                    <img src="https://em-content.zobj.net/source/microsoft-teams/337/shushing-face_1f92b.png" alt="Shushing" draggable="false" className="w-24 h-24 drop-shadow-lg" />
-                                                </div>
-                                                <h2 className="text-4xl font-display font-black text-red-500 tracking-tight mb-4 drop-shadow-sm">IMPOSTER</h2>
-                                                <p className="text-red-200/60 text-xs font-medium leading-relaxed max-w-[200px]">Blend in. Deceive. Don't let them know you are the spy.</p>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="w-28 h-28 flex items-center justify-center mb-6">
-                                                    <img src="https://em-content.zobj.net/source/microsoft-teams/337/clipboard_1f4cb.png" alt="Clipboard" draggable="false" className="w-20 h-20 drop-shadow-lg" />
-                                                </div>
-                                                <h2 className="text-3xl font-display font-bold text-white mb-4 drop-shadow-sm">{word}</h2>
-                                                <p className="text-teal-200/60 text-xs font-medium leading-relaxed max-w-[200px]">Memorize this word. It proves your innocence.</p>
-                                            </>
-                                        )}
-                                    </div>
+                            {/* Back (REVEAL) */}
+                            <div className={`absolute inset-0 backface-hidden rounded-[2rem] shadow-[inset_0_0_40px_rgba(0,0,0,0.6)] flex flex-col items-center justify-center p-8 text-center overflow-hidden border ${
+                                 word === "IMPOSTER" 
+                                    ? 'bg-gradient-to-br from-red-950 to-slate-950 border-[#020617]' 
+                                    : 'bg-gradient-to-br from-teal-950 to-slate-950 border-[#020617]'
+                            }`} style={{ transform: 'translateZ(-6px) rotateY(180deg)' }}>
+                                
+                                <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
+                                     <div className="absolute w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shine"></div>
                                 </div>
+
+                                <div className={`absolute top-[-50%] w-full h-full opacity-30 blur-[100px] z-0 ${word === 'IMPOSTER' ? 'bg-red-600' : 'bg-teal-500'}`}></div>
+
+                                <div className="relative z-10 flex flex-col items-center justify-center h-full">
+                                    {word === "IMPOSTER" ? (
+                                        <>
+                                            <div className="w-28 h-28 flex items-center justify-center mb-6">
+                                                <img src="https://em-content.zobj.net/source/microsoft-teams/337/shushing-face_1f92b.png" alt="Shushing" draggable="false" className="w-24 h-24 drop-shadow-lg" />
+                                            </div>
+                                            <h2 className="text-4xl font-display font-black text-red-500 tracking-tight mb-4 drop-shadow-sm">IMPOSTER</h2>
+                                            <p className="text-red-200/60 text-xs font-medium leading-relaxed max-w-[200px]">Blend in. Deceive. Don't let them know you are the spy.</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-28 h-28 flex items-center justify-center mb-6">
+                                                <img src="https://em-content.zobj.net/source/microsoft-teams/337/clipboard_1f4cb.png" alt="Clipboard" draggable="false" className="w-20 h-20 drop-shadow-lg" />
+                                            </div>
+                                            <h2 className="text-3xl font-display font-bold text-white mb-4 drop-shadow-sm">{word}</h2>
+                                            <p className="text-teal-200/60 text-xs font-medium leading-relaxed max-w-[200px]">Memorize this word. It proves your innocence.</p>
+                                        </>
+                                    )}
+                                </div>
+                                <Glare tiltX={tiltX} tiltY={tiltY} velX={velX} velY={velY} isBack />
                             </div>
 
-                        </div>
+                        </motion.div>
                     </div>
 
-                    <div className={`w-full max-w-sm mt-8 transition-all duration-700 transform ${isFlipped ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
+                    {/* Action Buttons */}
+                    <div className={`relative z-20 w-full max-w-sm mt-12 transition-all duration-700 transform ${isFlipped ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}>
                         <button 
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -3201,8 +3293,8 @@
                 </div>
             );
         };
-
-        const TurnOrderScreen = ({ players, onStartMission, audioManager, isHost }) => {
+		
+		const TurnOrderScreen = ({ players, onStartMission, audioManager, isHost }) => {
             useEffect(() => {
                 if (audioManager) {
                     audioManager.playSound('turnOrderReveal');
