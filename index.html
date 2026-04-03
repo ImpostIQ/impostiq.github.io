@@ -3081,8 +3081,12 @@
                         </div>
                     </div>
                     
-                    <h2 className="text-brand-400 text-xs font-bold uppercase tracking-[0.4em] mb-4">Classified Info For</h2>
-                    <h1 className="text-6xl font-display font-black text-white mb-16 drop-shadow-2xl break-words max-w-full">{player.name}</h1>
+                    <h2 className="text-xl font-display text-white/60 font-bold tracking-wide mb-1">
+						Pass the device to
+					</h2>
+					<h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
+						{player.name}
+					</h1>
                     
                     <div className="w-full max-w-sm">
                         <button 
@@ -3107,27 +3111,22 @@
                         <div className={`relative w-full h-full transition-transform duration-700 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
                             
                             <div className="absolute inset-0 backface-hidden">
-                                <div className="w-full h-full bg-slate-900 rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col items-center justify-center p-8 relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/soft-wallpaper.png')] opacity-10"></div>
+                                <div className="w-full h-full bg-slate-900 rounded-[2rem] border border-white/10 shadow-2xl flex flex-col items-center justify-center p-8 relative overflow-hidden group">
                                     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
 
                                     <div className="w-24 h-24 flex items-center justify-center mb-8">
                                         <img src="https://em-content.zobj.net/source/microsoft-teams/337/locked_1f512.png" alt="Locked" draggable="false" className="w-20 h-20" />
                                     </div>
                                     <h3 className="text-white font-display font-bold text-2xl mb-2">TOP SECRET</h3>
-                                    <p className="text-white/40 font-medium text-sm text-center tracking-wide">Tap to decrypt</p>
-                                    
-                                    <div className="absolute bottom-10 flex gap-2 items-center text-white/20 text-[10px] font-bold uppercase tracking-widest animate-pulse">
-                                        <span>Tap to Open</span>
-                                    </div>
+                                    <p className="text-white/40 font-medium text-sm text-center tracking-wide">Tap to turn</p>
                                 </div>
                             </div>
 
                             <div className="absolute inset-0 rotate-y-180 backface-hidden">
-                                <div className={`w-full h-full rounded-[2.5rem] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden shadow-2xl border ${
+                                <div className={`w-full h-full rounded-[2rem] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden shadow-2xl border ${
                                      word === "IMPOSTER" 
-                                        ? 'bg-gradient-to-br from-red-950 to-slate-950 border-red-500/20' 
-                                        : 'bg-gradient-to-br from-teal-950 to-slate-950 border-teal-500/20'
+                                        ? 'bg-gradient-to-br from-red-950 to-slate-950 border-[#020617]' 
+                                        : 'bg-gradient-to-br from-teal-950 to-slate-950 border-[#020617]'
                                 }`}>
                                     
                                     <div className="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
@@ -3137,8 +3136,6 @@
                                     <div className={`absolute top-[-50%] w-full h-full opacity-30 blur-[100px] z-0 ${word === 'IMPOSTER' ? 'bg-red-600' : 'bg-teal-500'}`}></div>
 
                                     <div className="relative z-10 flex flex-col items-center justify-center h-full">
-                                        <p className={`text-[10px] uppercase tracking-[0.4em] font-bold mb-8 ${word === 'IMPOSTER' ? 'text-red-400' : 'text-teal-400'}`}>Your Mission Role</p>
-                                        
                                         {word === "IMPOSTER" ? (
                                             <>
                                                 <div className="w-28 h-28 flex items-center justify-center mb-6">
