@@ -1154,7 +1154,7 @@
                                 className="relative w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-90 transition-transform group disabled:cursor-wait"
                             >
                                 <i className="fa-brands fa-android text-lg"></i>
-                                <div className={`absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-20 pointer-events-none transition-opacity duration-300 ${isDownloading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                                <div className={`absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-20 pointer-events-none transition-opacity duration-300 ease-in-out ${isDownloading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                                     {isDownloading ? "Downloading APK..." : "Download App"}
                                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-b-4 border-b-slate-800"></div>
                                 </div>
@@ -2457,6 +2457,7 @@
             const [isRendered, setIsRendered] = useState(false);
             const [isVisible, setIsVisible] = useState(false);
             const [coords, setCoords] = useState({ x: 0, y: 0 });
+            const [scrollNode, setScrollNode] = useState(null);
             const containerRef = useRef(null);
             
             const hideTimeoutRef = useRef(null);
@@ -2464,16 +2465,32 @@
 
             const updatePosition = () => {
                 if (containerRef.current) {
-                    const rect = containerRef.current.getBoundingClientRect();
-                    setCoords({
-                        x: rect.left + rect.width / 2,
-                        y: rect.top
-                    });
+                    // Find the main scrolling area so we can attach the tooltip to it
+                    const scrollContainer = containerRef.current.closest('.overflow-y-auto');
+                    if (scrollContainer) {
+                        if (window.getComputedStyle(scrollContainer).position === 'static') {
+                            scrollContainer.style.position = 'relative';
+                        }
+                        setScrollNode(scrollContainer);
+
+                        // Calculate position relative to the scroll container
+                        const containerRect = containerRef.current.getBoundingClientRect();
+                        const scrollRect = scrollContainer.getBoundingClientRect();
+                        
+                        setCoords({
+                            x: containerRect.left - scrollRect.left + (containerRect.width / 2) + scrollContainer.scrollLeft,
+                            y: containerRect.top - scrollRect.top + scrollContainer.scrollTop
+                        });
+                    }
                 }
             };
 
             const show = (e) => {
-                if (!isDisabled || !text) return;
+                const button = e.target.closest('button');
+                // ONLY trigger if the user clicked the actual toggle button AND it's disabled
+                if (!isDisabled || !text || !button || !button.disabled) {
+                    return;
+                }
                 
                 updatePosition();
 
@@ -2482,12 +2499,10 @@
                 
                 setIsRendered(true);
                 
-                // Allow DOM to mount before triggering fade
                 setTimeout(() => {
                     setIsVisible(true);
                 }, 10);
 
-                // Auto-hide after exactly 3 seconds
                 hideTimeoutRef.current = setTimeout(() => {
                     hide();
                 }, 3000);
@@ -2495,10 +2510,8 @@
 
             const hide = () => {
                 setIsVisible(false);
-                
                 clearTimeout(hideTimeoutRef.current);
                 clearTimeout(unmountTimeoutRef.current);
-                
                 unmountTimeoutRef.current = setTimeout(() => {
                     setIsRendered(false);
                 }, 300);
@@ -2508,18 +2521,22 @@
                 if (!isRendered) return;
 
                 const handleScroll = () => {
-                    updatePosition(); // Keeps it attached to the button while scrolling
-                    if (isVisible) {
-                        hide(); // Starts the fade out process
-                    }
+                    if (isVisible) hide(); // Fade out when the user scrolls
                 };
                 
-                window.addEventListener('scroll', handleScroll, true);
-                window.addEventListener('touchmove', handleScroll, { capture: true, passive: true });
+                const scrollContainer = containerRef.current?.closest('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+                }
+                
+                const handleResize = () => {
+                    if (isVisible) updatePosition();
+                };
+                window.addEventListener('resize', handleResize);
                 
                 return () => {
-                    window.removeEventListener('scroll', handleScroll, true);
-                    window.removeEventListener('touchmove', handleScroll, { capture: true });
+                    if (scrollContainer) scrollContainer.removeEventListener('scroll', handleScroll);
+                    window.removeEventListener('resize', handleResize);
                 };
             }, [isRendered, isVisible]);
 
@@ -2527,13 +2544,13 @@
                 <div 
                     ref={containerRef}
                     className={className}
-                    onPointerDownCapture={show} // Intercepts clicks on disabled buttons
+                    onPointerDownCapture={show}
                     onMouseLeave={hide}
                 >
                     {children}
-                    {isRendered && text && ReactDOM.createPortal(
+                    {isRendered && text && scrollNode && ReactDOM.createPortal(
                         <div 
-                            className={`fixed w-max max-w-xs bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-[150] pointer-events-none text-center transition-opacity duration-300 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+                            className={`absolute w-max max-w-xs bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-[150] pointer-events-none text-center transition-opacity duration-300 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
                             style={{ 
                                 left: coords.x, 
                                 top: coords.y - 8, 
@@ -2543,7 +2560,7 @@
                             {text}
                             <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-800"></div>
                         </div>,
-                        document.body
+                        scrollNode // Portal it into the scroll container to escape the parent's opacity
                     )}
                 </div>
             );
@@ -2975,12 +2992,10 @@
                                             <i className={`fa-solid ${recordedAudioData && !isRecording ? 'fa-check' : 'fa-microphone'} text-white text-lg ${isRecording ? '' : 'opacity-70'}`}></i>
                                         </button>
                                         
-                                        {showMicTooltip && (
-                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg animate-fadeIn z-20">
-                                                Record a custom "It's your turn" voice note!
-                                                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-800"></div>
-                                            </div>
-                                        )}
+                                        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-20 pointer-events-none transition-opacity duration-300 ease-in-out ${showMicTooltip ? 'opacity-100' : 'opacity-0'}`}>
+                                            Record a custom "It's your turn" voice note!
+                                            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-800"></div>
+                                        </div>
                                         
                                         <button 
                                             onClick={addPlayer}
