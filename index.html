@@ -1222,7 +1222,17 @@
             });
             
             const [error, setError] = useState('');
+            const errorRef = useRef('');
+            if (error) errorRef.current = error;
+            
             const [isLoading, setIsLoading] = useState(false);
+
+            useEffect(() => {
+                if (error) {
+                    const timer = setTimeout(() => setError(''), 4000);
+                    return () => clearTimeout(timer);
+                }
+            }, [error]);
 
             useEffect(() => {
                 try {
@@ -1289,7 +1299,7 @@
                                         <input
                                                 type="text"
                                                 value={username}
-                                                onChange={(e) => setUsername(e.target.value.slice(0, 25))}
+                                                onChange={(e) => { setUsername(e.target.value.slice(0, 25)); if (error) setError(''); }}
                                                 placeholder="Enter name..."
                                                 maxLength="25"
                                                 className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
@@ -1301,7 +1311,7 @@
                                             <input
                                                 type="text"
                                                 value={lobbyId}
-                                                onChange={(e) => setLobbyId(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 6))}
+                                                onChange={(e) => { setLobbyId(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 6)); if (error) setError(''); }}
                                                 placeholder="Lobby ID"
                                                 maxLength="6"
                                                 className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-colors placeholder:text-white/20 font-display font-bold text-lg tracking-widest text-white uppercase"
@@ -1309,15 +1319,22 @@
                                             <input
                                                 type="text"
                                                 value={password}
-                                                onChange={(e) => setPassword(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 4))}
+                                                onChange={(e) => { setPassword(e.target.value.replace(/\s/g, '').toUpperCase().slice(0, 4)); if (error) setError(''); }}
                                                 placeholder="Password"
                                                 maxLength="4"
                                                 className="w-full bg-slate-950/50 rounded-xl px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-colors placeholder:text-white/20 font-display font-bold text-lg tracking-widest text-white uppercase"
                                             />
                                         </>
                                     )}
-                                    
-                                    {error && <p className="text-red-400 text-xs text-center">{error}</p>}
+                                </div>
+                                
+                                <div key={isJoining ? 'join' : 'create'} className={`grid transition-all duration-300 ease-in-out px-4 ${error ? 'grid-rows-[1fr] opacity-100 pb-4' : 'grid-rows-[0fr] opacity-0 pb-0'}`}>
+                                    <div className="overflow-hidden">
+                                        <div className="flex items-center justify-center gap-2 text-red-400 text-sm font-medium">
+                                            <i className="fa-solid fa-circle-exclamation text-xs flex-shrink-0 mt-[1px]"></i>
+                                            <span className="truncate">{error || errorRef.current}</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div className="text-center py-3 bg-black/50 border-t border-white/5">
@@ -1832,23 +1849,24 @@
             };
             
             const handleSettingChange = (settingName, currentValue) => {
-                if (isHost) {
-                    const newValue = !currentValue;
-                    
-                    if(settingName === 'isFakeWordMode' && newValue) {
-                        db.collection('lobbies').doc(lobbyId).update({
-                            isFakeWordMode: true,
-                            notifyImposterOnVote: false,
-                            lastSoundEvent: { name: 'switchOn', timestamp: Date.now() }
-                        });
-                    } else {
-                        db.collection('lobbies').doc(lobbyId).update({ 
-                            [settingName]: newValue,
-                            lastSoundEvent: { name: newValue ? 'switchOn' : 'switchOff', timestamp: Date.now() }
-                        });
-                    }
-                }
-            };
+				if (isHost) {
+					const newValue = !currentValue;
+					
+					if(settingName === 'isFakeWordMode' && newValue) { // Switching TO Fake Word Mode
+						db.collection('lobbies').doc(lobbyId).update({
+							isFakeWordMode: true,
+							notifyImposterOnVote: false,
+							enableTwoImposters: false, // ADDED: Reset two imposters when going to fake word mode
+							lastSoundEvent: { name: 'switchOn', timestamp: Date.now() }
+						});
+					} else { // Generic toggle
+						db.collection('lobbies').doc(lobbyId).update({ 
+							[settingName]: newValue,
+							lastSoundEvent: { name: newValue ? 'switchOn' : 'switchOff', timestamp: Date.now() }
+						});
+					}
+				}
+			};
 
             const handleTwoImposterToggle = () => {
                 if (isHost && lobbyPlayers.length >= 10) {
@@ -2080,89 +2098,106 @@
                                             <i className="fa-solid fa-chevron-right text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0"></i>
                                         </button>
 
-                                        <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all">
-                                            <div className="flex items-center gap-4 pr-4">
-                                                <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
-                                                    <i className="fa-solid fa-masks-theater text-lg"></i>
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
-                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={() => handleSettingChange('isFakeWordMode', lobbyData.isFakeWordMode)}
-                                                disabled={!isHost}
-                                                className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
-                                            >
-                                                <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.isFakeWordMode ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
-                                            </button>
-                                        </div>
+                                        <Tooltip
+											className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all ${!isHost ? 'opacity-50' : ''}`}
+											text="Only the host can change settings"
+											isDisabled={!isHost}
+										>
+											<div className="flex items-center gap-4 pr-4">
+												<div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400 flex-shrink-0">
+													<i className="fa-solid fa-masks-theater text-lg"></i>
+												</div>
+												<div>
+													<h3 className="font-bold text-white/90 text-sm">Fake Word Mode</h3>
+													<p className="text-white/40 text-xs mt-1 leading-relaxed">One agent gets a different word. They don't know it's fake.</p>
+												</div>
+											</div>
+											<button 
+												onClick={() => handleSettingChange('isFakeWordMode', lobbyData.isFakeWordMode)}
+												disabled={!isHost}
+												// RETAIN COLOR: Background now directly reflects lobbyData state
+												className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.isFakeWordMode ? 'bg-yellow-500/80' : 'bg-white/10'} ${!isHost && 'cursor-not-allowed'}`}
+											>
+												<div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.isFakeWordMode ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
+											</button>
+										</Tooltip>
+
+										<Tooltip 
+											className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${!isHost || lobbyPlayers.length < 10 ? 'opacity-50' : ''}`}
+											text={
+												!isHost ? "Only the host can change settings" 
+												: lobbyPlayers.length < 10 ? "Requires 10 or more players" 
+												: lobbyData.isFakeWordMode ? "Add a second fake word card" 
+												: "Add a second spy to the mission"
+											}
+											isDisabled={!isHost || lobbyPlayers.length < 10}
+										>
+											<div className="flex items-center gap-4 pr-4">
+												<div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
+													<i className="fa-solid fa-user-secret text-lg"></i>
+												</div>
+												<div>
+													<h3 className="font-bold text-white/90 text-sm">{lobbyData.isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
+													<p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10+ agents are in the lobby.</p>
+												</div>
+											</div>
+											<button 
+												onClick={() => handleSettingChange('enableTwoImposters', lobbyData.enableTwoImposters)}
+												disabled={!isHost || lobbyPlayers.length < 10}
+												// RETAIN COLOR: Background now directly reflects lobbyData state
+												className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${(!isHost || lobbyPlayers.length < 10) && 'cursor-not-allowed'}`}
+											>
+												<div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.enableTwoImposters ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
+											</button>
+										</Tooltip>
 
                                         <Tooltip 
-                                            className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${(lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) ? 'opacity-50' : ''}`}
-                                            text={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (!isHost ? "Only the host can change settings" : (lobbyPlayers.length < 10 ? "Requires 10 or more players" : "Add a second spy to the mission"))}
-                                            isDisabled={!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode}
-                                        >
-                                            <div className="flex items-center gap-4 pr-4">
-                                                <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
-                                                    <i className="fa-solid fa-user-secret text-lg"></i>
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-white/90 text-sm">{lobbyData.isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
-                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10+ agents are in the lobby.</p>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={() => handleSettingChange('enableTwoImposters', lobbyData.enableTwoImposters)}
-                                                disabled={!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode}
-                                                className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.enableTwoImposters ? 'bg-orange-500/80' : 'bg-white/10'} ${(!isHost || lobbyPlayers.length < 10 || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
-                                            >
-                                                <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.enableTwoImposters ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
-                                            </button>
-                                        </Tooltip>
+											className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${(!isHost || lobbyData.isFakeWordMode) ? 'opacity-50' : ''}`} 
+											text={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (!isHost ? "Only the host can change settings" : "")}
+											isDisabled={!isHost || lobbyData.isFakeWordMode}
+										>
+											<div className="flex items-center gap-4 pr-4">
+												<div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
+													<i className="fa-solid fa-bell text-lg"></i>
+												</div>
+												<div>
+													<h3 className="font-bold text-red-400/90 text-sm">Notify Imposter on Vote</h3>
+													<p className="text-white/40 text-xs mt-1 leading-relaxed">Shows a pop-up to the Imposter if an agent initiates a word-check.</p>
+												</div>
+											</div>
+											<button 
+												onClick={() => handleSettingChange('notifyImposterOnVote', lobbyData.notifyImposterOnVote)}
+												disabled={!isHost || lobbyData.isFakeWordMode}
+												// RETAIN COLOR: Background now directly reflects lobbyData state
+												className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.notifyImposterOnVote ? 'bg-red-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
+											>
+												<div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.notifyImposterOnVote ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
+											</button>
+										</Tooltip>
 
-                                        <Tooltip 
-                                            className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${lobbyData.isFakeWordMode ? 'opacity-50' : ''}`} 
-                                            text={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (!isHost ? "Only the host can change settings" : "")}
-                                            isDisabled={!isHost || lobbyData.isFakeWordMode}
-                                        >
-                                            <div className="flex items-center gap-4 pr-4">
-                                                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
-                                                    <i className="fa-solid fa-bell text-lg"></i>
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-red-400/90 text-sm">Notify Imposter on Vote</h3>
-                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Shows a pop-up to the Imposter if an agent initiates a word-check.</p>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={() => handleSettingChange('notifyImposterOnVote', lobbyData.notifyImposterOnVote)}
-                                                disabled={!isHost || lobbyData.isFakeWordMode}
-                                                className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.notifyImposterOnVote ? 'bg-red-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'opacity-50 cursor-not-allowed'}`}
-                                            >
-                                                <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.notifyImposterOnVote ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
-                                            </button>
-                                        </Tooltip>
-
-                                        <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all">
-                                            <div className="flex items-center gap-4 pr-4">
-                                                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
-                                                    <i className="fa-solid fa-bullhorn text-lg"></i>
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
-                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={() => handleSettingChange('speakCategory', lobbyData.speakCategory)}
-                                                disabled={!isHost}
-                                                className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.speakCategory ? 'bg-purple-500/80' : 'bg-white/10'} ${!isHost && 'opacity-50 cursor-not-allowed'}`}
-                                            >
-                                                <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.speakCategory ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
-                                            </button>
-                                        </div>
+                                        <Tooltip
+											className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all ${!isHost ? 'opacity-50' : ''}`}
+											text="Only the host can change settings"
+										   isDisabled={!isHost}
+										>
+											<div className="flex items-center gap-4 pr-4">
+												<div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+													<i className="fa-solid fa-bullhorn text-lg"></i>
+												</div>
+												<div>
+													<h3 className="font-bold text-white/90 text-sm">Speak Category</h3>
+													<p className="text-white/40 text-xs mt-1 leading-relaxed">Announces the chosen category name when the mission begins.</p>
+												</div>
+											</div>
+											<button 
+												onClick={() => handleSettingChange('speakCategory', lobbyData.speakCategory)}
+												disabled={!isHost}
+												// RETAIN COLOR: Background now directly reflects lobbyData state
+												className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.speakCategory ? 'bg-purple-500/80' : 'bg-white/10'} ${!isHost && 'cursor-not-allowed'}`}
+											>
+												<div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.speakCategory ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
+											</button>
+										</Tooltip>
                                     </div>
                                 </section>
                             )}
@@ -2180,7 +2215,7 @@
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-200/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                                         <span className="relative z-10 flex items-center gap-3">
-                                            <i className="fa-solid fa-play text-sm"></i> START MISSION ({lobbyPlayers.length}/{lobbyPlayers.length})
+                                            <i className="fa-solid fa-list-ol text-sm"></i> VIEW TURN ORDER ({lobbyPlayers.length}/{lobbyPlayers.length})
                                         </span>
                                     </button>
                                 ) : (
@@ -2197,7 +2232,7 @@
                                     disabled={lobbyPlayers.length < MIN_PLAYERS || lobbyData.gameState !== 'waiting'}
                                     className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                 >
-                                    <i className="fa-solid fa-play text-sm"></i> ALL READY ({lobbyPlayers.length}/{MIN_PLAYERS}+)
+                                    <i className="fa-solid fa-play text-sm"></i> {lobbyPlayers.length < MIN_PLAYERS ? `WAITING FOR PLAYERS (${lobbyPlayers.length}/${MIN_PLAYERS})` : `ALL READY (${lobbyPlayers.length}/${MIN_PLAYERS}+)`}
                                 </button>
                             )
                         ) : (
@@ -2714,6 +2749,15 @@
             const DEFAULT_PLAYERS = [{ name: 'Player 1', audioData: null }, { name: 'Player 2', audioData: null }, { name: 'Player 3', audioData: null }];
             const MIN_PLAYERS = 3;
 			const [playerError, setPlayerError] = useState('');
+            const playerErrorRef = useRef('');
+            if (playerError) playerErrorRef.current = playerError;
+
+            useEffect(() => {
+                if (playerError) {
+                    const timer = setTimeout(() => setPlayerError(''), 4000);
+                    return () => clearTimeout(timer);
+                }
+            }, [playerError]);
 
             const [players, setPlayers] = useState(() => {
                 try {
@@ -2961,24 +3005,32 @@
                                 </div>
                                 <div className="p-4">
                                     <div className="flex flex-col gap-3 mb-4">
-                                        <div className="flex flex-col gap-2">
-										<div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors pr-4">
-											<input
-												type="text"
-												value={newPlayerName}
-												onChange={(e) => {
-													setNewPlayerName(e.target.value.slice(0, 25));
-													if (playerError) setPlayerError('');
-												}}
-												onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
-												placeholder="Enter name..."
-												maxLength="25"
-												className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
-											/>
-											{newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
-										</div>
-										{playerError && <p className="text-red-400 text-xs text-center animate-fadeIn">{playerError}</p>}
-									</div>
+                                        <div>
+                                            <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors pr-4 relative z-10">
+                                                <input
+                                                    type="text"
+                                                    value={newPlayerName}
+                                                    onChange={(e) => {
+                                                        setNewPlayerName(e.target.value.slice(0, 25));
+                                                        if (playerError) setPlayerError('');
+                                                    }}
+                                                    onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
+                                                    placeholder="Enter name..."
+                                                    maxLength="25"
+                                                    className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
+                                                />
+                                                {newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
+                                            </div>
+                                            
+                                            <div className={`grid transition-all duration-300 ease-in-out relative z-0 ${playerError ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                                                <div className="overflow-hidden">
+                                                    <div className="flex items-center justify-center gap-2 text-red-400 text-sm font-medium">
+                                                        <i className="fa-solid fa-circle-exclamation text-xs flex-shrink-0 mt-[1px]"></i>
+                                                        <span className="truncate">{playerError || playerErrorRef.current}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     <div className="flex gap-3 relative">
                                         <button 
                                             onClick={handleMicClick}
