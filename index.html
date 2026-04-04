@@ -2371,14 +2371,14 @@
 			}, [isTrueLoadingComplete]);
             
             const [showRetry, setShowRetry] = useState(false);
-			useEffect(() => {
-				if (isReady && isDataLoading) {
-					const timer = setTimeout(() => setShowRetry(true), 5000);
-					return () => clearTimeout(timer);
-				}
-			}, [isReady, isDataLoading]);
+useEffect(() => {
+    if (isReady && isDataLoading) {
+        const timer = setTimeout(() => setShowRetry(true), 5000);
+        return () => clearTimeout(timer);
+    }
+}, [isReady, isDataLoading]);
 
-			const isFullyReady = isReady && !isDataLoading;
+const isFullyReady = isReady && !isDataLoading;
 
 			return (
 				<div className="h-[100dvh] flex flex-col items-center justify-center p-8 bg-slate-950 text-center relative overflow-hidden animate-fadeIn">
@@ -2411,22 +2411,25 @@
 											className="bg-brand-500 h-full rounded-full transition-[width] duration-200 ease-out relative overflow-hidden" 
 											style={{ width: `${visualProgress}%` }}
 										>
-											<div className="absolute top-0 bottom-0 w-[150%] -skew-x-12" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)', animation: 'subtleShine 1s linear infinite' }}></div>
+											<div 
+												className="absolute top-0 bottom-0 w-[150%] -skew-x-12" 
+												style={{ 
+													background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+													animation: 'subtleShine 1s linear infinite' 
+												}}
+											></div>
 										</div>
+										
 										<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-											<span className="text-[10px] font-display font-black text-white drop-shadow-md tracking-wider">{`${Math.floor(visualProgress)}%`}</span>
+											<span className="text-[10px] font-display font-black text-white drop-shadow-md tracking-wider">
+												{`${Math.floor(visualProgress)}%`}
+											</span>
 										</div>
 									</div>
-									{showRetry ? (
-										<button onClick={() => window.location.reload()} className="text-brand-400 font-bold text-sm underline decoration-2 underline-offset-4 animate-pulse">
-											Connection slow? Tap to retry
-										</button>
-									) : (
-										<p key={currentTipIndex} className="text-white/60 font-medium text-sm animate-fadeIn h-10">
-											<i className="fa-solid fa-lightbulb text-brand-400 mr-1"></i>
-											{TIPS[currentTipIndex]}
-										</p>
-									)}
+									<p key={currentTipIndex} className="text-white/60 font-medium text-sm animate-fadeIn h-10">
+										<i className="fa-solid fa-lightbulb text-brand-400 mr-1"></i>
+										{TIPS[currentTipIndex]}
+									</p>
 								</div>
 							)}
 						</div>
@@ -4274,11 +4277,7 @@
             useEffect(() => {
                 const fetchWordBank = async () => {
                     try {
-                        const controller = new AbortController();
-						const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-
-						const response = await fetch('https://gist.githubusercontent.com/ImpostIQ/a933353f5bbd1ce4bca4a42df6c044a8/raw/57c70f97cf0f4a106b8df837c4bfd7e88007ddef/word_bank.txt', { signal: controller.signal });
-						clearTimeout(timeoutId);
+                        const response = await fetch('https://gist.githubusercontent.com/ImpostIQ/a933353f5bbd1ce4bca4a42df6c044a8/raw/57c70f97cf0f4a106b8df837c4bfd7e88007ddef/word_bank.txt');
                         if (!response.ok) throw new Error(`HTTP error fetching word bank! status: ${response.status}`);
                         
                         const text = await response.text();
