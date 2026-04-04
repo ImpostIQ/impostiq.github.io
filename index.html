@@ -2508,22 +2508,20 @@
                 if (!isRendered) return;
 
                 const handleScroll = () => {
+                    updatePosition(); // Keeps it attached to the button while scrolling
                     if (isVisible) {
-                        hide();
+                        hide(); // Starts the fade out process
                     }
                 };
-
-                const scrollContainer = containerRef.current?.closest('.overflow-y-auto, .no-scrollbar');
-                const targetElement = scrollContainer || window;
-
-                targetElement.addEventListener('scroll', handleScroll, { capture: true, passive: true });
-                window.addEventListener('touchmove', handleScroll, { capture: true, passive: true }); 
-
+                
+                window.addEventListener('scroll', handleScroll, true);
+                window.addEventListener('touchmove', handleScroll, { capture: true, passive: true });
+                
                 return () => {
-                    targetElement.removeEventListener('scroll', handleScroll, { capture: true });
+                    window.removeEventListener('scroll', handleScroll, true);
                     window.removeEventListener('touchmove', handleScroll, { capture: true });
                 };
-            }, [isRendered, isVisible]); // The dependency array is correct and doesn't need to be changed.
+            }, [isRendered, isVisible]);
 
             return (
                 <div 
