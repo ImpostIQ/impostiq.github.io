@@ -465,22 +465,24 @@
 	</script>
 	
 	<script>
-			document.addEventListener('touchstart', function() {
-				window.isTouchDevice = true;
-			}, { passive: true, once: true });
+		document.addEventListener('touchstart', function() {
+			window.isTouchDevice = true;
+		}, { passive: true, once: true });
 
-			document.addEventListener('click', function(e) {
-				if (!window.isTouchDevice) return;
-				var el = e.target.closest('button, a, [class*="hover:"]');
-				if (el) {
-					el.blur(); 
+		document.addEventListener('touchend', function(e) {
+			if (!window.isTouchDevice) return;
+			var el = e.target.closest('button, a, [class*="hover:"]');
+			if (el) {
+				setTimeout(function() {
 					var originalEvents = el.style.pointerEvents;
 					el.style.pointerEvents = 'none';
+					
 					setTimeout(function() {
 						el.style.pointerEvents = originalEvents;
-					}, 50);
-				}
-			});
+					}, 20);
+				}, 300);
+			}
+		});
 	</script>
 </head>
 <body class="select-none uninitialized">
