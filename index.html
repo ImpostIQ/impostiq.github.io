@@ -127,11 +127,18 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
     
-    <script>
+    <script>\
+        document.addEventListener('touchstart', function() {
+            document.documentElement.classList.add('is-touch');
+        }, { passive: true, once: true });
+
         tailwind.config = {
-            future: {
-                hoverOnlyWhenSupported: true,
-            },
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hover', 'html:not(.is-touch) &:hover');
+                    addVariant('group-hover', 'html:not(.is-touch) .group:hover &');
+                }
+            ],
             theme: {
                 extend: {
                     fontFamily: {
@@ -461,27 +468,6 @@
 		});
 		document.addEventListener('DOMContentLoaded', () => {
 			requestWakeLock();
-		});
-	</script>
-	
-	<script>
-		document.addEventListener('touchstart', function() {
-			window.isTouchDevice = true;
-		}, { passive: true, once: true });
-
-		document.addEventListener('touchend', function(e) {
-			if (!window.isTouchDevice) return;
-			var el = e.target.closest('button, a, [class*="hover:"]');
-			if (el) {
-				setTimeout(function() {
-					var originalEvents = el.style.pointerEvents;
-					el.style.pointerEvents = 'none';
-					
-					setTimeout(function() {
-						el.style.pointerEvents = originalEvents;
-					}, 20);
-				}, 300);
-			}
 		});
 	</script>
 </head>
