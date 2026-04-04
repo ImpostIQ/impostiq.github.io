@@ -2461,12 +2461,10 @@
             
             const hideTimeoutRef = useRef(null);
             const unmountTimeoutRef = useRef(null);
-            const requestRef = useRef(null);
 
             const updatePosition = () => {
                 if (containerRef.current) {
                     const rect = containerRef.current.getBoundingClientRect();
-                    // We use the raw rect values and let CSS handle the transform
                     setCoords({
                         x: rect.left + rect.width / 2,
                         y: rect.top
@@ -2477,17 +2475,19 @@
             const show = (e) => {
                 if (!isDisabled || !text) return;
                 
-                // Calculate position immediately before rendering
-                const rect = containerRef.current.getBoundingClientRect();
-                setCoords({ x: rect.left + rect.width / 2, y: rect.top });
+                updatePosition();
 
                 clearTimeout(hideTimeoutRef.current);
                 clearTimeout(unmountTimeoutRef.current);
                 
                 setIsRendered(true);
-                setIsVisible(true);
+                
+                // Allow DOM to mount before triggering fade
+                setTimeout(() => {
+                    setIsVisible(true);
+                }, 10);
 
-                // Auto-hide after 3 seconds
+                // Auto-hide after exactly 3 seconds
                 hideTimeoutRef.current = setTimeout(() => {
                     hide();
                 }, 3000);
@@ -2495,7 +2495,10 @@
 
             const hide = () => {
                 setIsVisible(false);
+                
                 clearTimeout(hideTimeoutRef.current);
+                clearTimeout(unmountTimeoutRef.current);
+                
                 unmountTimeoutRef.current = setTimeout(() => {
                     setIsRendered(false);
                 }, 300);
@@ -2504,33 +2507,29 @@
             useEffect(() => {
                 if (!isRendered) return;
 
-                // This logic ensures the tooltip is LOCKED to the button during scroll
                 const handleScroll = () => {
-                    if (requestRef.current) cancelAnimationFrame(requestRef.current);
-                    
-                    requestRef.current = requestAnimationFrame(() => {
-                        updatePosition();
-                    });
+                    if (isVisible) {
+                        hide();
+                    }
                 };
-                
-                // Find the actual scrolling container (the one with the scrollbar)
-                const scrollContainer = containerRef.current?.closest('.overflow-y-auto, .no-scrollbar') || window;
-                
-                scrollContainer.addEventListener('scroll', handleScroll, { capture: true, passive: true });
-                window.addEventListener('touchmove', handleScroll, { capture: true, passive: true });
-                
+
+                const scrollContainer = containerRef.current?.closest('.overflow-y-auto, .no-scrollbar');
+                const targetElement = scrollContainer || window;
+
+                targetElement.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+                window.addEventListener('touchmove', handleScroll, { capture: true, passive: true }); 
+
                 return () => {
-                    if (requestRef.current) cancelAnimationFrame(requestRef.current);
-                    scrollContainer.removeEventListener('scroll', handleScroll, { capture: true });
+                    targetElement.removeEventListener('scroll', handleScroll, { capture: true });
                     window.removeEventListener('touchmove', handleScroll, { capture: true });
                 };
-            }, [isRendered]);
+            }, [isRendered, isVisible]); // The dependency array is correct and doesn't need to be changed.
 
             return (
                 <div 
                     ref={containerRef}
                     className={className}
-                    onPointerDownCapture={show}
+                    onPointerDownCapture={show} // Intercepts clicks on disabled buttons
                     onMouseLeave={hide}
                 >
                     {children}
@@ -2540,9 +2539,7 @@
                             style={{ 
                                 left: coords.x, 
                                 top: coords.y - 8, 
-                                transform: 'translate(-50%, -100%)',
-                                willChange: 'top, left', // Forces the browser to sync movement
-                                backfaceVisibility: 'hidden' // Prevents sub-pixel blurring
+                                transform: 'translate(-50%, -100%)' 
                             }}
                         >
                             {text}
