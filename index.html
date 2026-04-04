@@ -2461,10 +2461,12 @@
             
             const hideTimeoutRef = useRef(null);
             const unmountTimeoutRef = useRef(null);
+            const requestRef = useRef(null);
 
             const updatePosition = () => {
                 if (containerRef.current) {
                     const rect = containerRef.current.getBoundingClientRect();
+                    // We use the raw rect values and let CSS handle the transform
                     setCoords({
                         x: rect.left + rect.width / 2,
                         y: rect.top
@@ -2475,19 +2477,17 @@
             const show = (e) => {
                 if (!isDisabled || !text) return;
                 
-                updatePosition();
+                // Calculate position immediately before rendering
+                const rect = containerRef.current.getBoundingClientRect();
+                setCoords({ x: rect.left + rect.width / 2, y: rect.top });
 
                 clearTimeout(hideTimeoutRef.current);
                 clearTimeout(unmountTimeoutRef.current);
                 
                 setIsRendered(true);
-                
-                // Allow DOM to mount before triggering fade
-                setTimeout(() => {
-                    setIsVisible(true);
-                }, 10);
+                setIsVisible(true);
 
-                // Auto-hide after exactly 3 seconds
+                // Auto-hide after 3 seconds
                 hideTimeoutRef.current = setTimeout(() => {
                     hide();
                 }, 3000);
@@ -2495,10 +2495,7 @@
 
             const hide = () => {
                 setIsVisible(false);
-                
                 clearTimeout(hideTimeoutRef.current);
-                clearTimeout(unmountTimeoutRef.current);
-                
                 unmountTimeoutRef.current = setTimeout(() => {
                     setIsRendered(false);
                 }, 300);
@@ -2507,27 +2504,33 @@
             useEffect(() => {
                 if (!isRendered) return;
 
+                // This logic ensures the tooltip is LOCKED to the button during scroll
                 const handleScroll = () => {
-                    updatePosition(); // Keeps it attached to the button while scrolling
-                    if (isVisible) {
-                        hide(); // Starts the fade out process
-                    }
+                    if (requestRef.current) cancelAnimationFrame(requestRef.current);
+                    
+                    requestRef.current = requestAnimationFrame(() => {
+                        updatePosition();
+                    });
                 };
                 
-                window.addEventListener('scroll', handleScroll, true);
+                // Find the actual scrolling container (the one with the scrollbar)
+                const scrollContainer = containerRef.current?.closest('.overflow-y-auto, .no-scrollbar') || window;
+                
+                scrollContainer.addEventListener('scroll', handleScroll, { capture: true, passive: true });
                 window.addEventListener('touchmove', handleScroll, { capture: true, passive: true });
                 
                 return () => {
-                    window.removeEventListener('scroll', handleScroll, true);
+                    if (requestRef.current) cancelAnimationFrame(requestRef.current);
+                    scrollContainer.removeEventListener('scroll', handleScroll, { capture: true });
                     window.removeEventListener('touchmove', handleScroll, { capture: true });
                 };
-            }, [isRendered, isVisible]);
+            }, [isRendered]);
 
             return (
                 <div 
                     ref={containerRef}
                     className={className}
-                    onPointerDownCapture={show} // Intercepts clicks on disabled buttons
+                    onPointerDownCapture={show}
                     onMouseLeave={hide}
                 >
                     {children}
@@ -2537,7 +2540,9 @@
                             style={{ 
                                 left: coords.x, 
                                 top: coords.y - 8, 
-                                transform: 'translate(-50%, -100%)' 
+                                transform: 'translate(-50%, -100%)',
+                                willChange: 'top, left', // Forces the browser to sync movement
+                                backfaceVisibility: 'hidden' // Prevents sub-pixel blurring
                             }}
                         >
                             {text}
