@@ -1338,11 +1338,11 @@
                                 </div>
                                 
                                 <div className="text-center py-3 bg-black/50 border-t border-white/5">
-                                    <button onClick={() => { setIsJoining(!isJoining); setError(''); }} className="text-white/50 font-semibold hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto text-sm">
-                                        <i className="fa-solid fa-rotate text-brand-400"></i>
-                                        <span>{isJoining ? 'Switch to Create Mission' : 'Switch to Join Mission'}</span>
-                                    </button>
-                                </div>
+									<button key={isJoining ? 'to-create' : 'to-join'} onClick={() => { setIsJoining(!isJoining); setError(''); }} className="text-white/50 font-semibold hover:text-white transition-colors flex items-center justify-center gap-2 mx-auto text-sm">
+										<i className="fa-solid fa-rotate text-brand-400"></i>
+										<span>{isJoining ? 'Switch to Create Mission' : 'Switch to Join Mission'}</span>
+									</button>
+								</div>
                             </section>
                         </div>
                     </div>
@@ -1566,62 +1566,126 @@
         };
 
 		const QRCodeModal = ({ lobbyId, password, onClose, audioManager, season }) => {
+            const [qrImageUrl, setQrImageUrl] = useState(null);
+
             const inviteCode = encodeInviteCode(lobbyId, password);
 			const inviteLink = `${window.location.origin}${window.location.pathname}?invite=${inviteCode}`;
 			
-            let qrColor = "d8dde3"; 
-            let qrBgColor = "0d121f";
+            let qrColor = "#d8dde3"; 
+            if (season === 'christmas') qrColor = "#0369a1";
+            else if (season === 'halloween') qrColor = "#ea580c";
             
-            if (season === 'christmas') {
-                qrColor = "0369a1";
-                qrBgColor = "0d121f"; 
-            } else if (season === 'halloween') {
-                qrColor = "ea580c";
-                qrBgColor = "0d121f"; 
-            }
-            
-			const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=${encodeURIComponent(inviteLink)}&qzone=0&margin=0&bgcolor=${qrBgColor}&color=${qrColor}`;
-
 			const getLogoUrl = () => {
-				if (season === 'christmas') {
-					return 'https://em-content.zobj.net/source/microsoft-teams/337/santa-claus_light-skin-tone_1f385-1f3fb_1f3fb.png';
-				}
-				if (season === 'halloween') {
-					return 'https://em-content.zobj.net/source/microsoft-teams/337/jack-o-lantern_1f383.png';
-				}
+				if (season === 'christmas') return 'https://em-content.zobj.net/source/microsoft-teams/337/santa-claus_light-skin-tone_1f385-1f3fb_1f3fb.png';
+				if (season === 'halloween') return 'https://em-content.zobj.net/source/microsoft-teams/337/jack-o-lantern_1f383.png';
 				return 'https://em-content.zobj.net/source/microsoft-teams/400/disguised-face_1f978.png';
 			};
 			const logoUrl = getLogoUrl();
 
+            useEffect(() => {
+                let mounted = true;
+                let objectUrl = null;
+
+                const generateQR = async () => {
+                    if (!window.QRCodeStyling) {
+                        try {
+                            await new Promise((resolve, reject) => {
+                                const script = document.createElement('script');
+                                script.src = "https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js";
+                                script.onload = resolve;
+                                script.onerror = reject;
+                                document.head.appendChild(script);
+                            });
+                        } catch (e) {
+                            console.error("Failed to load QR Library");
+                            return;
+                        }
+                    }
+
+                    if (!mounted) return;
+
+                    try {
+                        const qrCode = new window.QRCodeStyling({
+                            width: 1024, 
+                            height: 1024,
+                            margin: 0,
+                            type: "canvas", 
+                            data: inviteLink,
+                            qrOptions: { errorCorrectionLevel: 'Q' }, 
+                            dotsOptions: { color: qrColor, type: "rounded" },
+                            cornersSquareOptions: { color: qrColor, type: "extra-rounded" },
+                            cornersDotOptions: { color: qrColor, type: "dot" }, 
+                            backgroundOptions: { color: "transparent" }
+                        });
+
+                        const buffer = await qrCode.getRawData("png");
+                        if (mounted && buffer) {
+                            objectUrl = URL.createObjectURL(buffer);
+                            setQrImageUrl(objectUrl);
+                        }
+                    } catch (err) {
+                        console.error("Failed to generate QR:", err);
+                    }
+                };
+
+                generateQR();
+
+                return () => {
+                    mounted = false;
+                    if (objectUrl) URL.revokeObjectURL(objectUrl);
+                };
+            }, [inviteLink, qrColor]);
+
 			return (
-				<div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
+				<div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
 					<div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose}></div>
-					<div className="relative w-full max-w-sm glass-panel rounded-3xl p-6 border border-white/10 shadow-2xl animate-slide-up transform transition-all">
-						<button onClick={onClose} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-90 transition">
+					<div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl animate-slide-up transform transition-all max-h-[90vh] overflow-y-auto no-scrollbar flex flex-col">
+						<button onClick={onClose} className="absolute top-3 right-3 sm:top-4 sm:right-4 w-10 h-10 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-90 transition z-20 flex-shrink-0">
 							<i className="fa-solid fa-xmark"></i>
 						</button>
 						
-						<div className="flex flex-col items-center text-center">
+						<div className="flex flex-col items-center text-center mt-2 sm:mt-0">
 							<h2 className="text-2xl font-display font-bold text-white mb-2">Scan to Join</h2>
-							<p className="text-white/50 mb-6">Scan with a phone to instantly join the lobby.</p>
+							<p className="text-white/50 mb-4 sm:mb-6">Scan with a phone to instantly join the lobby.</p>
 
-							<div className="relative w-64 h-64">
-								<img src={qrCodeUrl} alt="Lobby Invite QR Code" className="w-full h-full object-contain rounded-lg" />
-								<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-									<div className="w-12 h-12 rounded-full bg-slate-50 p-1.5 shadow-md">
-										<img src={logoUrl} alt="Logo" className="w-full h-full" />
-									</div>
-								</div>
+                            {/* Responsive container: Scales down gracefully, stays square, never breaks out */}
+							<div className="relative w-full max-w-[17.5rem] aspect-square flex items-center justify-center pointer-events-none select-none flex-shrink-0">
+                                {/* Loading Spinner */}
+                                {!qrImageUrl && (
+                                    <div className="absolute inset-0 flex items-center justify-center z-0">
+                                        <svg className="sleek-spinner w-10 h-10 text-brand-500 drop-shadow-sm" viewBox="25 25 50 50">
+                                            <circle cx="50" cy="50" r="20"></circle>
+                                        </svg>
+                                    </div>
+                                )}
+
+                                {/* Extracted PNG QR Code - Strictly bound to absolute inset-0 to prevent overflowing */}
+                                {qrImageUrl && (
+                                    <img 
+										src={qrImageUrl} 
+										alt="Lobby Invite QR Code" 
+										draggable="false"
+										className="absolute inset-0 w-full h-full object-contain z-10 pointer-events-none select-none" 
+									/>
+                                )}
+
+                                {/* Center Logo Overlay - A clean, solid circle for a sleeker look */}
+                                <div className={`absolute inset-0 flex items-center justify-center z-20 ${qrImageUrl ? 'opacity-100' : 'opacity-0'}`}>
+                                    {/* This version uses a solid background, a clean border, and a shadow to create depth. */}
+                                    <div className="w-[22%] h-[22%] min-w-[48px] min-h-[48px] rounded-[1.5rem]  bg-slate-900 border-2 border-white/10 p-2 flex items-center justify-center shadow-2xl shadow-black/50">
+                                        <img src={logoUrl} alt="Logo" className="w-full h-full object-contain pointer-events-none select-none" draggable="false" />
+                                    </div>
+                                </div>
 							</div>
 							
-							<div className="w-full mt-6 flex gap-4">
-								<div className="flex-1 bg-white/5 p-3 rounded-lg border border-white/5">
-									<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Lobby ID</div>
-									<div className="font-mono text-xl font-bold tracking-widest text-white">{lobbyId}</div>
+							<div className="w-full mt-6 flex gap-3 sm:gap-4 flex-shrink-0">
+								<div className="flex-1 bg-black/20 p-3 rounded-lg border border-white/5 overflow-hidden">
+									<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1 truncate">Lobby ID</div>
+									<div className="font-mono text-lg sm:text-xl font-bold tracking-widest text-white truncate">{lobbyId}</div>
 								</div>
-								<div className="flex-1 bg-white/5 p-3 rounded-lg border border-white/5">
-									<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1">Password</div>
-									<div className="font-mono text-xl font-bold tracking-widest text-white">{password}</div>
+								<div className="flex-1 bg-black/20 p-3 rounded-lg border border-white/5 overflow-hidden">
+									<div className="text-white/40 text-[10px] uppercase font-bold tracking-widest mb-1 truncate">Password</div>
+									<div className="font-mono text-lg sm:text-xl font-bold tracking-widest text-white truncate">{password}</div>
 								</div>
 							</div>
 						</div>
