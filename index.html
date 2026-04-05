@@ -2973,12 +2973,12 @@ const isFullyReady = isReady && !isDataLoading;
             const addPlayer = () => {
                 const trimmedName = newPlayerName.trim();
                 if (!trimmedName) {
-                    setPlayerError('Please enter a codename.');
+                    setPlayerError('Please enter a player name.');
                     return;
                 }
                 const isDuplicate = players.some(p => p.name.toLowerCase() === trimmedName.toLowerCase());
                 if (isDuplicate) {
-                    setPlayerError('That codename is already in use.');
+                    setPlayerError('That player name is already in use.');
                     return;
                 }
 
