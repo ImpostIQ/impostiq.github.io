@@ -3859,7 +3859,7 @@ const isFullyReady = isReady && !isDataLoading;
                                 audioManager.playSound('alarm');
                             }
                             
-                            if (navigator.vibrate) navigator.vibrate();
+                            if (navigator.vibrate) navigator.vibrate(500);
                             
                             if (isHost || !isOnline) {
                                 onEndGame();
@@ -3979,7 +3979,7 @@ const isFullyReady = isReady && !isDataLoading;
                                 hasVotedToEnd ? (
                                     <div className="w-full h-[68px] bg-white/5 text-white/50 py-5 rounded-[1.5rem] font-display font-bold text-lg border border-white/10 flex items-center justify-center gap-3">
                                         <i className="fa-solid fa-hourglass-half text-lg"></i>
-                                        WAITING FOR OTHERS ({endVotes}/{requiredVotes})
+                                        WAITING FOR OTHERS ({endVotes}/{duration && timeLeft === 0 ? 1 : requiredVotes})
                                     </div>
                                 ) : (
                                     <button
@@ -3987,7 +3987,7 @@ const isFullyReady = isReady && !isDataLoading;
                                         className="w-full h-[68px] bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                     >
                                         <i className="fa-solid fa-check-to-slot text-lg"></i>
-                                        VOTE TO END ROUND ({endVotes}/{requiredVotes})
+                                        VOTE TO END ROUND ({endVotes}/{duration && timeLeft === 0 ? 1 : requiredVotes})
                                     </button>
                                 )
                             ) : (
