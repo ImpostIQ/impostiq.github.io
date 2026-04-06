@@ -3818,6 +3818,9 @@ const isFullyReady = isReady && !isDataLoading;
             const requiredVotes = isOnline ? Math.ceil((lobbyPlayers || []).length / 2) : 1;
             const hasVotedToEnd = isOnline ? !!(lobbyPlayers || []).find(p => p.id === user?.uid)?.votedToEnd : false;
 
+            const endVotesRef = useRef(endVotes);
+            useEffect(() => { endVotesRef.current = endVotes; }, [endVotes]);
+
             useEffect(() => {
                 if (isOnline && isHost && endVotes >= requiredVotes) {
                     onEndGame();
@@ -3850,7 +3853,7 @@ const isFullyReady = isReady && !isDataLoading;
                     setTimeLeft(newTimeLeft);
 
                     if (newTimeLeft <= 0 && !timerExpired) {
-                        if (!isOnline || endVotes >= 1) {
+                        if (!isOnline || endVotesRef.current >= 1) {
                             timerExpired = true;
                             clearInterval(timerRef.current);
                             
@@ -4988,22 +4991,9 @@ const isFullyReady = isReady && !isDataLoading;
             
             useEffect(() => {
                 if (lobbyData && lobbyData.gameState !== previousGameStateRef.current) {
-                    if (
-                        user && lobbyId &&
-                        (previousGameStateRef.current === 'result' || previousGameStateRef.current === 'reveal') &&
-                        lobbyData.gameState === 'waiting'
-                    ) {
-                        db.collection('lobbies').doc(lobbyId).collection('players').doc(user.uid).update({
-                            hasSeenCard: firebase.firestore.FieldValue.delete(),
-                            votedFor: firebase.firestore.FieldValue.delete(),
-                            status: firebase.firestore.FieldValue.delete(),
-                            votedToEnd: firebase.firestore.FieldValue.delete()
-                        }).catch(err => console.error("Could not reset player state:", err));
-                    }
                     previousGameStateRef.current = lobbyData.gameState;
                 }
-            }, [lobbyData, user, lobbyId]);
-
+            }, [lobbyData]);
 
             const startLocalGame = (players, selectedCategories, duration, isRandomMode, speakCategory, enableTwoImposters, isFakeWordMode) => {
                 const shuffledPlayers = shuffleArray([...players]);
@@ -5462,8 +5452,20 @@ const isFullyReady = isReady && !isDataLoading;
                     votingRecord: firebase.firestore.FieldValue.delete(),
                     lastRestartReason: firebase.firestore.FieldValue.delete(),
                 };
+				
+                const batch = db.batch();
+                batch.update(db.collection('lobbies').doc(lobbyId), updatePayload);
+                
+                lobbyPlayers.forEach(p => {
+                    batch.update(db.collection('lobbies').doc(lobbyId).collection('players').doc(p.id), {
+                        hasSeenCard: firebase.firestore.FieldValue.delete(),
+                        votedFor: firebase.firestore.FieldValue.delete(),
+                        status: firebase.firestore.FieldValue.delete(),
+                        votedToEnd: firebase.firestore.FieldValue.delete()
+                    });
+                });
 
-                await db.collection('lobbies').doc(lobbyId).update(updatePayload);
+                await batch.commit();
             };
 
             const handleStart = () => {
