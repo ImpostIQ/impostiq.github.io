@@ -812,12 +812,15 @@
 
             return (
                 <div className="h-[100dvh] flex flex-col items-center justify-center p-6 bg-slate-950 text-center relative overflow-hidden animate-fadeIn z-[100]">
+                    {/* Atmospheric Background */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
                         <div className="blob bg-brand-600/30 top-[10%] left-[-10%] w-[60%] h-[60%]"></div>
                         <div className="blob bg-cyan-600/20 bottom-[-10%] right-[-10%] w-[60%] h-[60%]" style={{ animationDelay: '2s' }}></div>
                     </div>
 
                     <div className="relative z-10 w-full max-w-sm flex flex-col items-center animate-slide-up">
+                        
+                        {/* Overlapping Emojis */}
                         <div className="relative w-40 h-40 flex justify-center z-20 -mb-2.5">
                             <div className="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full animate-pulse-slow"></div>
                             
@@ -832,12 +835,13 @@
                                  draggable="false" alt="Artist" />
                         </div>
 
+                        {/* Text Content */}
                         <div className="relative z-10 w-full glass-panel rounded-[2.5rem] p-8 pt-8 text-center">
                             <h1 className="text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 mb-4 drop-shadow-lg tracking-tight">
                                 404 • Lost
                             </h1>
                             <p className="text-white/60 text-sm font-medium leading-relaxed mb-8 mx-auto">
-                                The coordinates you entered are invalid. Return to base.
+                                The coordinates you entered are invalid or classified. Please return to base.
                             </p>
                             <button onClick={() => window.location.href = '/'} 
                                 className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
@@ -4855,15 +4859,17 @@ const isFullyReady = isReady && !isDataLoading;
                 const params = new URLSearchParams(window.location.search);
                 const inviteCode = params.get('invite');
                 const oldLobbyId = params.get('lobbyId'); 
-                const oldPassword = params.get('password');
                 
-                // SINGLE FILE ROUTING: Check the "Hash" in the URL bar
-                const currentHash = window.location.hash;
-                
-                // If there is a hash (e.g., #/Hello), trigger 404 screen
-                if (currentHash && currentHash !== '#/' && currentHash !== '#') {
+                // 1. SINGLE-FILE ERROR CHECK: 
+                // If there is random text after a "?" or "#", but it's not a valid link, trigger 404.
+                // Example: impostiq.github.io/?Hello
+                const isLost = (window.location.search.length > 0 && !inviteCode && !oldLobbyId) || 
+                               (window.location.hash.length > 0);
+
+                if (isLost) {
                     setIs404(true);
                 } 
+                // 2. HANDLE VALID INVITE CODES
                 else if (inviteCode) {
                     if (inviteCode.length === 10) {
                         const decoded = decodeInviteCode(inviteCode);
@@ -4871,13 +4877,15 @@ const isFullyReady = isReady && !isDataLoading;
                             setInitialLobbyParams({ lobbyId: decoded.lobbyId, password: decoded.password });
                             window.history.replaceState({}, document.title, window.location.pathname);
                         } else {
-                            setIs404(true);
+                            setIs404(true); // Decode failed = Lost
                         }
                     } else {
-                        setIs404(true);
+                        setIs404(true); // Wrong length = Lost
                     }
-                } else if (oldLobbyId) {
-                    setInitialLobbyParams({ lobbyId: oldLobbyId, password: oldPassword || '' });
+                } 
+                // 3. HANDLE OLD STYLE LINKS
+                else if (oldLobbyId) {
+                    setInitialLobbyParams({ lobbyId: oldLobbyId, password: params.get('password') || '' });
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 
