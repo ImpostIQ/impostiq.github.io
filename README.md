@@ -112,3 +112,8 @@ The game engine automatically transforms based on the time of year, changing the
   <p><strong>Developed by Jandré du Preez</strong></p>
   <p><a href="https://fillabrona.github.io">View Developer Portfolio</a></p>
 </div>
+
+<div align="center">
+  <picture>
+    <img src="https://i.ibb.co/pr1pz8ZR/image-3.png" style="border-radius: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); pointer-events: none;">
+  </picture>
