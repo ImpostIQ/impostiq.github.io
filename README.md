@@ -1,258 +1,112 @@
-# Impostiq • Find the Spy - Full Documentation
+<div align="center">
+  <img src="https://impostiq.github.io/favicon.png" width="160" height="160" style="border-radius: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+  
+  <h1>Impostiq • Find the Spy</h1>
+  
+  <p><strong>A thrilling social deduction party game of deception, secrets, and strategy.</strong></p>
 
-**AUTHOR/DEVELOPER/CREATOR: [Jandré du Preez/Fillabrona](https://fillabrona.github.io)**
+  <p>
+    <a href="https://impostiq.github.io"><strong>Play Online Now</strong></a> •
+    <a href="https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1"><strong>Download Android APK</strong></a> •
+    <a href="https://discord.gg/m9WrJxGKtr"><strong>Join the Discord</strong></a>
+  </p>
+</div>
 
-> **Source Code Reference:**
-> For exact implementation details, CSS animations, or specific React state logic, please refer to the raw source code file here:
-> [📂 View Source Code](https://raw.githubusercontent.com/Impostiq/Impostiq.github.io/refs/heads/main/index.html)
+<br>
 
-## System Overview
-**Impostiq** is a React-based Single Page Application (SPA) utilizing Firebase (Firestore/Auth) for real-time state management. It is designed as a social deduction game.
+<img src="https://em-content.zobj.net/source/microsoft-teams/337/direct-hit_1f3af.png" width="28" align="absmiddle"> **What is Impostiq?**
+---
+Impostiq is a party game similar to *Spyfall*. At the start of a round, players are given a **Secret Word** (e.g., "Shark", "New York", "Piano"). However, one player is the **Imposter** and receives nothing. 
 
-**Tech Stack:**
-- **Frontend:** React 18 (via CDN/Babel), Tailwind CSS.
-- **Backend:** Firebase Firestore (NoSQL), Firebase Auth (Anonymous).
-- **Audio:** Custom `audioManager` handling SFX and loops based on game state.
+Players must take turns asking each other questions or stating facts to figure out who the spy is. The Agents want to be specific enough to prove they know the word, but vague enough so the Imposter doesn't figure it out and blend in! 
 
+With over **8,500+ words** across **28 categories**, no two games are ever the same.
+
+<br>
+
+<img src="https://em-content.zobj.net/source/microsoft-teams/337/joystick_1f579-fe0f.png" width="28" align="absmiddle"> **Two Ways to Play**
 ---
 
-## Game Logic & Mechanics
+### <img src="https://em-content.zobj.net/source/microsoft-teams/337/globe-showing-americas_1f30e.png" width="24" align="absmiddle"> 1. Play Online (Real-Time Multiplayer)
+Play on separate devices over the internet with friends across the globe.
+*   **Easy Invites:** Share a dynamic 10-character deep-link or a custom QR code. Joining is instant.
+*   **Category Voting:** The host doesn't dictate the theme; all players vote for the category they want. Ties are resolved randomly!
+*   **Interactive Voting:** When the 3-minute timer ends (or a majority votes to end early), players use a secret interactive UI to lock in their suspects.
+*   **Voting Records:** At the end of the match, an intricate voting record shows exactly who betrayed whom.
 
-### 1. Game Modes
-The application runs in two distinct modes controlled by the `gameMode` state:
+### <img src="https://em-content.zobj.net/source/microsoft-teams/337/mobile-phone_1f4f1.png" width="24" align="absmiddle"> 2. Play on This Device (Local Pass-and-Play)
+Hanging out in person? You only need **one phone** to play.
+*   **Pass and Play:** The screen will tell you who to pass the phone to. They tap "Verify Identity" to secretly check their role.
+*   **Custom Voice Notes:** When setting up players, the host can tap the <img src="https://em-content.zobj.net/source/microsoft-teams/337/studio-microphone_1f399-fe0f.png" width="20" align="absmiddle"> microphone icon to record custom *"Hey, it's your turn!"* voice notes that play automatically when the phone is passed.
 
-#### A. Local Mode (Device Pass-and-Play)
-*   **State Management:** Local React `useState`.
-*   **Logic:**
-    1.  **Setup:** Users input player names and record optional voice notes ("It's your turn").
-    2.  **Role Assignment:** The app uses a Fisher-Yates shuffle on the player list.
-    3.  **Distribution:** The device is passed physically. Players tap a "Verify Identity" screen, then tap a 3D card (CSS `rotate-y-180`) to reveal their role.
-    4.  **Timer:** A local timer runs (visualized by an SVG circle stroke-dashoffset).
+<br>
 
-#### B. Online Mode (Real-Time Multiplayer)
-*   **State Management:** Firebase Firestore (`onSnapshot` listeners).
-*   **Lobby Logic:**
-    *   **ID/Password:** 6-char ID / 4-char Password generated via `generateRandomString`.
-    *   **QR Code:** Generated via `api.qrserver.com` pointing to `window.location.origin + ?lobbyId=...`.
-    *   **Sync:** `lobbyData` tracks `gameState` ('waiting', 'reveal', 'turnOrder', 'active', 'voting', 'result').
-*   **Connection Handling:**
-    *   `navigator.onLine` checks network status.
-    *   `OfflineScreen` component mounts if connection drops.
-
-### 2. Core Gameplay Loop
-1.  **Category Selection:** Host selects a category (e.g., "Food") or "Random Mode" (system picks).
-2.  **Word Selection:**
-    *   System accesses `WORD_BANK[Category]`.
-    *   A `secretWord` is chosen randomly.
-    *   In **Fake Word Mode**, a `fakeWord` is chosen (must not equal `secretWord`).
-3.  **Role Distribution:**
-    *   **Agents:** See the `secretWord`.
-    *   **Imposter (Classic):** See "IMPOSTER".
-    *   **Fake Word Player:** See the `fakeWord` (they believe they are an Agent).
-    *   **Second Imposter:** Activated if `enableTwoImposters` is true (requires 10+ players).
-4.  **Turn Order:** A randomized list is generated.
-5.  **The Game:** Players discuss/ask questions.
-6.  **Voting:** Players select who they suspect.
-7.  **Results:**
-    *   **Agents Win:** If the Imposter/Fake Word Player receives the majority votes.
-    *   **Imposter Wins:** If an innocent Agent is voted out, or if there is a tie.
-
-### 3. Special Mechanics
-*   **Confusion Poll (Word Check):**
-    *   If an Agent does not recognize a word, they click "I don't recognize this word".
-    *   A secret poll triggers in Firestore (`status: 'confused'`).
-    *   If >50% of Agents vote "Confused", the round automatically restarts with a new word.
-    *   *Strategic Note:* In "Fake Word Mode", the Fake Word Player is included in the poll to prevent identifying them via exclusion.
-*   **Seasonal Logic:**
-    *   System checks `Date()`.
-    *   **Halloween:** Oct 24 - Nov 7. Changes UI theme, adds "Halloween" Category, plays spooky music.
-    *   **Christmas:** Dec 18 - Jan 1. Changes UI theme, adds "Christmas" Category, plays festive music.
-
+<img src="https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png" width="28" align="absmiddle"> **Game Settings & Customization**
 ---
 
-## Configuration & Settings
+As the Host, you can tweak the game rules to create chaos. Some settings are exclusive depending on how you are playing.
 
-| Setting | Variable | Description |
-| :--- | :--- | :--- |
-| **Timer** | `duration` | Sets countdown (1-15 mins). If disabled, game is untimed. |
-| **Fake Word Mode** | `isFakeWordMode` | Replaces the Imposter with a player who has a slightly different word from the same category. |
-| **Two Imposters** | `enableTwoImposters` | Adds a second spy. Only available with 10+ players. |
-| **Speak Category** | `speakCategory` | Uses ElevenLabs generated audio to announce the category name at start. |
-| **Notify Imposter** | `notifyImposterOnVote` | If True, the Imposter is alerted if Agents trigger a "Confusion Poll". |
-| **Random Mode** | `isRandomMode` | System picks a random valid category from `WORD_BANK`. |
+| Setting | Icon | Availability | Description |
+| :--- | :---: | :---: | :--- |
+| **Fake Word Mode** | <img src="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/3d/1f3ad_3d.png" width="24"> | **Both** | Replaces the Imposter. Instead, one Agent receives a *different* word from the same category. They have no idea their word is the fake one! |
+| **Second Imposter** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" width="24"> | **Both** | Have a massive group? Lobbies with **10 or more players** unlock the ability to add a second Imposter (or a second Fake Card) to the mission. |
+| **Speak Category** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/megaphone_1f4e3.png" width="24"> | **Both** | When the round begins, text-to-speech automatically announces the chosen category aloud so everyone is on the same page. |
+| **Countdown Timer** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/three-oclock_1f552.png" width="24"> | **Local Only** | Adjust the discussion timer from 1 to 15 minutes, or turn it off entirely for a relaxed, **Untimed Mode**. *(Online missions are hardcoded to a fast-paced 3 minutes).* |
+| **Notify Imposter** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/bell_1f514.png" width="24"> | **Online Only** | If an Agent is confused by a word, they can trigger a secret poll. This setting gives the Imposter a secret red popup warning so they don't look surprised. |
 
+<br>
+
+<img src="https://em-content.zobj.net/source/microsoft-teams/337/face-with-monocle_1f9d0.png" width="28" align="absmiddle"> **The "Word Check" Mechanic**
+---
+Because Impostiq features an enormous **8,500+ word bank**, sometimes an Agent might receive a secret word they don't recognize. 
+
+To keep the game 100% fair, online mode features the **Word Check** system:
+1. During the card reveal, an Agent can click *"I don't recognize this word"*.
+2. The game pauses and pushes a secret Yes/No poll to all other Agents.
+3. If the majority of Agents admit they don't know the word either, the game intercepts the round, forces an automatic restart, and deals a brand new word and Imposter. 
+
+<br>
+
+<img src="https://em-content.zobj.net/source/microsoft-teams/364/calendar_1f4c5.png" width="28" align="absmiddle"> **Seasonal Events**
+---
+The game engine automatically transforms based on the time of year, changing the UI, metadata, and background music!
+
+*   <img src="https://em-content.zobj.net/source/microsoft-teams/337/jack-o-lantern_1f383.png" width="20" align="absmiddle"> **Halloween Event (Oct 24 - Nov 7):** Unlocks a spooky UI, eerie music, and a special Halloween category (Vampires, Zombies, Jack-O-Lanterns).
+*   <img src="https://em-content.zobj.net/source/microsoft-teams/364/christmas-tree_1f384.png" width="20" align="absmiddle"> **Christmas Event (Dec 18 - Jan 1):** The UI freezes over with festive jingles and a dedicated Christmas category (Reindeer, Eggnog, Santa Claus).
+
+<br>
+
+<img src="https://em-content.zobj.net/source/microsoft-teams/337/light-bulb_1f4a1.png" width="28" align="absmiddle"> **Strategy Guide & Scenarios**
 ---
 
-## The Complete Database (Word Bank)
+#### Playing as an Agent
+*   **Be Specific, Not Obvious:** If the word is *Shark*, saying "Jaws" gives it away instantly. Instead, say "It's a predator" or "It has a distinct fin".
+*   **Watch for Hesitation:** The Imposter needs extra time to process clues and invent a plausible answer. Silence is suspicious!
 
-The AI logic selects words from the following hardcoded JSON structure (`WORD_BANK`).
+#### Playing as the Imposter
+*   **Stay Vague Early:** If you go first, state something incredibly generic. 
+*   **Listen and Adapt:** Use the first few clues from other players to build a theory.
+*   *Example:* If the word is *Bicycle*, and someone says "It has two wheels," say "It's a form of transportation." It keeps you safe until you figure it out.
 
-### Category: Supercell
-*Words:* Barbarian, Archer, Giant, Goblin, Wall Breaker, Balloon, Wizard, Healer, Dragon, P.E.K.K.A, Minion, Hog Rider, Valkyrie, Golem, etc.
+#### Playing Fake Word Mode
+*   **Detect the Dissonance:** If everyone's clues seem to point to a different word, *you* might be the one with the fake word. If you suspect this, pivot to more general clues.
+*   *Example:* Real Word: *Apple*. Your Fake Word: *Banana*. An agent says "It can be red or green." If you proudly say "It's long and you peel it," you will immediately expose yourself as the fake!
 
-### Category: Celebs
-*Words:* Leonardo DiCaprio, Brad Pitt, Angelina Jolie, Tom Cruise, Johnny Depp, Will Smith, Dwayne Johnson, Scarlett Johansson, Robert Downey Jr, Jennifer Lawrence, Chris Hemsworth, Emma Watson, Ryan Reynolds, Keanu Reeves, etc.
+> **Pro-Tip:** During setup, press and hold (long-press) any category card to sneak a peek at some example words before the game begins!
 
-### Category: Movies
-*Words:* The Godfather, Titanic, Avatar, Star Wars, Jurassic Park, The Matrix, Inception, Forrest Gump, The Lion King, Avengers, Pulp Fiction, Frozen, The Dark Knight, Harry Potter, Back to the Future, etc.
+<br>
 
-### Category: Food
-*Words:* Pizza, Sushi, Burger, Tacos, Pasta, Curry, Steak, Salad, Sandwich, Soup, Fried Chicken, Ramen, Dumplings, Burrito, Pancakes, etc.
+<img src="https://em-content.zobj.net/source/microsoft-teams/337/gear_2699-fe0f.png" width="28" align="absmiddle"> **Technical Details**
+---
+*   **Frontend:** React 18, Tailwind CSS, Framer Motion (for dynamic 3D card tilt physics).
+*   **Backend:** Firebase Firestore (Real-time NoSQL state management) & Firebase Auth.
+*   **Infrastructure:** Time-based Database Load Balancing (Swaps between Firebase instances at 12:00 PT to prevent rate limits).
+*   **Audio Engine:** Custom-built `audioManager` for parallel SFX and looping music states.
 
-### Category: Brands
-*Words:* Apple, Nike, Coca-Cola, Samsung, McDonalds, Toyota, Disney, Amazon, Google, Tesla, Adidas, Pepsi, Starbucks, Netflix, Microsoft, etc.
-
-### Category: Technology
-*Words:* iPhone, Laptop, Drone, Robot, Bluetooth, Wifi, Keyboard, Mouse, Monitor, Camera, Headphones, Smartwatch, Tablet, Printer, Router, etc.
-
-### Category: TV
-*Words:* Stranger Things, Game of Thrones, Breaking Bad, The Office, Friends, The Simpsons, South Park, SpongeBob SquarePants, The Mandalorian, The Crown, Squid Game, The Witcher, Black Mirror, Rick and Morty, Avatar: The Last of Airbender, etc.
-
-### Category: Jobs
-*Words:* Doctor, Teacher, Engineer, Lawyer, Chef, Pilot, Firefighter, Police, Artist, Musician, Actor, Writer, Scientist, Programmer, Designer, etc.
-
-### Category: Mythology
-*Words:* Zeus, Thor, Hercules, Medusa, Dragon, Unicorn, Phoenix, Mermaid, Centaur, Griffin, Poseidon, Hades, Athena, Apollo, Odin, etc.
-
-### Category: Sport
-*Words:* Soccer, Basketball, Football, Tennis, Golf, Cricket, Rugby, Baseball, Volleyball, Hockey, Boxing, MMA, Wrestling, Formula 1, Swimming, etc.
-
-### Category: Places
-*Words:* School, Hospital, Library, Airport, Station, Park, Beach, Forest, Mountain, Desert, City, Village, Farm, Zoo, Museum, etc.
-
-### Category: Instruments
-*Words:* Guitar, Piano, Drums, Violin, Flute, Saxophone, Trumpet, Cello, Harp, Clarinet, Trombone, Tuba, Banjo, Ukulele, Accordion, etc.
-
-### Category: Superheroes
-*Words:* Superman, Batman, Spider-Man, Iron Man, Wonder Woman, Thor, Hulk, Captain America, Black Panther, Flash, Aquaman, Green Lantern, Wolverine, Deadpool, Doctor Strange, etc.
-
-### Category: Animals
-*Words:* Lion, Tiger, Elephant, Giraffe, Penguin, Dolphin, Whale, Shark, Eagle, Parrot, Dog, Cat, Hamster, Snake, Lizard, etc.
-
-### Category: Countries
-*Words:* USA, Canada, Mexico, Brazil, Argentina, UK, France, Germany, Italy, Spain, Russia, China, Japan, India, Australia, etc.
-
-### Category: Video Games
-*Words:* Mario, Zelda, Pokemon, Minecraft, Fortnite, Roblox, Call of Duty, GTA, Halo, God of War, The Witcher, Skyrim, Fallout, Overwatch, League of Legends, etc.
-
-### Category: Science
-*Words:* Atom, Molecule, Cell, DNA, Gravity, Magnetism, Electricity, Light, Sound, Heat, Energy, Force, Motion, Planet, Star, etc.
-
-### Category: Clothing
-*Words:* Shirt, T-Shirt, Pants, Jeans, Shorts, Skirt, Dress, Suit, Coat, Jacket, Sweater, Hoodie, Vest, Scarf, Gloves, etc.
-
-### Category: Home
-*Words:* Table, Chair, Sofa, Bed, Desk, Shelf, Cabinet, Cupboard, Wardrobe, Lamp, Light, Fan, Heater, AC, Fridge, etc.
-
-### Category: People
-*Words:* President, King, Queen, Athlete, Celebrity, Artist, Musician, Scientist, Teacher, Student, Child, Elderly, Baby, Tourist, Police Officer, etc.
-
-### Category: Historical Figures
-*Words:* Cleopatra, Julius Caesar, Alexander the Great, Joan of Arc, Leonardo da Vinci, William Shakespeare, Isaac Newton, George Washington, Napoleon Bonaparte, Abraham Lincoln, Queen Victoria, Albert Einstein, Marie Curie, Mahatma Gandhi, Winston Churchill, etc.
-
-### Category: Board Games
-*Words:* Chess, Checkers, Monopoly, Scrabble, Clue, Risk, Battleship, Catan, Ticket to Ride, Pandemic, Codenames, Jenga, Connect Four, Sorry!, etc.
-
-### Category: Famous Landmarks
-*Words:* Eiffel Tower, Statue of Liberty, Great Wall of China, Pyramids of Giza, Colosseum, Taj Mahal, Machu Picchu, Christ the Redeemer, Big Ben, Leaning Tower of Pisa, Sydney Opera House, Acropolis, Stonehenge, Mount Rushmore, Burj Khalifa, The Louvre, etc.
-
-### Category: Music
-*Words:* Bohemian Rhapsody, Like a Rolling Stone, Smells Like Teen Spirit, Billie Jean, Stairway to Heaven, Hey Jude, Hotel California, I Will Always Love You, Shape of You, Uptown Funk, Rolling in the Deep, Blinding Lights, Despacito, Hallelujah, Wonderwall, etc.
-
-### Category: School
-*Words:* Blackboard, Chalk, Desk, Chair, Backpack, Pencil, Pen, Eraser, Ruler, Notebook, Textbook, Homework, Test, Exam, Quiz, etc.
-
-### Category: Halloween (Seasonal)
-*Words:* Witch, Ghost, Vampire, Werewolf, Zombie, Mummy, Skeleton, Spider, Bat, Black Cat, Pumpkin, Jack-o'-lantern, Haunted House, Cemetery, Gravestone, etc.
-
-### Category: Christmas (Seasonal)
-*Words:* A Christmas Carol, Advent, All I Want for Christmas is You, Angel, Anticipation, Artificial Tree, Atmosphere, Baking, Bauble, Believe, Bells, Bethlehem, Blanket, Blessing, Blitzen, etc.
-
-Here is the detailed section to add **at the very end** of your `README.md` file.
-
-This section explicitly breaks down the date logic, asset swaps, music triggers, and social sharing changes so an AI understands exactly how the game transforms based on the date.
-
-Copy and paste the following text to the bottom of your `README.md`:
+<br>
 
 ---
-
-## Seasonal & Time-Based Logic
-
-The application uses a client-side date check (`new Date()`) to automatically toggle "Seasonal Modes." This logic affects the UI theme, available categories, background music, metadata, and social sharing text.
-
-### 1. Trigger Mechanism
-The function `getSeasonalInfo()` determines the current season based on the user's local system time.
-
-*   **Default Mode:** Active most of the year.
-*   **Halloween Mode:** Active from **October 24th** to **November 7th**.
-*   **Christmas Mode:** Active from **December 18th** to **January 1st**.
-
-### 2. Halloween Mode Details
-*   **Date Logic:** `(month === 10 && day >= 24) || (month === 11 && day <= 7)` (Note: Months are 0-indexed in JS).
-*   **Visual Changes:**
-    *   **Title:** "Impostiq" text is styled with a Jack-O-Lantern emoji replacing the 'O'.
-    *   **Category Card:** The "Halloween" category card gets an orange border, orange glow/ring, and a spooky background image.
-    *   **Favicon/Metadata:** Changes to a 3D Jack-O-Lantern icon.
-*   **Audio:**
-    *   Background Music: Plays `halloweenMainMenuMusic` (Spooky/Eerie theme).
-    *   Voiceover: Custom ElevenLabs voiceover for the "Halloween" category.
-*   **Gameplay:**
-    *   **Category:** The "Halloween" category becomes selectable.
-    *   **Word Bank:** Accesses the specific `Halloween` array in `WORD_BANK` (e.g., Witch, Ghost, Vampire).
-*   **Social Sharing:**
-    *   Invite Text: "🎃 Spooky Impostiq Invite... Something is lurking in the shadows... 👻"
-
-### 3. Christmas Mode Details
-*   **Date Logic:** `(month === 12 && day >= 18) || (month === 1 && day <= 1)`.
-*   **Visual Changes:**
-    *   **Title:** "Impostiq" text is styled with a Christmas Tree emoji replacing the 'T'.
-    *   **Category Card:** The "Christmas" category card gets a red border, red glow/ring, and a festive background image (Three Kings/Nativity style).
-    *   **Favicon/Metadata:** Changes to a 3D Snowman icon.
-*   **Audio:**
-    *   Background Music: Plays `christmasMainMenuMusic` (Festive/Jingle Bells theme).
-    *   Voiceover: Custom ElevenLabs voiceover for the "Christmas" category.
-*   **Gameplay:**
-    *   **Category:** The "Christmas" category becomes selectable.
-    *   **Word Bank:** Accesses the specific `Christmas` array in `WORD_BANK` (e.g., Santa Claus, Reindeer, Eggnog).
-*   **Social Sharing:**
-    *   Invite Text: "🎁 Festive Impostiq Invite... The North Pole has a traitor! 🎅🏻"
-
-### 4. Dynamic Metadata & SEO
-An Immediately Invoked Function Expression (IIFE) runs before the DOM loads to update `<head>` tags based on the season:
-*   **Favicon (`link[rel="icon"]`):** Updates to seasonal emoji.
-*   **Open Graph Image (`og:image`):** Updates to seasonal emoji for link previews (Discord, WhatsApp, iMessage).
-*   **Twitter Image (`twitter:image`):** Updates to match Open Graph.
-
-### 5. Asset Preloading Strategy
-To ensure smooth transitions, the `preloadAssets` function builds a list of URLs to cache:
-1.  **Static UI:** Standard game icons (Locked, Shushing Face, etc.).
-2.  **Category Icons:** Iterates through `CATEGORY_ICONS` object.
-3.  **Audio:** Iterates through `AUDIO_URLS`, distinguishing between SFX (loaded as `Audio` objects) and Music (streamed).
-4.  **Seasonal Backgrounds:** Specifically preloads the Halloween pumpkin background and the Christmas Nativity background to prevent pop-in when seasonal modes are active.
-
-## User Interface & Interaction Flow
-
-### 1. Creating a Lobby (Step-by-Step)
-1.  **Landing Screen:** User clicks **"PLAY ONLINE"**.
-2.  **Lobby Setup:**
-    *   User enters a **Username**.
-    *   User clicks **"Create a new lobby"** text (toggles mode).
-    *   User clicks the **"CREATE LOBBY"** button.
-3.  **Waiting Room (Host View):**
-    *   Host sees the **Lobby ID** (6 chars) and **Password** (4 chars).
-    *   **QR Code:** Host can click "SCAN QR" to display a code for friends to scan.
-    *   **Settings:** Host can toggle "Fake Word Mode", "Second Imposter", "Timer", and "Speak Category".
-    *   **Category:** Host selects a card (e.g., "Movies") or toggles "Mystery Mode" (Random).
-    *   **Start:** Once 3+ players join, Host clicks "START MISSION".
-
-### 2. Joining a Lobby
-1.  **Landing Screen:** User clicks **"PLAY ONLINE"**.
-2.  **Input:** User enters **Username**, **Lobby ID**, and **Password**.
-3.  **Action:** User clicks **"JOIN LOBBY"**.
-    *   *Alternative:* User scans the Host's QR code to auto-fill credentials.
-
-### 3. Edge Cases & Error Handling
-*   **Host Disconnection:** If the Host leaves, the system automatically promotes the next player in the list (by `createdAt` timestamp) to be the new Host.
-*   **Player Removal:** The Host can click the "Trash Can" icon next to a player's name in the Waiting Room to kick them out.
-*   **Connection Loss:** An **Offline Screen** triggers immediately if `navigator.onLine` returns false, blocking gameplay until connection is restored.
-*   **Minimum Players:** The "Start Mission" button is disabled until at least **3 players** are in the lobby.
+<div align="center">
+  <p><strong>Developed by Jandré du Preez</strong></p>
+  <p><a href="https://fillabrona.github.io">View Developer Portfolio</a></p>
+</div>
