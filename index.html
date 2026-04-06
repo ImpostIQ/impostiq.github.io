@@ -2205,7 +2205,7 @@
                                 <SeasonalTitle season={currentSeason} className="text-5xl font-display font-black text-white mb-2 drop-shadow-lg tracking-tight" />
                                 <p class="text-white/40 font-semibold tracking-wide">Mission Lobby • Waiting for agents</p>
 							</div>
-                            
+
 							{lobbyData.gameState === 'waiting' && (
                                 <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
                                     <div className="text-center py-3 bg-black/50 border-b border-white/5">
@@ -2241,18 +2241,28 @@
                             <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
                                 <div className="text-center py-3 bg-black/50 border-b border-white/5">
                                     <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
-                                        <i className="fa-solid fa-users text-brand-400 mr-1"></i> Agents
+                                        <i className={`fa-solid ${lobbyData.gameState === 'reveal' ? 'fa-list-ol' : 'fa-users'} text-brand-400 mr-1`}></i> 
+                                        {lobbyData.gameState === 'reveal' ? 'Mission Turn Order' : 'Agents'}
                                     </h2>
                                 </div>
                                 <div className="p-4 flex flex-col gap-3">
-                                    {lobbyPlayers.map(p => {
+                                    {(lobbyData.gameState === 'reveal' && lobbyData.turnOrder ? lobbyData.turnOrder : lobbyPlayers).map((playerOrTurn, index) => {
+                                        const p = lobbyPlayers.find(lp => lp.id === (playerOrTurn.id || playerOrTurn));
+                                        if (!p) return null;
                                         const hasAcknowledgedCard = !!p.hasSeenCard;
+                                        const isTurnOrder = lobbyData.gameState === 'reveal';
 
                                         return (
                                             <div key={p.id} className={`flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-xl border transition-all ${p.id === user.uid ? 'bg-white/10 border-white/10 shadow-sm' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
-                                                <div className="w-5 flex items-center justify-center flex-shrink-0">
-                                                    <i className={`fa-solid ${p.id === lobbyData.hostId ? 'fa-crown text-yellow-400 text-sm drop-shadow-md' : 'fa-user-secret text-white/20 text-sm'}`}></i>
-                                                </div>
+                                                {isTurnOrder ? (
+                                                    <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-brand-500/20 text-brand-400 font-mono font-bold text-sm rounded-lg border border-brand-500/20">
+                                                        {index + 1}
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-5 flex items-center justify-center flex-shrink-0">
+                                                        <i className={`fa-solid ${p.id === lobbyData.hostId ? 'fa-crown text-yellow-400 text-sm drop-shadow-md' : 'fa-user-secret text-white/20 text-sm'}`}></i>
+                                                    </div>
+                                                )}
                                                 <PlayerAvatar name={p.name} className="w-7 h-7 rounded-full flex-shrink-0"/>
                                                 <span className={`font-bold truncate ${p.id === user.uid ? 'text-white' : 'text-white/80'}`}>{p.name}</span>
                                                 
@@ -2277,6 +2287,13 @@
                                         );
                                     })}
                                 </div>
+                                {lobbyData.gameState === 'reveal' && lobbyData.turnOrder && (
+                                    <div className="text-center py-3 bg-black/50 border-t border-white/5 animate-fadeIn">
+                                        <p className="text-xs text-white/60 font-semibold px-4">
+                                            Study the turn order! <strong className="text-white/90">{lobbyData.turnOrder[0]?.name}</strong> starts the interrogation.
+                                        </p>
+                                    </div>
+                                )}
                             </section>
                             
                             {lobbyData.gameState === 'waiting' && (
@@ -2426,7 +2443,7 @@
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-200/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                                         <span className="relative z-10 flex items-center gap-3">
-                                            <i className="fa-solid fa-list-ol text-sm"></i> VIEW TURN ORDER ({lobbyPlayers.length}/{lobbyPlayers.length})
+                                            <i className="fa-solid fa-play text-sm"></i> START TIMER
                                         </span>
                                     </button>
                                 ) : (
@@ -3762,7 +3779,9 @@ const isFullyReady = isReady && !isDataLoading;
                         <div className="max-w-lg mx-auto p-6 pt-28">
                             <div className="mb-10 text-center">
                                 <h1 className="text-5xl font-display font-black text-white mb-2 drop-shadow-lg tracking-tight">Turn Order</h1>
-                                <p className="text-white/40 font-semibold tracking-wide">The mission will proceed in this sequence.</p>
+                                <p className="text-white/40 font-semibold tracking-wide">
+                                    Study the turn order! <strong className="text-white/80">{players && players.length > 0 ? players[0].name : 'The first player'}</strong> starts the interrogation.
+                                </p>
                             </div>
 
                             <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
@@ -5311,10 +5330,7 @@ const isFullyReady = isReady && !isDataLoading;
             };
             
             const handleStartMissionOnline = () => {
-                db.collection('lobbies').doc(lobbyId).update({ 
-                    gameState: 'turnOrder',
-                    lastSoundEvent: { name: 'uiClick', timestamp: Date.now() }
-                }); 
+                handleStartActiveMission();
             };
             
             const handleStartActiveMission = () => {
