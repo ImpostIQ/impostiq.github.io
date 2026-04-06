@@ -5,16 +5,16 @@
   
   <p align="center">
     <picture>
-      <img draggable="false" src="https://i.ibb.co/MkWgy705/imageiconlogotext.png" alt="Impostiq • Find the Spy" style="display: block; width: 100%; max-width: 700px; margin: 0 auto;">
+      <img draggable="false" src="https://i.ibb.co/RGkvQGLx/impostiq-text-1775497965180-2x.png" alt="Impostiq • Find the Spy" style="display: block; width: 100%; max-width: 700px; margin: 0 auto;">
     </picture>
   </p>
   
   <p><strong>A thrilling social deduction party game of deception, secrets, and strategy.</strong></p>
 
   <p>
-    <a href="https://impostiq.github.io"><img draggable="false" src="https://i.ibb.co/N6T2XvzH/impostiq-button-1775491222460.png" alt="Play Online Now" height="50"></a>&nbsp;
-    <a href="https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1"><img draggable="false" src="https://i.ibb.co/NdKQRgT1/impostiq-button-1775491248669.png" alt="Download Android APK" height="50"></a>&nbsp;
-    <a href="https://discord.gg/m9WrJxGKtr"><img draggable="false" src="https://i.ibb.co/PsTyjt2V/impostiq-button-1775491267437.png" alt="Join the Discord" height="50"></a>
+    <a href="https://impostiq.github.io"><img draggable="false" src="https://i.ibb.co/Vc0cxTKG/impostiq-button-1775497061086-4x.png" alt="Play Online Now" height="50"></a>&nbsp;
+    <a href="https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1"><img draggable="false" src="https://i.ibb.co/LDZtxw6W/impostiq-button-1775497736055-4x.png" alt="Download Android APK" height="50"></a>&nbsp;
+    <a href="https://discord.gg/m9WrJxGKtr"><img draggable="false" src="https://i.ibb.co/Qv71bg0m/impostiq-button-1775497772121-4x.png" alt="Join the Discord" height="50"></a>
   </p>
 </div>
 
@@ -160,12 +160,12 @@ The game engine automatically transforms based on the time of year, changing the
   
   <p>
     <picture>
-      <img draggable="false" src="https://i.ibb.co/xSYzBT2f/devnameimage.png" alt="Developed by Jandré du Preez" height="25">
+      <img draggable="false" src="https://i.ibb.co/23m3D50m/impostiq-text-1775498076737-2x.png" alt="Developed by Jandré du Preez" height="30">
     </picture>
   </p>
   
   <p>
-    <a href="https://fillabrona.github.io"><img draggable="false" src="https://i.ibb.co/HLchnjjG/impostiq-button-1775491450333.png" alt="View Developer Portfolio" height="50"></a>
+    <a href="https://fillabrona.github.io"><img draggable="false" src="https://i.ibb.co/gnz0pWd/impostiq-button-1775497813744-4x.png" alt="View Developer Portfolio" height="50"></a>
   </p>
 </div>
 
