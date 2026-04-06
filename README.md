@@ -1,5 +1,7 @@
 <div align="center">
-  <img src="https://impostiq.github.io/favicon.png" width="160" height="160" style="border-radius: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+  <picture>
+    <img src="https://impostiq.github.io/favicon.png" width="160" height="160" style="border-radius: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); pointer-events: none;">
+  </picture>
   
   <h1>Impostiq • Find the Spy</h1>
   
@@ -14,7 +16,7 @@
 
 <br>
 
-<img src="https://em-content.zobj.net/source/microsoft-teams/337/direct-hit_1f3af.png" width="28" align="absmiddle"> **What is Impostiq?**
+<picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/direct-hit_1f3af.png" width="28" align="absmiddle"></picture> **What is Impostiq?**
 ---
 Impostiq is a party game similar to *Spyfall*. At the start of a round, players are given a **Secret Word** (e.g., "Shark", "New York", "Piano"). However, one player is the **Imposter** and receives nothing. 
 
@@ -24,39 +26,39 @@ With over **8,500+ words** across **28 categories**, no two games are ever the s
 
 <br>
 
-<img src="https://em-content.zobj.net/source/microsoft-teams/337/joystick_1f579-fe0f.png" width="28" align="absmiddle"> **Two Ways to Play**
+<picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/joystick_1f579-fe0f.png" width="28" align="absmiddle"></picture> **Two Ways to Play**
 ---
 
-### <img src="https://em-content.zobj.net/source/microsoft-teams/337/globe-showing-americas_1f30e.png" width="24" align="absmiddle"> 1. Play Online (Real-Time Multiplayer)
+### <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/globe-showing-americas_1f30e.png" width="24" align="absmiddle"></picture> 1. Play Online (Real-Time Multiplayer)
 Play on separate devices over the internet with friends across the globe.
 *   **Easy Invites:** Share a dynamic 10-character deep-link or a custom QR code. Joining is instant.
 *   **Category Voting:** The host doesn't dictate the theme; all players vote for the category they want. Ties are resolved randomly!
 *   **Interactive Voting:** When the 3-minute timer ends (or a majority votes to end early), players use a secret interactive UI to lock in their suspects.
 *   **Voting Records:** At the end of the match, an intricate voting record shows exactly who betrayed whom.
 
-### <img src="https://em-content.zobj.net/source/microsoft-teams/337/mobile-phone_1f4f1.png" width="24" align="absmiddle"> 2. Play on This Device (Local Pass-and-Play)
+### <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/mobile-phone_1f4f1.png" width="24" align="absmiddle"></picture> 2. Play on This Device (Local Pass-and-Play)
 Hanging out in person? You only need **one phone** to play.
 *   **Pass and Play:** The screen will tell you who to pass the phone to. They tap "Verify Identity" to secretly check their role.
-*   **Custom Voice Notes:** When setting up players, the host can tap the <img src="https://em-content.zobj.net/source/microsoft-teams/337/studio-microphone_1f399-fe0f.png" width="20" align="absmiddle"> microphone icon to record custom *"Hey, it's your turn!"* voice notes that play automatically when the phone is passed.
+*   **Custom Voice Notes:** When setting up players, the host can tap the <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/studio-microphone_1f399-fe0f.png" width="20" align="absmiddle"></picture> microphone icon to record custom *"Hey, it's your turn!"* voice notes that play automatically when the phone is passed.
 
 <br>
 
-<img src="https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png" width="28" align="absmiddle"> **Game Settings & Customization**
+<picture><img src="https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png" width="28" align="absmiddle"></picture> **Game Settings & Customization**
 ---
 
 As the Host, you can tweak the game rules to create chaos. Some settings are exclusive depending on how you are playing.
 
 | Setting | Icon | Availability | Description |
 | :--- | :---: | :---: | :--- |
-| **Fake Word Mode** | <img src="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/3d/1f3ad_3d.png" width="24"> | **Both** | Replaces the Imposter. Instead, one Agent receives a *different* word from the same category. They have no idea their word is the fake one! |
-| **Second Imposter** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" width="24"> | **Both** | Have a massive group? Lobbies with **10 or more players** unlock the ability to add a second Imposter (or a second Fake Card) to the mission. |
-| **Speak Category** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/megaphone_1f4e3.png" width="24"> | **Both** | When the round begins, text-to-speech automatically announces the chosen category aloud so everyone is on the same page. |
-| **Countdown Timer** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/three-oclock_1f552.png" width="24"> | **Local Only** | Adjust the discussion timer from 1 to 15 minutes, or turn it off entirely for a relaxed, **Untimed Mode**. *(Online missions are hardcoded to a fast-paced 3 minutes).* |
-| **Notify Imposter** | <img src="https://em-content.zobj.net/source/microsoft-teams/337/bell_1f514.png" width="24"> | **Online Only** | If an Agent is confused by a word, they can trigger a secret poll. This setting gives the Imposter a secret red popup warning so they don't look surprised. |
+| **Fake Word Mode** | <picture><img src="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/3d/1f3ad_3d.png" width="24"></picture> | **Both** | Replaces the Imposter. Instead, one Agent receives a *different* word from the same category. They have no idea their word is the fake one! |
+| **Second Imposter** | <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" width="24"></picture> | **Both** | Have a massive group? Lobbies with **10 or more players** unlock the ability to add a second Imposter (or a second Fake Card) to the mission. |
+| **Speak Category** | <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/megaphone_1f4e3.png" width="24"></picture> | **Both** | When the round begins, text-to-speech automatically announces the chosen category aloud so everyone is on the same page. |
+| **Countdown Timer** | <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/three-oclock_1f552.png" width="24"></picture> | **Local Only** | Adjust the discussion timer from 1 to 15 minutes, or turn it off entirely for a relaxed, **Untimed Mode**. *(Online missions are hardcoded to a fast-paced 3 minutes).* |
+| **Notify Imposter** | <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/bell_1f514.png" width="24"></picture> | **Online Only** | If an Agent is confused by a word, they can trigger a secret poll. This setting gives the Imposter a secret red popup warning so they don't look surprised. |
 
 <br>
 
-<img src="https://em-content.zobj.net/source/microsoft-teams/337/face-with-monocle_1f9d0.png" width="28" align="absmiddle"> **The "Word Check" Mechanic**
+<picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/face-with-monocle_1f9d0.png" width="28" align="absmiddle"></picture> **The "Word Check" Mechanic**
 ---
 Because Impostiq features an enormous **8,500+ word bank**, sometimes an Agent might receive a secret word they don't recognize. 
 
@@ -67,16 +69,16 @@ To keep the game 100% fair, online mode features the **Word Check** system:
 
 <br>
 
-<img src="https://em-content.zobj.net/source/microsoft-teams/364/calendar_1f4c5.png" width="28" align="absmiddle"> **Seasonal Events**
+<picture><img src="https://em-content.zobj.net/source/microsoft-teams/364/calendar_1f4c5.png" width="28" align="absmiddle"></picture> **Seasonal Events**
 ---
 The game engine automatically transforms based on the time of year, changing the UI, metadata, and background music!
 
-*   <img src="https://em-content.zobj.net/source/microsoft-teams/337/jack-o-lantern_1f383.png" width="20" align="absmiddle"> **Halloween Event (Oct 24 - Nov 7):** Unlocks a spooky UI, eerie music, and a special Halloween category (Vampires, Zombies, Jack-O-Lanterns).
-*   <img src="https://em-content.zobj.net/source/microsoft-teams/364/christmas-tree_1f384.png" width="20" align="absmiddle"> **Christmas Event (Dec 18 - Jan 1):** The UI freezes over with festive jingles and a dedicated Christmas category (Reindeer, Eggnog, Santa Claus).
+*   <picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/jack-o-lantern_1f383.png" width="20" align="absmiddle"></picture> **Halloween Event (Oct 24 - Nov 7):** Unlocks a spooky UI, eerie music, and a special Halloween category (Vampires, Zombies, Jack-O-Lanterns).
+*   <picture><img src="https://em-content.zobj.net/source/microsoft-teams/364/christmas-tree_1f384.png" width="20" align="absmiddle"></picture> **Christmas Event (Dec 18 - Jan 1):** The UI freezes over with festive jingles and a dedicated Christmas category (Reindeer, Eggnog, Santa Claus).
 
 <br>
 
-<img src="https://em-content.zobj.net/source/microsoft-teams/337/light-bulb_1f4a1.png" width="28" align="absmiddle"> **Strategy Guide & Scenarios**
+<picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/light-bulb_1f4a1.png" width="28" align="absmiddle"></picture> **Strategy Guide & Scenarios**
 ---
 
 #### Playing as an Agent
@@ -96,7 +98,7 @@ The game engine automatically transforms based on the time of year, changing the
 
 <br>
 
-<img src="https://em-content.zobj.net/source/microsoft-teams/337/gear_2699-fe0f.png" width="28" align="absmiddle"> **Technical Details**
+<picture><img src="https://em-content.zobj.net/source/microsoft-teams/337/gear_2699-fe0f.png" width="28" align="absmiddle"></picture> **Technical Details**
 ---
 *   **Frontend:** React 18, Tailwind CSS, Framer Motion (for dynamic 3D card tilt physics).
 *   **Backend:** Firebase Firestore (Real-time NoSQL state management) & Firebase Auth.
