@@ -5,7 +5,7 @@
   
   <p align="center">
     <picture>
-      <img draggable="false" src="https://i.ibb.co/C3MpcCKb/imageiconlogotext.png" alt="Impostiq • Find the Spy" style="display: block; width: 100%; max-width: 700px; margin: 0 auto;">
+      <img draggable="false" src="https://i.ibb.co/MkWgy705/imageiconlogotext.png" alt="Impostiq • Find the Spy" style="display: block; width: 100%; max-width: 700px; margin: 0 auto;">
     </picture>
   </p>
   
