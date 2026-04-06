@@ -56,6 +56,18 @@
 
     <script>
         (function() {
+            var path = window.location.pathname;
+            if (path === '/404/') {
+                window.history.replaceState(null, '', '/404' + window.location.search + window.location.hash);
+            } 
+            else if (path !== '/' && path !== '/index.html' && path !== '/404') {
+                window.location.replace('/404');
+            }
+        })();
+    </script>
+
+    <script>
+        (function() {
             const getSeasonalInfo = () => {
                 const now = new Date();
                 const month = now.getMonth() + 1;
@@ -4807,11 +4819,13 @@ const isFullyReady = isReady && !isDataLoading;
                 const oldLobbyId = params.get('lobbyId'); 
                 const oldPassword = params.get('password');
                 
-                if (inviteCode && inviteCode.length === 10) {
-                    const decoded = decodeInviteCode(inviteCode);
+                if (inviteCode) {
+                    const decoded = inviteCode.length === 10 ? decodeInviteCode(inviteCode) : null;
                     if (decoded) {
                         setInitialLobbyParams({ lobbyId: decoded.lobbyId, password: decoded.password });
                         window.history.replaceState({}, document.title, window.location.pathname);
+                    } else {
+                        window.location.replace('/404');
                     }
                 } else if (oldLobbyId) {
                     setInitialLobbyParams({ lobbyId: oldLobbyId, password: oldPassword || '' });
