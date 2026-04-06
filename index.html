@@ -5397,7 +5397,9 @@ const isFullyReady = isReady && !isDataLoading;
                 const sortedAccused = Object.entries(voteCounts).sort(([, a], [, b]) => b - a);
                 let result = {};
 
-                if (numRoguePlayers === 1) {
+                if (sortedAccused.length === 0) {
+                    result = { winner: isFakeWordMode ? 'fakeWordPlayer' : 'imposter', reason: 'no_votes' };
+                } else if (numRoguePlayers === 1) {
                     const maxVotes = sortedAccused.length > 0 ? sortedAccused[0][1] : 0;
                     const accusedIds = sortedAccused.filter(([, votes]) => votes === maxVotes).map(([id]) => id);
 
