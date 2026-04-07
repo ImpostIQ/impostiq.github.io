@@ -157,5 +157,14 @@
             }, 5000);
         });
     </script>
+
+    <script>
+        (function() {
+            var path = window.location.pathname;
+            if (path === '/404/') {
+                window.history.replaceState(null, '', '/404');
+            }
+        })();
+    </script>
 </body>
 </html>
