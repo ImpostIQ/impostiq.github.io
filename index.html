@@ -2485,7 +2485,6 @@
             );
         };
 
-
 		const TIPS = [
             "The Imposter doesn't know the secret word. Ask questions that might expose them!",
             "Pay attention to hesitation. The Imposter might need extra time to think of a lie.",
@@ -2608,14 +2607,14 @@
 			}, [isTrueLoadingComplete]);
             
             const [showRetry, setShowRetry] = useState(false);
-useEffect(() => {
-    if (isReady && isDataLoading) {
-        const timer = setTimeout(() => setShowRetry(true), 5000);
-        return () => clearTimeout(timer);
-    }
-}, [isReady, isDataLoading]);
+			useEffect(() => {
+				if (isReady && isDataLoading) {
+					const timer = setTimeout(() => setShowRetry(true), 5000);
+					return () => clearTimeout(timer);
+				}
+			}, [isReady, isDataLoading]);
 
-const isFullyReady = isReady && !isDataLoading;
+			const isFullyReady = isReady && !isDataLoading;
 
 			return (
 				<div className="h-[100dvh] flex flex-col items-center justify-center p-8 bg-slate-950 text-center relative overflow-hidden animate-fadeIn">
