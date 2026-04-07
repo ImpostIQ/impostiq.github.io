@@ -462,6 +462,30 @@
 			requestWakeLock();
 		});
 	</script>
+	
+	<script>
+		document.addEventListener('contextmenu', function(e) {
+			e.preventDefault();
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (
+				e.keyCode === 123 || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 74) ||
+				(e.ctrlKey && e.shiftKey && e.keyCode === 67) || 
+				(e.ctrlKey && e.keyCode === 85) ||
+				(e.ctrlKey && e.keyCode === 83) || 
+				(e.ctrlKey && e.keyCode === 80) || 
+				(e.metaKey && e.keyCode === 83) ||
+				(e.metaKey && e.keyCode === 80) ||
+				(e.metaKey && e.altKey && e.keyCode === 73) 
+			) {
+				e.preventDefault();
+				return false;
+			}
+		});
+	</script>
 </head>
 <body class="select-none uninitialized">
 	<noscript>
