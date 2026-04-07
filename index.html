@@ -4802,12 +4802,6 @@ const isFullyReady = isReady && !isDataLoading;
             }, [isMuted]);
 
             useEffect(() => {
-                const currentPath = window.location.pathname;
-                if (currentPath !== '/' && currentPath !== '/index.html' && !currentPath.startsWith('/404')) {
-                    window.location.replace('/404/');
-                    return; 
-                }
-
                 const params = new URLSearchParams(window.location.search);
                 const inviteCode = params.get('invite');
                 const oldLobbyId = params.get('lobbyId'); 
