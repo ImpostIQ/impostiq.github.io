@@ -2539,14 +2539,11 @@
 
 			useEffect(() => {
 				const { assetPromise } = preloadAssets(() => {});
-				const hasLoaded = sessionStorage.getItem('imposter_fast_load');
-				const waitTime = hasLoaded ? 0 : 4000;
 				
 				Promise.all([
 					assetPromise,
-					new Promise(resolve => setTimeout(resolve, waitTime)) 
+					new Promise(resolve => setTimeout(resolve, 4000)) 
 				]).then(() => {
-					sessionStorage.setItem('imposter_fast_load', 'true');
 					setIsTrueLoadingComplete(true);
 				});
 			}, []);
@@ -4541,14 +4538,7 @@ const isFullyReady = isReady && !isDataLoading;
                 };
             }, []);
             
-            const [isLoading, setIsLoading] = useState(() => {
-                const skip = sessionStorage.getItem('skip_loading_once');
-                if (skip) {
-                    sessionStorage.removeItem('skip_loading_once'); 
-                    return false;
-                }
-                return true;
-            });
+            const [isLoading, setIsLoading] = useState(true);
             const [appReady, setAppReady] = useState(false);
             const [user, setUser] = useState(null);
             const [gameMode, setGameMode] = useState('select');
@@ -4728,8 +4718,7 @@ const isFullyReady = isReady && !isDataLoading;
                     },
             
                     playMusic: function(name) {
-                        if (!this.isUnlocked) this.unlockAudio();
-                        if (this.currentMusicTrack === name && this.music[name] && !this.music[name].paused) return;
+                        if (!this.isUnlocked || (this.currentMusicTrack === name && this.music[name] && !this.music[name].paused)) return;
             
                         this.stopMusic();
                         const track = this.music[name];
