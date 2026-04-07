@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>404 Page Not Found • Impostiq</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="https://em-content.zobj.net/source/microsoft/379/dizzy-face_1f635.png" type="image/png">
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
 	
-    <!-- Exact Tailwind Config from your game -->
     <script>
         tailwind.config = {
             theme: {
@@ -86,21 +81,16 @@
 </head>
 <body class="min-h-[100dvh] flex flex-col items-center justify-center p-6 relative">
 
-    <!-- Atmospheric Background -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
         <div class="blob bg-brand-600/30 top-[10%] left-[-10%] w-[60%] h-[60%]"></div>
         <div class="blob bg-cyan-600/20 bottom-[-10%] right-[-10%] w-[60%] h-[60%]" style="animation-delay: 2s;"></div>
     </div>
 
-    <!-- Main Container -->
     <div class="relative z-10 w-full max-w-sm flex flex-col items-center animate-fadeIn">
         
-        <!-- The Emoji Container (Bigger size, overlapping the panel slightly) -->
         <div class="relative w-40 h-40 flex justify-center z-20 -mb-2.5">
-            <!-- Subtle glow behind the emoji -->
             <div class="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full animate-pulse-slow"></div>
             
-            <!-- Crossfading Images -->
             <img src="https://em-content.zobj.net/source/microsoft-teams/363/man-construction-worker-medium-dark-skin-tone_1f477-1f3fe-200d-2642-fe0f.png" 
                  class="fade-emoji absolute bottom-0 w-40 h-40 object-contain object-bottom drop-shadow-2xl transition-opacity duration-1000 opacity-100" 
                  draggable="false" alt="Worker">
@@ -114,11 +104,8 @@
                  draggable="false" alt="Artist">
         </div>
 
-        <!-- The Text Block Bubble -->
-        <!-- Matches the "ResultScreen" and "OfflineScreen" styling exactly -->
         <div class="relative z-10 w-full glass-panel rounded-[2.5rem] p-8 pt-8 text-center animate-slide-up">
             
-            <!-- Title matching your game's gradient style -->
             <h1 class="text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/50 mb-4 drop-shadow-lg tracking-tight">
                 404 Not Found
             </h1>
@@ -127,8 +114,7 @@
                 We couldn't find the page you’re looking for. It might have been moved, or the link is just broken.
             </p>
 
-            <!-- Smart "Go Back" Button -->
-            <button onclick="returnHome()" 
+             <button onclick="window.location.href='/'" 
 					class="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
 				<i class="fa-solid fa-house text-lg"></i> RETURN TO HOME
 			</button>
@@ -140,19 +126,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             const emojis = document.querySelectorAll('.fade-emoji');
             let currentIndex = 0;
+
             setInterval(() => {
                 emojis[currentIndex].classList.remove('opacity-100');
                 emojis[currentIndex].classList.add('opacity-0');
+
                 currentIndex = (currentIndex + 1) % emojis.length;
+
                 emojis[currentIndex].classList.remove('opacity-0');
                 emojis[currentIndex].classList.add('opacity-100');
             }, 5000);
         });
-
-        function returnHome() {
-            sessionStorage.setItem('skip_loading_once', 'true');
-            window.location.replace('/' + window.location.search + window.location.hash);
-        }
     </script>
 </body>
 </html>
