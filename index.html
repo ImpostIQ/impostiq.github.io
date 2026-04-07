@@ -3876,22 +3876,24 @@
                     setTimeLeft(newTimeLeft);
 
                     if (newTimeLeft <= 0 && !timerExpired) {
-                        if (!isOnline || endVotes >= 1) {
-                            timerExpired = true;
-                            clearInterval(timerRef.current);
-                            
-                            if (audioManager) {
-                                audioManager.stopMusic(); 
-                                audioManager.playSound('alarm');
-                            }
-                            
-                            if (navigator.vibrate) navigator.vibrate(500);
-                            
-                            if (isHost || !isOnline) {
-                                onEndGame();
-                            }
-                        }
-                    }
+						if (!isOnline || endVotes >= 1) {
+							timerExpired = true;
+							clearInterval(timerRef.current);
+							
+							if (audioManager) {
+								audioManager.stopMusic(); 
+								audioManager.playSound('alarm');
+							}
+							
+							if (navigator.vibrate) navigator.vibrate(500);
+							
+							// Only auto-switch for Online Mode (to keep players synced)
+							// In Local Mode, the players must manually tap "REVEAL IMPOSTER"
+							if (isOnline && isHost) {
+								onEndGame();
+							}
+						}
+					}
                 };
 
                 if(timerRef.current) clearInterval(timerRef.current);
