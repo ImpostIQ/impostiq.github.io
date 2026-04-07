@@ -4541,7 +4541,7 @@ const isFullyReady = isReady && !isDataLoading;
                 };
             }, []);
             
-            const [isLoading, setIsLoading] = useState(true);
+            const [isLoading, setIsLoading] = useState(() => !sessionStorage.getItem('imposter_fast_load'));
             const [appReady, setAppReady] = useState(false);
             const [user, setUser] = useState(null);
             const [gameMode, setGameMode] = useState('select');
@@ -4704,7 +4704,7 @@ const isFullyReady = isReady && !isDataLoading;
                     },
             
                     playSound: function(name, category = null) {
-                        if (!this.isUnlocked) return;
+                        if (!this.isUnlocked) this.unlockAudio();
             
                         let soundToPlay = null;
                         if (name === 'category' && category && this.sounds.categories && this.sounds.categories[category]) {
@@ -4721,7 +4721,8 @@ const isFullyReady = isReady && !isDataLoading;
                     },
             
                     playMusic: function(name) {
-                        if (!this.isUnlocked || (this.currentMusicTrack === name && this.music[name] && !this.music[name].paused)) return;
+                        if (!this.isUnlocked) this.unlockAudio();
+                        if (this.currentMusicTrack === name && this.music[name] && !this.music[name].paused) return;
             
                         this.stopMusic();
                         const track = this.music[name];
@@ -5488,6 +5489,7 @@ const isFullyReady = isReady && !isDataLoading;
                     audioManagerRef.current.unlockAudio();
                     audioManagerRef.current.playSound('uiClick');
                 }
+                sessionStorage.setItem('imposter_fast_load', 'true');
                 setTimeout(() => {
                     setIsLoading(false);
                     if (initialLobbyParams) {
