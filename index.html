@@ -2539,11 +2539,14 @@
 
 			useEffect(() => {
 				const { assetPromise } = preloadAssets(() => {});
+				const hasLoaded = sessionStorage.getItem('imposter_fast_load');
+				const waitTime = hasLoaded ? 0 : 4000;
 				
 				Promise.all([
 					assetPromise,
-					new Promise(resolve => setTimeout(resolve, 4000)) 
+					new Promise(resolve => setTimeout(resolve, waitTime)) 
 				]).then(() => {
+					sessionStorage.setItem('imposter_fast_load', 'true');
 					setIsTrueLoadingComplete(true);
 				});
 			}, []);
