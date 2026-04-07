@@ -1348,9 +1348,9 @@
                             </div>
                         </section>
                     </div>
-                    <div className="absolute bottom-6 left-0 right-0 text-center text-xs text-white/30 z-20">
-                        Game by <button onClick={() => window.open("https://fillabrona.github.io", "_blank")} className="font-bold text-white/50 hover:text-white/80 transition">Jandré du Preez</button>
-                    </div>
+                    <div className="absolute bottom-6 left-0 right-0 px-4 text-center text-xs text-white/30 z-20 pb-[env(safe-area-inset-bottom)]">
+						&copy; {new Date().getFullYear()} Impostiq • Game by <button onClick={() => window.open("https://fillabrona.github.io", "_blank")} className="font-bold text-white/50 hover:text-white/80 transition">Jandré du Preez</button>
+					</div>
                 </div>
             );
         };
