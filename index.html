@@ -418,6 +418,29 @@
 		});
 	</script>
 	
+	<script>
+		document.addEventListener('contextmenu', function(e) {
+			e.preventDefault();
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (
+				e.keyCode === 123 || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 74) ||
+				(e.ctrlKey && e.shiftKey && e.keyCode === 67) || 
+				(e.ctrlKey && e.keyCode === 85) ||
+				(e.ctrlKey && e.keyCode === 83) || 
+				(e.ctrlKey && e.keyCode === 80) || 
+				(e.metaKey && e.keyCode === 83) ||
+				(e.metaKey && e.keyCode === 80) ||
+				(e.metaKey && e.altKey && e.keyCode === 73) 
+			) {
+				e.preventDefault();
+				return false;
+			}
+		});
+	</script>
 </head>
 <body class="select-none uninitialized">
 	<noscript>
@@ -3497,6 +3520,7 @@
                 if (player.audioData) {
                     playerPressTimerRef.current = setTimeout(() => {
                         const audio = new Audio(player.audioData);
+                        if (audioManager && audioManager.isMuted) audio.muted = true;
                         audio.play().catch(e => console.error("Failed to play custom audio:", e));
                         if (navigator.vibrate) navigator.vibrate(20);
                     }, 300);
@@ -3917,9 +3941,10 @@
             useEffect(() => {
                 if (step === 'handover' && player.audioData) {
                     const audio = new Audio(player.audioData);
+                    if (audioManager && audioManager.isMuted) audio.muted = true;
                     audio.play().catch(e => console.error("Custom audio playback failed:", e));
                 }
-            }, [player, step]);
+            }, [player, step, audioManager]);
 
             const handleReveal = () => {
                 if (!isFlipped) {
@@ -5033,7 +5058,7 @@
                     },
             
                     playSound: function(name, category = null) {
-                        if (!this.isUnlocked) return;
+                        if (!this.isUnlocked || this.isMuted) return;
             
                         let soundToPlay = null;
                         if (name === 'category' && category && this.sounds.categories && this.sounds.categories[category]) {
@@ -5083,8 +5108,21 @@
             
                     setMuted: function(muted) {
                         this.isMuted = muted;
+                        
+                        // Mute music
                         Object.values(this.music).forEach(track => {
                             track.muted = muted;
+                        });
+                        
+                        // Mute all sound effects and voice lines
+                        Object.entries(this.sounds).forEach(([key, track]) => {
+                            if (key === 'categories') {
+                                Object.values(track).forEach(catTrack => {
+                                    catTrack.muted = muted;
+                                });
+                            } else {
+                                track.muted = muted;
+                            }
                         });
                     },
             
