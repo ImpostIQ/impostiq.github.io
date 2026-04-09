@@ -818,18 +818,52 @@
 		};
 
         const PlayerAvatar = ({ name, className = "" }) => {
+			const [isLoaded, setIsLoaded] = useState(false);
+
+			// Reset the loading state every time the typed name changes
+			useEffect(() => {
+				setIsLoaded(false);
+			}, [name]);
+
 			if (!name) return null;
 			
-			const avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(name)}&backgroundColor=transparent`;
+			const cleanName = name.trim().toLowerCase();
+			
+			const spyMapping = {
+				'james bond': { url: "https://em-content.zobj.net/source/microsoft-teams/364/man-in-tuxedo-light-skin-tone_1f935-1f3fb-200d-2642-fe0f.png", size: "scale-[1.1] translate-y-[10%]" },
+				'007': { url: "https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png", size: "scale-[1.1] translate-y-[10%]" },
+			};
+
+			const isSpy = !!spyMapping[cleanName];
+			
+			let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(name)}&backgroundColor=transparent`;
+			let spyScaleClass = '';
+			
+			if (isSpy) {
+				avatarUrl = spyMapping[cleanName].url;
+				spyScaleClass = spyMapping[cleanName].size;
+			}
 
 			return (
-				<div className={`flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/5 overflow-hidden w-4 h-4 rounded-[0.5rem] ${className}`}>
+				<div className={`flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/5 overflow-hidden w-4 h-4 rounded-[0.5rem] relative ${className}`}>
+					{/* Loading Spinner */}
+					{!isLoaded && (
+						<div className="absolute inset-0 flex items-center justify-center">
+							<svg className="sleek-spinner w-1/2 h-1/2 text-white/30" viewBox="25 25 50 50">
+								<circle cx="50" cy="50" r="20"></circle>
+							</svg>
+						</div>
+					)}
+					
+					{/* Avatar Image */}
 					<img
+						key={name}
 						src={avatarUrl}
 						alt={`${name}'s avatar`}
 						draggable="false"
-						className="w-full h-full object-contain"
-						onError={(e) => { e.target.style.display = 'none'; }}
+						onLoad={() => setIsLoaded(true)}
+						className={`w-full h-full object-contain transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'} ${isSpy ? `${spyScaleClass} drop-shadow-sm` : ''}`}
+						onError={(e) => { e.target.style.display = 'none'; setIsLoaded(true); }}
 					/>
 				</div>
 			);
@@ -1377,7 +1411,13 @@
                 if (!username.trim()) { setError('Please enter a username.'); return; }
                 setIsLoading(true);
                 setError('');
-                audioManager.playSound('uiClick');
+                
+                const spyNames = ['james bond', '007', 'ethan hunt', 'jason bourne'];
+                if (spyNames.includes(username.trim().toLowerCase())) {
+                    audioManager.playSound('imposterWin'); // Secret spy chord
+                } else {
+                    audioManager.playSound('uiClick');
+                }
                 try {
                     if (isJoining) {
                         if (!lobbyId.trim() || !password.trim()) {
@@ -3495,7 +3535,13 @@
                     return;
                 }
 
-                audioManager.playSound('uiClick');
+                const spyNames = ['james bond', '007', 'ethan hunt', 'jason bourne'];
+                if (spyNames.includes(trimmedName.toLowerCase())) {
+                    audioManager.playSound('imposterWin'); // Reusing the dramatic imposter win sound for a spy vibe
+                } else {
+                    audioManager.playSound('uiClick');
+                }
+
                 setPlayers([...players, { name: trimmedName, audioData: recordedAudioData }]);
                 setNewPlayerName('');
                 setRecordedAudioData(null);
@@ -3861,6 +3907,55 @@
             
             // 1. Detect Touch Device (for physics)
             const [isTouchDevice] = useState(() => typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+
+            // --- EASTER EGG: DIZZY IMPOSTER ---
+            const [isDizzy, setIsDizzy] = useState(false);
+
+            useEffect(() => {
+                if (!isTouchDevice || word !== "IMPOSTER") return;
+
+                let shakeCount = 0;
+                let lastShakeTime = new Date().getTime();
+                let lastX = null, lastY = null, lastZ = null;
+
+                const handleMotion = (event) => {
+                    const current = event.accelerationIncludingGravity;
+                    if (!current || current.x === null) return;
+
+                    const currentTime = new Date().getTime();
+
+                    if (lastX !== null && lastY !== null && lastZ !== null) {
+                        const deltaX = current.x - lastX;
+                        const deltaY = current.y - lastY;
+                        const deltaZ = current.z - lastZ;
+
+                        const magnitude = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+
+                        // If spike in magnitude breaches threshold
+                        if (magnitude > 22) {
+                            // Ensure enough time between tracked shakes so 1 shake isn't counted as 5
+                            if (currentTime - lastShakeTime > 150) {
+                                shakeCount++;
+                                lastShakeTime = currentTime;
+                                
+                                if (shakeCount >= 6 && !isDizzy) {
+                                    setIsDizzy(true);
+                                    if (navigator.vibrate) navigator.vibrate([50, 50, 50, 50, 100]);
+                                    if (audioManager) audioManager.playSound('turnOrderReveal'); // Subtle sweep/dizzy sound
+                                    window.removeEventListener('devicemotion', handleMotion);
+                                }
+                            }
+                        }
+                    }
+
+                    lastX = current.x;
+                    lastY = current.y;
+                    lastZ = current.z;
+                };
+
+                window.addEventListener('devicemotion', handleMotion);
+                return () => window.removeEventListener('devicemotion', handleMotion);
+            }, [isTouchDevice, isDizzy, word, audioManager]);
             
             // 2. FOOLPROOF MEDIAN.CO / APK DETECTION
             const [isWebView] = useState(() => {
@@ -3966,42 +4061,59 @@
                 }
             };
 
-            const renderHandover = () => (
-				<div className="flex flex-col items-center justify-center h-full text-center p-8 animate-slide-up relative z-10">
-					<div className="w-32 h-32 rounded-full flex items-center justify-center mb-10 relative">
-						<div className="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full animate-pulse-slow"></div>
-						<div className="glass-panel w-full h-full rounded-[2rem] flex items-center justify-center border border-white/10 overflow-hidden">
-							{/* Replaced generic detective with dynamic player avatar */}
-							<img 
-								src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=transparent`} 
-								alt={`${player.name}'s avatar`} 
-								draggable="false" 
-								className="w-25 h-25 object-contain" 
-							/>
+            const renderHandover = () => {
+				const cleanName = player.name.trim().toLowerCase();
+				
+				const spyMapping = {
+					'james bond': { url: "https://em-content.zobj.net/source/microsoft-teams/364/man-in-tuxedo-light-skin-tone_1f935-1f3fb-200d-2642-fe0f.png", size: "scale-[1.1] translate-y-[10%]" },
+					'007': { url: "https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png", size: "scale-[1.1] translate-y-[10%]" },
+				};
+
+				const isSpy = !!spyMapping[cleanName];
+				let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=transparent`;
+				let spyScaleClass = '';
+				
+				if (isSpy) {
+					avatarUrl = spyMapping[cleanName].url;
+					spyScaleClass = spyMapping[cleanName].size;
+				}
+
+				return (
+					<div className="flex flex-col items-center justify-center h-full text-center p-8 animate-slide-up relative z-10">
+						<div className="w-32 h-32 rounded-full flex items-center justify-center mb-10 relative">
+							<div className="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full animate-pulse-slow"></div>
+							<div className="glass-panel w-full h-full rounded-[2rem] flex items-center justify-center border border-white/10 overflow-hidden">
+								<img 
+									src={avatarUrl} 
+									alt={`${player.name}'s avatar`} 
+									draggable="false" 
+									className={`w-25 h-25 object-contain ${isSpy ? `${spyScaleClass} drop-shadow-md` : ''}`} 
+								/>
+							</div>
+						</div>
+						
+						<h2 className="text-xl font-display text-white/60 font-bold tracking-wide mb-1">
+							Pass the device to
+						</h2>
+						<h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
+							{player.name}
+						</h1>
+						
+						<div className="w-full max-w-sm">
+							<button 
+								onClick={() => {
+									audioManager.playSound('uiClick');
+									setStep('reveal');
+									if (navigator.vibrate) navigator.vibrate(20);
+								}}
+								className="w-full glass-panel hover:bg-white/5 border border-white/10 text-white font-display font-bold text-lg py-5 rounded-[1.5rem] transition-all active:scale-95 flex items-center justify-center gap-3"
+							>
+								<FaIcon name="icon-fingerprint" className=" text-brand-400" /> Verify Identity
+							</button>
 						</div>
 					</div>
-					
-					<h2 className="text-xl font-display text-white/60 font-bold tracking-wide mb-1">
-						Pass the device to
-					</h2>
-					<h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
-						{player.name}
-					</h1>
-					
-					<div className="w-full max-w-sm">
-						<button 
-							onClick={() => {
-								audioManager.playSound('uiClick');
-								setStep('reveal');
-								if (navigator.vibrate) navigator.vibrate(20);
-							}}
-							className="w-full glass-panel hover:bg-white/5 border border-white/10 text-white font-display font-bold text-lg py-5 rounded-[1.5rem] transition-all active:scale-95 flex items-center justify-center gap-3"
-						>
-							<FaIcon name="icon-fingerprint" className=" text-brand-400" /> Verify Identity
-						</button>
-					</div>
-				</div>
-			);
+				);
+			};
 
             const renderFlipCard = () => (
                 <div className="flex flex-col items-center justify-center h-full w-full p-6 relative">
@@ -4055,10 +4167,22 @@
                                     {word === "IMPOSTER" ? (
                                         <>
                                             <div className="w-28 h-28 flex items-center justify-center mb-6">
-                                                <img src="https://em-content.zobj.net/source/microsoft-teams/337/shushing-face_1f92b.png" alt="Shushing" draggable="false" className="w-24 h-24 drop-shadow-lg" />
+                                                <img 
+                                                    src={isDizzy 
+                                                        ? "https://em-content.zobj.net/source/microsoft-teams/337/face-with-spiral-eyes_1f635-200d-1f4ab.png" 
+                                                        : "https://em-content.zobj.net/source/microsoft-teams/337/shushing-face_1f92b.png"} 
+                                                    alt={isDizzy ? "Dizzy" : "Shushing"} 
+                                                    draggable="false" 
+                                                    className={`w-24 h-24 drop-shadow-lg ${isDizzy ? 'animate-spin' : ''}`} 
+                                                    style={isDizzy ? { animationDuration: '3s' } : {}}
+                                                />
                                             </div>
-                                            <h2 className="text-4xl font-display font-black text-red-500 tracking-tight mb-4 drop-shadow-sm">IMPOSTER</h2>
-                                            <p className="text-red-200/60 text-xs font-medium leading-relaxed max-w-[200px]">Blend in. Deceive. Don't let them know you are the spy.</p>
+                                            <h2 className="text-4xl font-display font-black text-red-500 tracking-tight mb-4 drop-shadow-sm text-center">
+                                                {isDizzy ? "DIZZY IMPOSTER" : "IMPOSTER"}
+                                            </h2>
+                                            <p className="text-red-200/60 text-xs font-medium leading-relaxed max-w-[200px] text-center">
+                                                {isDizzy ? "Whoa... everything is spinning. I think I'm gonna be sick..." : "Blend in. Deceive. Don't let them know you are the spy."}
+                                            </p>
                                         </>
                                     ) : (
                                         <>
@@ -5042,8 +5166,21 @@
                     unlockAudio: function() {
                         if (this.isUnlocked) return;
                         this.isUnlocked = true;
+                        
+                        // 1. Unlock Web Audio API (iOS requirement)
                         const silentSound = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
                         silentSound.play().catch(() => {});
+
+                        // 2. Unlock DeviceMotion API (iOS 13+ Safari requirement for the Shake Easter Egg)
+                        if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                            DeviceMotionEvent.requestPermission()
+                                .then(permissionState => {
+                                    if (permissionState === 'granted') {
+                                        console.log('DeviceMotion permission granted.');
+                                    }
+                                })
+                                .catch(console.error); // Catch if user denies or if it's unsupported
+                        }
                     },
             
                     initSound: function(name, url, options = {}) {
