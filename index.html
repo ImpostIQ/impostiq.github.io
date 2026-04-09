@@ -817,19 +817,9 @@
 			return <h1 className={`${baseWrapperClass} ${textGradientClass}`}>IMPOSTIQ</h1>;
 		};
 
+		const globalAvatarCache = new Set();
+
         const PlayerAvatar = ({ name, className = "" }) => {
-			const [isLoaded, setIsLoaded] = useState(false);
-			const imgRef = useRef(null);
-
-			// Reset the loading state every time the typed name changes
-			useEffect(() => {
-				setIsLoaded(false);
-				// Check if the browser loaded the image instantly from cache
-				if (imgRef.current && imgRef.current.complete) {
-					setIsLoaded(true);
-				}
-			}, [name]);
-
 			if (!name) return null;
 			
 			const cleanName = name.trim().toLowerCase();
@@ -849,10 +839,38 @@
 				spyScaleClass = spyMapping[cleanName].size;
 			}
 
+			const isAlreadyCached = globalAvatarCache.has(avatarUrl);
+			const [isLoaded, setIsLoaded] = useState(isAlreadyCached);
+			const imgRef = useRef(null);
+
+			// Sync state if the URL changes
+			useEffect(() => {
+				if (globalAvatarCache.has(avatarUrl)) {
+					setIsLoaded(true);
+				} else {
+					setIsLoaded(false);
+					if (imgRef.current && imgRef.current.complete) {
+						globalAvatarCache.add(avatarUrl);
+						setIsLoaded(true);
+					}
+				}
+			}, [avatarUrl]);
+
+			const handleLoad = () => {
+				globalAvatarCache.add(avatarUrl);
+				setIsLoaded(true);
+			};
+
+			const handleError = (e) => {
+				e.target.style.display = 'none';
+				globalAvatarCache.add(avatarUrl); // Count as resolved so it stops spinning
+				setIsLoaded(true);
+			};
+
 			return (
 				<div className={`flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/5 overflow-hidden w-4 h-4 rounded-[0.5rem] relative ${className}`}>
 					{/* Loading Spinner */}
-					{!isLoaded && (
+					{(!isLoaded && !isAlreadyCached) && (
 						<div className="absolute inset-0 flex items-center justify-center">
 							<svg className="sleek-spinner w-1/2 h-1/2 text-white/30" viewBox="25 25 50 50">
 								<circle cx="50" cy="50" r="20"></circle>
@@ -863,13 +881,13 @@
 					{/* Avatar Image */}
 					<img
 						ref={imgRef}
-						key={name}
+						key={avatarUrl}
 						src={avatarUrl}
 						alt={`${name}'s avatar`}
 						draggable="false"
-						onLoad={() => setIsLoaded(true)}
-						className={`w-full h-full object-contain transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'} ${isSpy ? `${spyScaleClass} drop-shadow-sm` : ''}`}
-						onError={(e) => { e.target.style.display = 'none'; setIsLoaded(true); }}
+						onLoad={handleLoad}
+						className={`w-full h-full object-contain transition-opacity duration-300 ${(isLoaded || isAlreadyCached) ? 'opacity-100' : 'opacity-0'} ${isSpy ? `${spyScaleClass} drop-shadow-sm` : ''}`}
+						onError={handleError}
 					/>
 				</div>
 			);
