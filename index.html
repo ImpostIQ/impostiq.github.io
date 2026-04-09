@@ -3967,35 +3967,41 @@
             };
 
             const renderHandover = () => (
-                <div className="flex flex-col items-center justify-center h-full text-center p-8 animate-slide-up relative z-10">
-                    <div className="w-32 h-32 rounded-full flex items-center justify-center mb-10 relative">
-                        <div className="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full animate-pulse-slow"></div>
-                        <div className="glass-panel w-full h-full rounded-full flex items-center justify-center border border-white/10 overflow-hidden">
-                            <img src="https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png" alt="Detective" draggable="false" className="w-35 h-35 relative top-3" />
-                        </div>
-                    </div>
-                    
-                    <h2 className="text-xl font-display text-white/60 font-bold tracking-wide mb-1">
-                        Pass the device to
-                    </h2>
-                    <h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
-                        {player.name}
-                    </h1>
-                    
-                    <div className="w-full max-w-sm">
-                        <button 
-                            onClick={() => {
-                                audioManager.playSound('uiClick');
-                                setStep('reveal');
-                                if (navigator.vibrate) navigator.vibrate(20);
-                            }}
-                            className="w-full glass-panel hover:bg-white/5 border border-white/10 text-white font-display font-bold text-lg py-5 rounded-[1.5rem] transition-all active:scale-95 flex items-center justify-center gap-3"
-                        >
-                            <FaIcon name="icon-fingerprint" className=" text-brand-400" /> Verify Identity
-                        </button>
-                    </div>
-                </div>
-            );
+				<div className="flex flex-col items-center justify-center h-full text-center p-8 animate-slide-up relative z-10">
+					<div className="w-32 h-32 rounded-full flex items-center justify-center mb-10 relative">
+						<div className="absolute inset-0 bg-brand-500/20 blur-2xl rounded-full animate-pulse-slow"></div>
+						<div className="glass-panel w-full h-full rounded-[2rem] flex items-center justify-center border border-white/10 overflow-hidden">
+							{/* Replaced generic detective with dynamic player avatar */}
+							<img 
+								src={`https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=transparent`} 
+								alt={`${player.name}'s avatar`} 
+								draggable="false" 
+								className="w-25 h-25 object-contain" 
+							/>
+						</div>
+					</div>
+					
+					<h2 className="text-xl font-display text-white/60 font-bold tracking-wide mb-1">
+						Pass the device to
+					</h2>
+					<h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
+						{player.name}
+					</h1>
+					
+					<div className="w-full max-w-sm">
+						<button 
+							onClick={() => {
+								audioManager.playSound('uiClick');
+								setStep('reveal');
+								if (navigator.vibrate) navigator.vibrate(20);
+							}}
+							className="w-full glass-panel hover:bg-white/5 border border-white/10 text-white font-display font-bold text-lg py-5 rounded-[1.5rem] transition-all active:scale-95 flex items-center justify-center gap-3"
+						>
+							<FaIcon name="icon-fingerprint" className=" text-brand-400" /> Verify Identity
+						</button>
+					</div>
+				</div>
+			);
 
             const renderFlipCard = () => (
                 <div className="flex flex-col items-center justify-center h-full w-full p-6 relative">
@@ -4020,7 +4026,7 @@
                             ))}
 
                             {/* Front (TOP SECRET) */}
-                            <div className="absolute inset-0 backface-hidden rounded-[2rem] shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] bg-slate-900 border border-white/10 flex flex-col items-center justify-center p-8 overflow-hidden" 
+                            <div className="absolute inset-0 backface-hidden rounded-[2rem] bg-slate-900 border border-white/10 flex flex-col items-center justify-center p-8 overflow-hidden" 
                                  style={{ transform: isWebView ? 'translateZ(0px)' : 'translateZ(1px)', WebkitBackfaceVisibility: 'hidden' }}>
                                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
 
@@ -4032,7 +4038,7 @@
                             </div>
 
                             {/* Back (REVEAL) */}
-                            <div className={`absolute inset-0 backface-hidden rounded-[2rem] shadow-[inset_0_0_40px_rgba(0,0,0,0.6)] flex flex-col items-center justify-center p-8 text-center overflow-hidden border ${
+                            <div className={`absolute inset-0 backface-hidden rounded-[2rem] flex flex-col items-center justify-center p-8 text-center overflow-hidden border ${
                                  word === "IMPOSTER" 
                                     ? 'bg-gradient-to-br from-red-950 to-slate-950 border-[#020617]' 
                                     : 'bg-gradient-to-br from-teal-950 to-slate-950 border-[#020617]'
