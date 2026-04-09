@@ -13,8 +13,8 @@
 
   <p>
     <a href="https://impostiq.github.io"><img draggable="false" src="https://i.ibb.co/SpmN53G/impostiq-button-1775747942201-4x.png" alt="Play Online Now" height="50"></a>&nbsp;
-    <a href="https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1"><img draggable="false" src="https://i.ibb.co/LDZtxw6W/impostiq-button-1775497736055-4x.png" alt="Download Android APK" height="50"></a>&nbsp;
-    <a href="https://discord.gg/m9WrJxGKtr"><img draggable="false" src="https://i.ibb.co/Qv71bg0m/impostiq-button-1775497772121-4x.png" alt="Join the Discord" height="50"></a>
+    <a href="https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1"><img draggable="false" src="https://i.ibb.co/ym97RvG0/impostiq-button-1775748439177-4x.png" alt="Download Android APK" height="50"></a>&nbsp;
+    <a href="https://discord.gg/m9WrJxGKtr"><img draggable="false" src="https://i.ibb.co/XZ5NRYp6/impostiq-button-1775748563963-4x.png" alt="Join the Discord" height="50"></a>
   </p>
 </div>
 
