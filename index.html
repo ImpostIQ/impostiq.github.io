@@ -818,22 +818,22 @@
 		};
 
         const PlayerAvatar = ({ name, className = "" }) => {
-            if (!name) return null;
-            const avatarUrl = `https://api.dicebear.com/9.x/croodles-neutral/svg?seed=${encodeURIComponent(name)}`;
-            
-            const monochromeFilter = { filter: 'invert(1)' };
+			if (!name) return null;
+			
+			const avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(name)}&backgroundColor=transparent`;
 
-            return (
-                <img
-                    src={avatarUrl}
-                    alt={`${name}'s avatar`}
-                    className={`flex-shrink-0 ${className}`}
-                    style={monochromeFilter}
-                    draggable="false"
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                />
-            );
-        };
+			return (
+				<div className={`flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/5 overflow-hidden w-4 h-4 rounded-[0.5rem] ${className}`}>
+					<img
+						src={avatarUrl}
+						alt={`${name}'s avatar`}
+						draggable="false"
+						className="w-full h-full object-contain"
+						onError={(e) => { e.target.style.display = 'none'; }}
+					/>
+				</div>
+			);
+		};
 
 		const HowToPlayModal = ({ onClose }) => {
 			const scenarios = {
