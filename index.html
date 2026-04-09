@@ -1412,12 +1412,8 @@
                 setIsLoading(true);
                 setError('');
                 
-                const spyNames = ['james bond', '007', 'ethan hunt', 'jason bourne'];
-                if (spyNames.includes(username.trim().toLowerCase())) {
-                    audioManager.playSound('imposterWin'); // Secret spy chord
-                } else {
-                    audioManager.playSound('uiClick');
-                }
+                audioManager.playSound('uiClick');
+				
                 try {
                     if (isJoining) {
                         if (!lobbyId.trim() || !password.trim()) {
@@ -3535,12 +3531,7 @@
                     return;
                 }
 
-                const spyNames = ['james bond', '007', 'ethan hunt', 'jason bourne'];
-                if (spyNames.includes(trimmedName.toLowerCase())) {
-                    audioManager.playSound('imposterWin'); // Reusing the dramatic imposter win sound for a spy vibe
-                } else {
-                    audioManager.playSound('uiClick');
-                }
+                audioManager.playSound('uiClick');
 
                 setPlayers([...players, { name: trimmedName, audioData: recordedAudioData }]);
                 setNewPlayerName('');
@@ -3941,7 +3932,6 @@
                                 if (shakeCount >= 6 && !isDizzy) {
                                     setIsDizzy(true);
                                     if (navigator.vibrate) navigator.vibrate([50, 50, 50, 50, 100]);
-                                    if (audioManager) audioManager.playSound('turnOrderReveal'); // Subtle sweep/dizzy sound
                                     window.removeEventListener('devicemotion', handleMotion);
                                 }
                             }
@@ -4173,8 +4163,7 @@
                                                         : "https://em-content.zobj.net/source/microsoft-teams/337/shushing-face_1f92b.png"} 
                                                     alt={isDizzy ? "Dizzy" : "Shushing"} 
                                                     draggable="false" 
-                                                    className={`w-24 h-24 drop-shadow-lg ${isDizzy ? 'animate-spin' : ''}`} 
-                                                    style={isDizzy ? { animationDuration: '3s' } : {}}
+                                                    className="w-24 h-24 drop-shadow-lg" 
                                                 />
                                             </div>
                                             <h2 className="text-4xl font-display font-black text-red-500 tracking-tight mb-4 drop-shadow-sm text-center">
