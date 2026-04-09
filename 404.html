@@ -78,6 +78,30 @@
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
     </style>
+	
+	<script>
+		document.addEventListener('contextmenu', function(e) {
+			e.preventDefault();
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (
+				e.keyCode === 123 || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 74) ||
+				(e.ctrlKey && e.shiftKey && e.keyCode === 67) || 
+				(e.ctrlKey && e.keyCode === 85) ||
+				(e.ctrlKey && e.keyCode === 83) || 
+				(e.ctrlKey && e.keyCode === 80) || 
+				(e.metaKey && e.keyCode === 83) ||
+				(e.metaKey && e.keyCode === 80) ||
+				(e.metaKey && e.altKey && e.keyCode === 73) 
+			) {
+				e.preventDefault();
+				return false;
+			}
+		});
+	</script>
 </head>
 <body class="min-h-[100dvh] flex flex-col items-center justify-center p-6 relative">
 
@@ -114,9 +138,15 @@
                 We couldn't find the page you’re looking for. It might have been moved, or the link is just broken.
             </p>
 
-             <button onclick="window.location.href='/'" 
-					class="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
-				<i class="fa-solid fa-house text-lg"></i> RETURN TO HOME
+             <button onclick="window.location.href='/'"
+				  class="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+				  <svg xmlns="http://www.w3.org/2000/svg"
+					   viewBox="0 0 512 512"
+					   fill="currentColor"
+					   class="w-5 h-5">
+					<path d="M490.134,185.472L338.966,34.304c-45.855-45.737-120.076-45.737-165.931,0L21.867,185.472C7.819,199.445-0.055,218.457,0,238.272v221.397C0.047,488.568,23.475,511.976,52.374,512h407.253c28.899-0.023,52.326-23.432,52.373-52.331V238.272C512.056,218.457,504.182,199.445,490.134,185.472zM448,448H341.334v-67.883c0-44.984-36.467-81.451-81.451-81.451c0,0,0,0,0,0h-7.765c-44.984,0-81.451,36.467-81.451,81.451l0,0V448H64V238.272c0.007-2.829,1.125-5.541,3.115-7.552L218.283,79.552c20.825-20.831,54.594-20.835,75.425-0.01c0.003,0.003,0.007,0.007,0.01,0.01L444.886,230.72c1.989,2.011,3.108,4.723,3.115,7.552V448z"/>
+				  </svg>
+				  RETURN TO HOME
 			</button>
         </div>
 
