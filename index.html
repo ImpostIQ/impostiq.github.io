@@ -819,10 +819,15 @@
 
         const PlayerAvatar = ({ name, className = "" }) => {
 			const [isLoaded, setIsLoaded] = useState(false);
+			const imgRef = useRef(null);
 
 			// Reset the loading state every time the typed name changes
 			useEffect(() => {
 				setIsLoaded(false);
+				// Check if the browser loaded the image instantly from cache
+				if (imgRef.current && imgRef.current.complete) {
+					setIsLoaded(true);
+				}
 			}, [name]);
 
 			if (!name) return null;
@@ -857,6 +862,7 @@
 					
 					{/* Avatar Image */}
 					<img
+						ref={imgRef}
 						key={name}
 						src={avatarUrl}
 						alt={`${name}'s avatar`}
