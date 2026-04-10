@@ -40,6 +40,30 @@
             }
         })();
     </script>
+	
+	<script>
+		document.addEventListener('contextmenu', function(e) {
+			e.preventDefault();
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (
+				e.keyCode === 123 || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+				(e.ctrlKey && e.shiftKey && e.keyCode === 74) ||
+				(e.ctrlKey && e.shiftKey && e.keyCode === 67) || 
+				(e.ctrlKey && e.keyCode === 85) ||
+				(e.ctrlKey && e.keyCode === 83) || 
+				(e.ctrlKey && e.keyCode === 80) || 
+				(e.metaKey && e.keyCode === 83) ||
+				(e.metaKey && e.keyCode === 80) ||
+				(e.metaKey && e.altKey && e.keyCode === 73) 
+			) {
+				e.preventDefault();
+				return false;
+			}
+		});
+	</script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -520,7 +544,7 @@
                         results = results.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
                     }
                     setCategories(results);
-                } catch (e) { setAlert({ title: 'Connection Lost', message: 'Failed to load community vault.', type: 'error' }); }
+                } catch (e) { setAlert({ title: 'Connection Lost', message: 'Failed to load community categories.', type: 'error' }); }
                 setIsLoading(false);
             };
 
