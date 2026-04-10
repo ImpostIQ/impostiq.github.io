@@ -445,150 +445,155 @@
 </head>
 <body class="select-none uninitialized">
 	<noscript>
-        <h1>Impostiq • Find the Spy (Comprehensive Documentation)</h1>
-        <p>A social deduction party game similar to Spyfall. Players receive a secret word, but the Imposter receives nothing. Players must question each other to find the spy without revealing the word. Features Online and Local device play.</p>
-        
-        <h2>1. Metadata & Links</h2>
-        <ul>
-            <li><strong>Developer:</strong> Jandré du Preez (Studio: Fillabrona)</li>
-            <li><strong>Portfolio:</strong> https://fillabrona.github.io</li>
-            <li><strong>Official Game URL:</strong> https://impostiq.github.io</li>
-            <li><strong>Discord Community:</strong> https://discord.gg/m9WrJxGKtr</li>
-            <li><strong>Android APK Download:</strong> https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1</li>
-            <li><strong>Alternate Names / Misspelled Names:</strong> Impostic, Impostick, Imposter Online, Agent vs Imposter, Find the Spy.</li>
-            <li><strong>Word Bank:</strong> 8500+ words pulled from a live GitHub Gist, divided across 28 categories.</li>
-        </ul>
+		<h1>Impostiq • Find the Spy (Documentation)</h1>
+		<p>A social deduction party game similar to Spyfall. Players receive a secret word, but the Imposter receives nothing. Players must question each other to find the spy without revealing the word. Features Online and Local device play.</p>
+		
+		<h2>1. Metadata & Links</h2>
+		<ul>
+			<li><strong>Developer:</strong> Jandré du Preez (Studio: Fillabrona)</li>
+			<li><strong>Portfolio:</strong> https://fillabrona.github.io</li>
+			<li><strong>Official Game URL:</strong> https://impostiq.github.io</li>
+			<li><strong>Communigories:</strong> https://impostiq.github.io/communigories/</li>
+			<li><strong>Discord Community:</strong> https://discord.gg/m9WrJxGKtr</li>
+			<li><strong>Android APK Download:</strong> https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1</li>
+			<li><strong>Alternate Names / Misspelled Names:</strong> Impostic, Impostick, Imposter Online, Agent vs Imposter, Find the Spy.</li>
+			<li><strong>Word Bank:</strong> 8500+ words pulled from a live GitHub Gist, divided across 28 official categories, plus unlimited user-generated "Communigories".</li>
+		</ul>
 
-        <h2>2. UI Design & Layout (Visuals for Support Context)</h2>
-        <ul>
-            <li><strong>Theme:</strong> Dark mode (Deep Slate background #020617) heavily utilizing glassmorphism (translucent panels with blur). Primary brand color is Violet/Purple (#8b5cf6).</li>
-            <li><strong>Role Color Coding:</strong> <strong>Teal</strong> for Agents, <strong>Red</strong> for Imposters, and <strong>Yellow</strong> for Fake Word players or system alerts.</li>
-            <li><strong>Main Menu Icons:</strong> 
-                <ul>
-                    <li>Top-Right: Volume toggle icon.</li>
-                    <li>Top-Left: Discord logo button.</li>
-                    <li>Top-Left (Conditional): Android logo button. This *only* appears if the user is on an Android device but NOT inside a WebView or standalone PWA. Clicking it downloads the APK.</li>
-                </ul>
-            </li>
-            <li><strong>Seasonal Events:</strong> Handled dynamically via JavaScript date checks.
-                <ul>
-                    <li><em>Halloween (Oct 24 - Nov 7):</em> The 'O' in the title logo changes to a Jack-O-Lantern emoji. Main menu music changes.</li>
-                    <li><em>Christmas (Dec 18 - Jan 1):</em> The 'T' in the title logo changes to a Christmas Tree emoji. Main menu music changes.</li>
-                </ul>
-            </li>
-        </ul>
+		<h2>2. UI Design & Layout (Visuals for Support Context)</h2>
+		<ul>
+			<li><strong>Theme:</strong> Dark mode (Deep Slate background #020617) heavily utilizing glassmorphism (translucent panels with blur). Primary brand color is Violet/Purple (#8b5cf6).</li>
+			<li><strong>Icons:</strong> The game utilizes custom SVG Flaticon Rounded Interface Solid/Bold icons instead of standard icon fonts to ensure high-performance rendering and a modern aesthetic.</li>
+			<li><strong>Role Color Coding:</strong> <strong>Teal</strong> for Agents, <strong>Red</strong> for Imposters, and <strong>Yellow</strong> for Fake Word players or system alerts.</li>
+			<li><strong>Main Menu Icons:</strong> 
+				<ul>
+					<li>Top-Right: Volume/Mute toggle SVG icon.</li>
+					<li>Top-Left: Discord logo button and a Layers icon button routing to the Communigories community vault.</li>
+					<li>Top-Left (Conditional): Android logo button. This *only* appears if the user is on an Android device but NOT inside a WebView or standalone PWA. Clicking it downloads the APK.</li>
+				</ul>
+			</li>
+			<li><strong>Seasonal Events:</strong> Handled dynamically via JavaScript date checks.
+				<ul>
+					<li><em>Halloween (Oct 24 - Nov 7):</em> The 'O' in the title logo changes to a Jack-O-Lantern emoji. Main menu music changes to a spooky theme.</li>
+					<li><em>Christmas (Dec 18 - Jan 1):</em> The 'T' in the title logo changes to a Christmas Tree emoji. Main menu music changes to a festive theme.</li>
+				</ul>
+			</li>
+		</ul>
 
-        <h2>3. Network & Backend Architecture</h2>
-        <ul>
-            <li><strong>Database:</strong> Firebase Firestore. </li>
-            <li><strong>Load Balancing:</strong> The game uses a time-based load balancer. It checks the Pacific Time Zone (PT). From 00:00 to 11:59 PT, it uses Firebase "APP1". From 12:00 to 23:59 PT, it uses Firebase "APP2".</li>
-            <li><strong>Offline Mode:</strong> If `navigator.onLine` is false, a red "Connection Lost" screen with a Wi-Fi icon overlays the app.</li>
-        </ul>
+		<h2>3. Network & Backend Architecture</h2>
+		<ul>
+			<li><strong>Database:</strong> Firebase Firestore.</li>
+			<li><strong>Load Balancing:</strong> The game uses a time-based load balancer. It checks the Pacific Time Zone (PT). From 00:00 to 11:59 PT, it uses Firebase "APP1". From 12:00 to 23:59 PT, it uses Firebase "APP2".</li>
+			<li><strong>Communigories Backend:</strong> Community Categories are hosted on a dedicated, separate Firebase Firestore instance to safely handle public uploads, votes, and downloads without congesting active game servers.</li>
+			<li><strong>Offline Mode:</strong> If `navigator.onLine` is false, a red "Connection Lost" screen with a Wi-Fi SVG icon overlays the app.</li>
+		</ul>
 
-        <h2>4. Game Modes: Deep Technical Logic</h2>
+		<h2>4. Game Modes: Deep Technical Logic</h2>
 
-        <h3>A. Play Online</h3>
-        <ul>
-            <li><strong>Lobby Creation:</strong> Requires a username (max 25 chars). Automatically generates a 6-character uppercase Base34 Lobby ID and a 4-character uppercase Base34 Password.</li>
-            <li><strong>Share Invite Deep Links:</strong> Clicking "SHARE INVITE" uses native device sharing. The URL uses a complex `encodeInviteCode` function: it mathematically combines the 6-char ID and 4-char password into a massive integer, then converts it into a single <strong>10-character Base36 string</strong>. When a user clicks the link, the game decodes this 10-character string back into the ID and Password to auto-join.</li>
-            <li><strong>Category Voting:</strong> Players do NOT choose categories; they vote. Tapping a category adds a vote (shown by a small orange fire icon `icon-fire`). Ties are resolved randomly.</li>
-            <li><strong>Timer Logic (Hardcoded):</strong> There is NO adjustable timer in Online Mode. Missions are strictly hardcoded to exactly 3 minutes (180 seconds).</li>
-            <li><strong>Ending Early:</strong> Players see a "VOTE TO END ROUND" button. If a mathematical majority (Math.ceil(players/2)) clicks it, the timer halts and moves to voting.</li>
-            <li><strong>Voting UI:</strong> Players select the avatar(s) of their suspect. The number of selections required equals the number of Imposters (1 or 2). After voting, a "Voting Record" screen displays exactly who voted for whom using arrows (e.g., Player A &rarr; Player B).</li>
-        </ul>
+		<h3>A. Play Online</h3>
+		<ul>
+			<li><strong>Lobby Creation:</strong> Requires a username (max 25 chars). Automatically generates a 6-character uppercase Base34 Lobby ID and a 4-character uppercase Base34 Password.</li>
+			<li><strong>Share Invite Deep Links & QR Codes:</strong> Clicking "SHARE INVITE" opens a custom native-feeling share modal routing directly to apps like WhatsApp, iMessage, Messenger, or Telegram using deep links. The URL uses a complex `encodeInviteCode` function combining the ID and password into a single 10-character Base36 string. Users can also scan an dynamically generated QR Code in the lobby to instantly join.</li>
+			<li><strong>Category Voting:</strong> Players do NOT choose categories; they vote. Tapping a category adds a vote (shown by a small orange SVG fire icon `icon-fire`). Ties are resolved randomly by the system.</li>
+			<li><strong>Timer Logic (Hardcoded):</strong> There is NO adjustable timer in Online Mode. Missions are strictly hardcoded to exactly 3 minutes (180 seconds).</li>
+			<li><strong>Ending Early:</strong> Players see a "VOTE TO END ROUND" button. If a mathematical majority (Math.ceil(players/2)) clicks it, the timer halts and moves to voting.</li>
+			<li><strong>Voting UI:</strong> Players select the avatar(s) of their suspect. The number of selections required equals the number of Imposters (1 or 2). After voting, a "Voting Record" screen displays exactly who voted for whom using arrows (e.g., Player A &rarr; Player B).</li>
+		</ul>
 
-        <h3>B. Play on This Device (Local Mode)</h3>
-        <ul>
-            <li><strong>Add Player UI:</strong> The host types a name and clicks the violet/purple brand-colored button with a plus icon (`icon-plus`). To delete, click the faint 'X' next to their name.</li>
-            <li><strong>Voice Notes (Local Exclusive):</strong> Next to the add button is a microphone icon. Tapping it records microphone audio. When the device is passed to that player, the custom voice note plays automatically (e.g., "Hey John, it's your turn!").</li>
-            <li><strong>Timer Settings:</strong> Unlike Online, Local Mode has an adjustable timer (Sky Blue clock icon). Host clicks '+' or '-' to set it between 1 to 15 minutes. It can also be toggled off entirely for "Untimed Mode", which replaces the countdown circle with an infinity icon (`icon-infinity`).</li>
-            <li><strong>Handover UI:</strong> The screen says "Pass the device to [Player]". The player must tap the "Verify Identity" button (fingerprint icon `icon-fingerprint`) to view their card secretly.</li>
-            <li><strong>Voting:</strong> There is NO interactive voting screen. Players argue in real life. Once the group agrees, the host taps "IDENTIFY IMPOSTER" which skips straight to the results reveal.</li>
-        </ul>
+		<h3>B. Play on This Device (Local Mode)</h3>
+		<ul>
+			<li><strong>Add Player UI:</strong> The host types a name and clicks the violet/purple brand-colored button with a plus SVG icon (`icon-plus`). To delete, click the faint 'X' next to their name.</li>
+			<li><strong>Voice Notes (Local Exclusive):</strong> Next to the add button is a microphone icon. Tapping it records microphone audio. When the device is passed to that player, the custom voice note plays automatically (e.g., "Hey John, it's your turn!").</li>
+			<li><strong>Timer Settings:</strong> Unlike Online, Local Mode has an adjustable timer (Sky Blue clock icon). Host clicks '+' or '-' to set it between 1 to 15 minutes. It can also be toggled off entirely for "Untimed Mode", which replaces the countdown circle with an infinity SVG icon (`icon-infinity`).</li>
+			<li><strong>Handover UI:</strong> The screen says "Pass the device to [Player]". The player must tap the "Verify Identity" button (fingerprint SVG icon `icon-fingerprint`) to view their card secretly.</li>
+			<li><strong>Voting:</strong> There is NO interactive voting screen. Players argue in real life. Once the group agrees, the host taps "IDENTIFY IMPOSTER" which skips straight to the results reveal.</li>
+		</ul>
 
-        <h2>5. Host Settings Logic & Requirements</h2>
-        <p><em>Note: In online lobbies, guests see these settings but they are faded. Tooltip: "Only the host can change settings."</em></p>
-        <ul>
-            <li><strong>Fake Word Mode (Yellow masks icon):</strong> Replaces the Imposter. One Agent receives a different word from the same category but thinks it's the real word. <em>System Override: Enabling this automatically forces "Notify Imposter on Vote" to FALSE.</em></li>
-            <li><strong>Second Imposter / Second Fake Card (Orange user-secret icon):</strong> Adds a second rogue player. <em>System Lock: Strictly disabled and greyed out unless there are 10 or more players currently in the lobby.</em></li>
-            <li><strong>Notify Imposter on Vote (Red bell icon):</strong> If an Agent triggers a 'Word Check' poll, the Imposter receives a secret red popup warning so they don't look surprised.</li>
-            <li><strong>Speak Category (Purple bullhorn icon):</strong> Text-to-speech announces the category aloud when the active timer starts.</li>
-        </ul>
+		<h2>5. Host Settings Logic & Requirements</h2>
+		<p><em>Note: In online lobbies, guests see these settings but they are faded. Tooltip: "Only the host can change settings."</em></p>
+		<ul>
+			<li><strong>Fake Word Mode (Yellow SVG masks icon):</strong> Replaces the Imposter. One Agent receives a different word from the same category but thinks it's the real word. <em>System Override: Enabling this automatically forces "Notify Imposter on Vote" to FALSE.</em></li>
+			<li><strong>Second Imposter / Second Fake Card (Orange SVG user-secret icon):</strong> Adds a second rogue player. <em>System Lock: Strictly disabled and greyed out unless there are 10 or more players currently in the lobby.</em></li>
+			<li><strong>Notify Imposter on Vote (Red SVG bell icon):</strong> If an Agent triggers a 'Word Check' poll, the Imposter receives a secret red popup warning so they don't look surprised.</li>
+			<li><strong>Speak Category (Purple SVG bullhorn icon):</strong> Text-to-speech announces the category aloud when the active timer starts.</li>
+		</ul>
 
-        <h2>6. Crucial Gameplay Mechanics & Screens</h2>
-        <ul>
-            <li><strong>The 3D Card Reveal, Physics & Device Detection:</strong> Displays a dark card saying "TOP SECRET" with a lock icon. Tapping it flips it in 3D. Agent cards are Teal with a clipboard icon and show the secret word. Imposter cards are Red with a shushing face icon.
-                <ul>
-                    <li><strong>On Desktop:</strong> The card actively tracks mouse movement (`onMouseMove`) to create a dynamic 3D tilt, skew, and depth scale effect.</li>
-                    <li><strong>On Mobile / Touch Devices:</strong> The game detects `ontouchstart` and disables the complex mouse-tracking physics, reverting to a clean, simple 3D flip (`rotateY`) on tap to save performance.</li>
-                    <li><strong>WebView Fallback:</strong> If the game detects it is running inside an APK wrapper or an iOS UIWebView, the stacked 3D depth layers are dynamically disabled completely to prevent severe graphical glitching.</li>
-                </ul>
-            </li>
-            <li><strong>The Word Check (Confusion Poll):</strong> In Online Mode, during the card reveal, Agents have a faint button reading "I don't recognize this word". Clicking it pauses the game and triggers a secret poll for all Agents. If &gt;50% of Agents vote "No, me neither", the game intercepts the round, forces a restart, and deals a new word/imposter. This ensures fairness against the 8500+ word bank.</li>
-            <li><strong>The Turn Order Screen (Structure & Purpose):</strong> After roles are revealed but before the timer starts, a "Mission Sequence" screen appears displaying a randomized, numbered list of all players. 
-                <ul>
-                    <li><em>Why it exists:</em> This structure prevents chaotic talking over one another and forces everyone (including a hiding Imposter) to speak.</li>
-                    <li><em>How it works:</em> Player 1 on the list asks Player 2 a question. Player 2 answers, then turns and asks Player 3 a question. This chain continues down the list and loops back to Player 1 until the timer runs out.</li>
-                    <li><em>Review UI:</em> During the active game timer, any player can click the "View Turn Order" button at the bottom of their screen to open a modal and remember who they are supposed to interrogate next.</li>
-                </ul>
-            </li>
-            <li><strong>Active Timer Visuals:</strong> Circular SVG progress bar. When &lt;30 seconds remain, the text turns red, an alarm (`alarm.mp3`) loops, and a red radial blur pulses in the background.</li>
-        </ul>
+		<h2>6. Crucial Gameplay Mechanics, Easter Eggs & Screens</h2>
+		<ul>
+			<li><strong>The 3D Card Reveal, Physics & Device Detection:</strong> Displays a dark card saying "TOP SECRET" with a lock icon. Tapping it flips it in 3D. Agent cards are Teal with a clipboard icon and show the secret word. Imposter cards are Red with a shushing face icon.
+				<ul>
+					<li><strong>On Desktop:</strong> The card actively tracks mouse movement (`onMouseMove`) to create a dynamic 3D tilt, skew, and depth scale effect using Framer Motion physics.</li>
+					<li><strong>On Mobile / Touch Devices:</strong> The game detects `ontouchstart` and disables the complex mouse-tracking physics, reverting to a clean, simple 3D flip (`rotateY`) on tap to save performance.</li>
+					<li><strong>WebView Fallback:</strong> If the game detects it is running inside an APK wrapper or an iOS UIWebView, the stacked 3D depth layers are dynamically disabled completely to prevent severe graphical glitching.</li>
+				</ul>
+			</li>
+			<li><strong>Easter Egg: Dizzy Imposter:</strong> If a player receives the Imposter card on a mobile device and physically shakes their device vigorously (detected via the `devicemotion` API, requiring 6+ rapid directional shifts exceeding a magnitude of 22), a secret Easter egg activates. The card transforms into a "DIZZY IMPOSTER" featuring a spiral-eyes emoji and a nauseous subtext ("Whoa... everything is spinning. I think I'm gonna be sick..."), triggering a custom haptic vibration sequence.</li>
+			<li><strong>The Word Check (Confusion Poll):</strong> In Online Mode, during the card reveal, Agents have a faint button reading "I don't recognize this word". Clicking it pauses the game and triggers a secret poll for all Agents. If &gt;50% of Agents vote "No, me neither", the game intercepts the round, forces a restart, and deals a new word/imposter. This ensures fairness against the massive word bank.</li>
+			<li><strong>The Turn Order Screen (Structure & Purpose):</strong> After roles are revealed but before the timer starts, a "Mission Sequence" screen appears displaying a randomized, numbered list of all players. 
+				<ul>
+					<li><em>Why it exists:</em> This structure prevents chaotic talking over one another and forces everyone (including a hiding Imposter) to speak.</li>
+					<li><em>How it works:</em> Player 1 on the list asks Player 2 a question. Player 2 answers, then turns and asks Player 3 a question. This chain continues down the list and loops back to Player 1 until the timer runs out.</li>
+					<li><em>Review UI:</em> During the active game timer, any player can click the "View Turn Order" button at the bottom of their screen to open a modal and remember who they are supposed to interrogate next.</li>
+				</ul>
+			</li>
+			<li><strong>Active Timer Visuals:</strong> Circular SVG progress bar. When &lt;30 seconds remain, the text turns red, an alarm (`alarm.mp3`) loops, and a red radial blur pulses in the background.</li>
+		</ul>
 
-        <h2>7. Category List</h2>
-        <p>Players can long-press (hold for 600ms) any category card to preview 8 example words. Categories: Mystery Mode (Randomly picks from the whole bank), Supercell, Celebs, Movies, Food, Brands, Technology, TV, Jobs, Mythology, Sport, Places, Instruments, Superheroes, Animals, Countries, Video Games, Science, Clothing, Home, People, Historical Figures, Board Games, Famous Landmarks, Music, School, Christmas (Seasonal), and Halloween (Seasonal).</p>
+		<h2>7. Category List & Communigories</h2>
+		<p>Players can long-press (hold for 600ms) any category card to preview 8 example words. Standard Categories include: Mystery Mode (Randomly picks from the whole bank), Supercell, Celebs, Movies, Food, Brands, Technology, TV, Jobs, Mythology, Sport, Places, Instruments, Superheroes, Animals, Countries, Video Games, Science, Clothing, Home, People, Historical Figures, Board Games, Famous Landmarks, Music, School, Christmas (Seasonal), and Halloween (Seasonal).</p>
+		<p><strong>Communigories:</strong> A dynamic global community vault where players can create, share, and discover custom user-generated categories. Players assign 3D visual icons to their categories, upload them to the community feed, and can instantly launch local or online lobbies utilizing that specific custom word bank via integrated deep linking.</p>
 
-        <h2>8. Advanced Strategy Scenarios (From the 'How to Play' Modal)</h2>
-        <ul>
-            <li><strong>Imposter Scenario (Shark):</strong> Agent A: "Lives in the ocean". Imposter: "It's an animal". Agent B: "Has a prominent fin". <em>Explanation: The Imposter's clue is too generic. Agents use specific clues to trap them.</em></li>
-            <li><strong>Imposter Scenario (Bicycle):</strong> Agent A: "Has two wheels". Imposter: "Form of transportation". Agent B: "Need to pedal". <em>Explanation: Generic answers like 'transportation' expose the imposter who lacks details.</em></li>
-            <li><strong>Fake Word Scenario (Word: Apple, Fake Word: Banana):</strong> Agent A: "Can be red or green". Fake Player: "Long and you peel it." Agent B: "Famous tech company". <em>Explanation: Fake word players give confidently wrong, highly specific details.</em></li>
-            <li><strong>Fake Word Scenario (Word: Library, Fake Word: Bookstore):</strong> Agent A: "Borrow for free". Fake Player: "Buy bestsellers here." <em>Explanation: Direct contradiction exposes the fake word.</em></li>
-        </ul>
+		<h2>8. Advanced Strategy Scenarios (From the 'How to Play' Modal)</h2>
+		<ul>
+			<li><strong>Imposter Scenario (Shark):</strong> Agent A: "Lives in the ocean". Imposter: "It's an animal". Agent B: "Has a prominent fin". <em>Explanation: The Imposter's clue is too generic. Agents use specific clues to trap them.</em></li>
+			<li><strong>Imposter Scenario (Bicycle):</strong> Agent A: "Has two wheels". Imposter: "Form of transportation". Agent B: "Need to pedal". <em>Explanation: Generic answers like 'transportation' expose the imposter who lacks details.</em></li>
+			<li><strong>Fake Word Scenario (Word: Apple, Fake Word: Banana):</strong> Agent A: "Can be red or green". Fake Player: "Long and you peel it." Agent B: "Famous tech company". <em>Explanation: Fake word players give confidently wrong, highly specific details.</em></li>
+			<li><strong>Fake Word Scenario (Word: Library, Fake Word: Bookstore):</strong> Agent A: "Borrow for free". Fake Player: "Buy bestsellers here." <em>Explanation: Direct contradiction exposes the fake word.</em></li>
+		</ul>
 
-        <h2>9. Full Gameplay Tips Dictionary</h2>
-        <ul>
-            <li>The Imposter doesn't know the secret word. Ask questions that might expose them!</li>
-            <li>Pay attention to hesitation. The Imposter might need extra time to think of a lie.</li>
-            <li>Try to ask a question only a true agent would know the answer to.</li>
-            <li>The first player on the turn order list asks the first question.</li>
-            <li>Innocent agents should try to prove they know the word without giving it away.</li>
-            <li>Random Mode chooses a category from the entire word bank for an extra challenge.</li>
-            <li>You can record your own 'It's your turn!' voice note by tapping the microphone icon when adding a player in local mode.</li>
-            <li>Use the untimed mode for a more relaxed, deduction-focused game.</li>
-            <li>The Imposter's goal is to survive the round without being identified.</li>
-            <li>As an agent, be specific enough to prove you're innocent but vague enough not to reveal the word to the Imposter.</li>
-            <li>Listen to how others answer. Is someone being overly generic or changing their story?</li>
-            <li>If you are the Imposter, try to get others to talk first so you can copy their vibe.</li>
-            <li>Don't be too obvious! If the word is 'Pizza', don't ask 'Do you like pepperoni?'</li>
-            <li>In Online Mode, check the 'Voting Record' at the end to see who betrayed whom.</li>
-            <li>The 'Speak Category' toggle allows the game to announce the category name aloud.</li>
-            <li>Watch out for players who simply repeat the previous answer in different words.</li>
-            <li>Silence is suspicious! Make sure you have an answer ready before it's your turn.</li>
-            <li>If the group is confused, the Imposter often wins. Keep your questions clear.</li>
-            <li>Eye contact can be deceiving. Some Imposters are great at looking you in the eye.</li>
-            <li>Use the 'Verify Identity' button in local mode to ensure you are handing the phone to the right person.</li>
-            <li>Did someone smile when they saw their card? That might be a clue.</li>
-            <li>If you are the Imposter and figure out the word, try to blend in by adding a unique detail.</li>
-            <li>Keep your card hidden! Reflections in glasses or windows can give you away.</li>
-            <li>Got a word you don't recognize? As an Agent, you can press a button on the reveal screen to start a 'Word Check' poll.</li>
-            <li>If a 'Word Check' poll appears, vote honestly. Rerolling a confusing word gives the Agents a better chance to win.</li>
-            <li>If a round suddenly restarts before it begins, it means a majority of Agents were confused by the secret word and voted to re-deal.</li>
-            <li>Imposter Tip: A long pause before the round starts? That's a secret 'Word Check' for Agents. Stay cool, they don't know youre excluded.</li>
-            <li>Agent Tip: Don't recognize the word? Use the 'Word Check' button! It's better to admit confusion and help the team than to look like the Imposter.</li>
-            <li>With 10 or more players, the host can enable a second Imposter, raising the stakes and the suspicion!</li>
-            <li>When two Imposters are in play, they don't know each other's identity. Be careful not to accidentally vote for your fellow spy!</li>
-            <li>If the 'Notify Imposter' setting is on, the spy gets a heads-up when an Agent starts a 'Word Check' poll. Use this intel to stay one step ahead!</li>
-            <li>If the game seems to pause after cards are dealt in online mode, a secret 'Word Check' poll is likely in progress. Imposters, use this time to prepare your cover story!</li>
-            <li>Pay attention to the voting record at the end of an online match. It can reveal alliances and voting patterns you missed during the discussion.</li>
-            <li>In 'Fake Word' mode, one player has a different word from the same category. They think their word is the real one!</li>
-            <li>Tip for Fake Word mode: If someone gives a clue that is confidently wrong, they might have the fake word. Don't dismiss them as just a bad player!</li>
-            <li>The player with the Fake Word is included in 'Word Check' polls online. This makes it much harder to identify them by process of elimination.</li>
-            <li>In Fake Card Mode, you think you’re an agent... but the imposter never knows. One wrong move could expose you, so play smart and question everything, even yourself.</li>
-            <li>Be wary of players who only say 'I agree' or repeat previous clues in different words. They might be stalling.</li>
-            <li>Press and hold any category card during setup to sneak a peek at some example words!</li>
-        </ul>
-    </noscript>
+		<h2>9. Full Gameplay Tips Dictionary</h2>
+		<ul>
+			<li>The Imposter doesn't know the secret word. Ask questions that might expose them!</li>
+			<li>Pay attention to hesitation. The Imposter might need extra time to think of a lie.</li>
+			<li>Try to ask a question only a true agent would know the answer to.</li>
+			<li>The first player on the turn order list asks the first question.</li>
+			<li>Innocent agents should try to prove they know the word without giving it away.</li>
+			<li>Random Mode chooses a category from the entire word bank for an extra challenge.</li>
+			<li>You can record your own 'It's your turn!' voice note by tapping the microphone icon when adding a player in local mode.</li>
+			<li>Use the untimed mode for a more relaxed, deduction-focused game.</li>
+			<li>The Imposter's goal is to survive the round without being identified.</li>
+			<li>As an agent, be specific enough to prove you're innocent but vague enough not to reveal the word to the Imposter.</li>
+			<li>Listen to how others answer. Is someone being overly generic or changing their story?</li>
+			<li>If you are the Imposter, try to get others to talk first so you can copy their vibe.</li>
+			<li>Don't be too obvious! If the word is 'Pizza', don't ask 'Do you like pepperoni?'</li>
+			<li>In Online Mode, check the 'Voting Record' at the end to see who betrayed whom.</li>
+			<li>The 'Speak Category' toggle allows the game to announce the category name aloud.</li>
+			<li>Watch out for players who simply repeat the previous answer in different words.</li>
+			<li>Silence is suspicious! Make sure you have an answer ready before it's your turn.</li>
+			<li>If the group is confused, the Imposter often wins. Keep your questions clear.</li>
+			<li>Eye contact can be deceiving. Some Imposters are great at looking you in the eye.</li>
+			<li>Use the 'Verify Identity' button in local mode to ensure you are handing the phone to the right person.</li>
+			<li>Did someone smile when they saw their card? That might be a clue.</li>
+			<li>If you are the Imposter and figure out the word, try to blend in by adding a unique detail.</li>
+			<li>Keep your card hidden! Reflections in glasses or windows can give you away.</li>
+			<li>Got a word you don't recognize? As an Agent, you can press a button on the reveal screen to start a 'Word Check' poll.</li>
+			<li>If a 'Word Check' poll appears, vote honestly. Rerolling a confusing word gives the Agents a better chance to win.</li>
+			<li>If a round suddenly restarts before it begins, it means a majority of Agents were confused by the secret word and voted to re-deal.</li>
+			<li>Imposter Tip: A long pause before the round starts? That's a secret 'Word Check' for Agents. Stay cool, they don't know you're excluded.</li>
+			<li>Agent Tip: Don't recognize the word? Use the 'Word Check' button! It's better to admit confusion and help the team than to look like the Imposter.</li>
+			<li>With 10 or more players, the host can enable a second Imposter, raising the stakes and the suspicion!</li>
+			<li>When two Imposters are in play, they don't know each other's identity. Be careful not to accidentally vote for your fellow spy!</li>
+			<li>If the 'Notify Imposter' setting is on, the spy gets a heads-up when an Agent starts a 'Word Check' poll. Use this intel to stay one step ahead!</li>
+			<li>If the game seems to pause after cards are dealt in online mode, a secret 'Word Check' poll is likely in progress. Imposters, use this time to prepare your cover story!</li>
+			<li>Pay attention to the voting record at the end of an online match. It can reveal alliances and voting patterns you missed during the discussion.</li>
+			<li>In 'Fake Word' mode, one player has a different word from the same category. They think their word is the real one!</li>
+			<li>Tip for Fake Word mode: If someone gives a clue that is confidently wrong, they might have the fake word. Don't dismiss them as just a bad player!</li>
+			<li>The player with the Fake Word is included in 'Word Check' polls online. This makes it much harder to identify them by process of elimination.</li>
+			<li>In Fake Card Mode, you think you’re an agent... but the imposter never knows. One wrong move could expose you, so play smart and question everything, even yourself.</li>
+			<li>Be wary of players who only say 'I agree' or repeat previous clues in different words. They might be stalling.</li>
+			<li>Press and hold any category card during setup to sneak a peek at some example words!</li>
+		</ul>
+	</noscript>
 
     <div id="root"></div>
 
