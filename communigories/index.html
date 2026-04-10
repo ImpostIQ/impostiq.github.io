@@ -52,12 +52,18 @@
     <script>
         document.addEventListener('touchstart', function() { document.documentElement.classList.add('is-touch'); }, { passive: true, once: true });
         tailwind.config = {
+            plugins: [
+                function({ addVariant }) {
+                    addVariant('hover', 'html:not(.is-touch) &:hover');
+                    addVariant('group-hover', 'html:not(.is-touch) .group:hover &');
+                }
+            ],
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     colors: { slate: { 850: '#151e2e', 950: '#020617' }, brand: { 400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed' } },
                     animation: {
-                        'fade-in': 'fadeIn 0.2s ease-out forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
@@ -68,31 +74,6 @@
             }
         }
     </script>
-	
-	<script>
-		document.addEventListener('contextmenu', function(e) {
-			e.preventDefault();
-		});
-
-		document.addEventListener('keydown', function(e) {
-			if (
-				e.keyCode === 123 || 
-				(e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
-				(e.ctrlKey && e.shiftKey && e.keyCode === 74) ||
-				(e.ctrlKey && e.shiftKey && e.keyCode === 67) || 
-				(e.ctrlKey && e.keyCode === 85) ||
-				(e.ctrlKey && e.keyCode === 83) || 
-				(e.ctrlKey && e.keyCode === 80) || 
-				(e.metaKey && e.keyCode === 83) ||
-				(e.metaKey && e.keyCode === 80) ||
-				(e.metaKey && e.altKey && e.keyCode === 73) 
-			) {
-				e.preventDefault();
-				return false;
-			}
-		});
-	</script>
-	
     <style>
         * { -webkit-tap-highlight-color: transparent; }
         *:focus { outline: none !important; }
@@ -103,7 +84,19 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; z-index: 0; animation: blobBounce 10s infinite ease-in-out; }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+            animation: blobBounce 10s infinite ease-in-out;
+        }
+        @keyframes blobBounce {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
         
         .sleek-spinner circle { stroke: currentColor; stroke-width: 6; stroke-dasharray: 1, 200; stroke-dashoffset: 0; animation: sleek-dash 1.5s ease-in-out infinite; stroke-linecap: round; fill: none; }
         @keyframes sleek-rotate { 100% { transform: rotate(360deg); } }
@@ -145,8 +138,8 @@
         const FLATICONS = {
             "icon-plus": props => <svg viewBox="0 0 520 520" width="1em" {...props}><path fill="currentColor" d="M480,224H288V32c0-17.673-14.327-32-32-32s-32,14.327-32,32v192H32c-17.673,0-32,14.327-32,32s14.327,32,32,32h192v192c0,17.673,14.327,32,32,32s32-14.327,32-32V288h192c17.673,0,32-14.327,32-32S497.673,224,480,224z"/></svg>,
             "icon-xmark": props => <svg viewBox="0 0 24 24" width="1.4em" {...props}><path fill="currentColor" d="M14.121,12l3.879-3.883a1.5,1.5,0,0,0-2.121-2.117L12,9.879,8.11,5.988a1.5,1.5,0,1,0-2.122,2.122L9.879,12,6,15.882a1.5,1.5,0,1,0,2.118,2.118L12,14.121l3.878,3.879a1.5,1.5,0,0,0,2.122-2.122Z"/></svg>,
-            "icon-fire": props => <svg viewBox="0 0 24 24" width="1em" {...props}><path fill="currentColor" d="M16.773,2.9c-.747-.634-1.53-1.3-2.327-2.024A3.354,3.354,0,0,0,11.731.031,3.264,3.264,0,0,0,9.4,1.516h0a18.708,18.708,0,0,0-2.126,5.02,2.458,2.458,0,0,0-3.795-.163,9.159,9.159,0,0,0-2.61,6.493A11.024,11.024,0,0,0,9.133,23.64,11.667,11.667,0,0,0,11.99,24a11.122,11.122,0,0,0,11.137-11.126C23.127,8.3,20.183,5.8,16.773,2.9Zm.218,16.386a7.974,7.974,0,0,1-.9.6,4.486,4.486,0,0,0,.44-1.919c0-1.927-1.343-4.164-3-6.125a2.025,2.025,0,0,0-3.079,0C8.1,14.6,6.627,17.582,8,20a8.1,8.1,0,0,1-4.129-7.127,5.951,5.951,0,0,1,1.345-3.9q.212.348.455.673a2.3,2.3,0,0,0,2.375.87,2.364,2.364,0,0,0,1.8-1.826,17.255,17.255,0,0,1,2.091-5.567A.259.259,0,0,1,12.132,3a.367.367,0,0,1,.295.093c.824.749,1.633,1.437,2.405,2.091,3.189,2.708,5.295,4.5,5.295,7.686A8.081,8.081,0,0,1,16.991,19.288Z"/></svg>,
-			"icon-fire2": props => <svg viewBox="0 0 26 23" width="1em" {...props}><path fill="currentColor" d="M16.773,2.9c-.747-.634-1.53-1.3-2.327-2.024A3.354,3.354,0,0,0,11.731.031,3.264,3.264,0,0,0,9.4,1.516h0a18.708,18.708,0,0,0-2.126,5.02,2.458,2.458,0,0,0-3.795-.163,9.159,9.159,0,0,0-2.61,6.493A11.024,11.024,0,0,0,9.133,23.64,11.667,11.667,0,0,0,11.99,24a11.122,11.122,0,0,0,11.137-11.126C23.127,8.3,20.183,5.8,16.773,2.9Zm.218,16.386a7.974,7.974,0,0,1-.9.6,4.486,4.486,0,0,0,.44-1.919c0-1.927-1.343-4.164-3-6.125a2.025,2.025,0,0,0-3.079,0C8.1,14.6,6.627,17.582,8,20a8.1,8.1,0,0,1-4.129-7.127,5.951,5.951,0,0,1,1.345-3.9q.212.348.455.673a2.3,2.3,0,0,0,2.375.87,2.364,2.364,0,0,0,1.8-1.826,17.255,17.255,0,0,1,2.091-5.567A.259.259,0,0,1,12.132,3a.367.367,0,0,1,.295.093c.824.749,1.633,1.437,2.405,2.091,3.189,2.708,5.295,4.5,5.295,7.686A8.081,8.081,0,0,1,16.991,19.288Z"/></svg>,
+            "icon-fire": props => <svg viewBox="0 0 24 24" width="1.1em" {...props}><path fill="currentColor" d="M16.773,2.9c-.747-.634-1.53-1.3-2.327-2.024A3.354,3.354,0,0,0,11.731.031,3.264,3.264,0,0,0,9.4,1.516h0a18.708,18.708,0,0,0-2.126,5.02,2.458,2.458,0,0,0-3.795-.163,9.159,9.159,0,0,0-2.61,6.493A11.024,11.024,0,0,0,9.133,23.64,11.667,11.667,0,0,0,11.99,24a11.122,11.122,0,0,0,11.137-11.126C23.127,8.3,20.183,5.8,16.773,2.9Zm.218,16.386a7.974,7.974,0,0,1-.9.6,4.486,4.486,0,0,0,.44-1.919c0-1.927-1.343-4.164-3-6.125a2.025,2.025,0,0,0-3.079,0C8.1,14.6,6.627,17.582,8,20a8.1,8.1,0,0,1-4.129-7.127,5.951,5.951,0,0,1,1.345-3.9q.212.348.455.673a2.3,2.3,0,0,0,2.375.87,2.364,2.364,0,0,0,1.8-1.826,17.255,17.255,0,0,1,2.091-5.567A.259.259,0,0,1,12.132,3a.367.367,0,0,1,.295.093c.824.749,1.633,1.437,2.405,2.091,3.189,2.708,5.295,4.5,5.295,7.686A8.081,8.081,0,0,1,16.991,19.288Z"/></svg>,
+			"icon-fire2": props => <svg viewBox="0 0 26 23" width="1.2em" {...props}><path fill="currentColor" d="M16.773,2.9c-.747-.634-1.53-1.3-2.327-2.024A3.354,3.354,0,0,0,11.731.031,3.264,3.264,0,0,0,9.4,1.516h0a18.708,18.708,0,0,0-2.126,5.02,2.458,2.458,0,0,0-3.795-.163,9.159,9.159,0,0,0-2.61,6.493A11.024,11.024,0,0,0,9.133,23.64,11.667,11.667,0,0,0,11.99,24a11.122,11.122,0,0,0,11.137-11.126C23.127,8.3,20.183,5.8,16.773,2.9Zm.218,16.386a7.974,7.974,0,0,1-.9.6,4.486,4.486,0,0,0,.44-1.919c0-1.927-1.343-4.164-3-6.125a2.025,2.025,0,0,0-3.079,0C8.1,14.6,6.627,17.582,8,20a8.1,8.1,0,0,1-4.129-7.127,5.951,5.951,0,0,1,1.345-3.9q.212.348.455.673a2.3,2.3,0,0,0,2.375.87,2.364,2.364,0,0,0,1.8-1.826,17.255,17.255,0,0,1,2.091-5.567A.259.259,0,0,1,12.132,3a.367.367,0,0,1,.295.093c.824.749,1.633,1.437,2.405,2.091,3.189,2.708,5.295,4.5,5.295,7.686A8.081,8.081,0,0,1,16.991,19.288Z"/></svg>,
             "icon-sparkles": props => <svg viewBox="0 0 24 24" width="1em" {...props}><path fill="currentColor" d="m21,20.5c0,.828-.672,1.5-1.5,1.5s-1.5-.672-1.5-1.5.672-1.5,1.5-1.5,1.5.672,1.5,1.5ZM1.5,3c-.828,0-1.5.672-1.5,1.5s.672,1.5,1.5,1.5,1.5-.672,1.5-1.5-.672-1.5-1.5-1.5ZM6.5,0c-.828,0-1.5.672-1.5,1.5s.672,1.5,1.5,1.5,1.5-.672,1.5-1.5-.672-1.5-1.5-1.5Zm16.5,8.998c.42,0,.796.263.94.657.144.394.026.837-.295,1.107l-2.365,1.927.978,2.98c.134.403-.002.847-.339,1.107-.338.259-.801.277-1.156.046l-2.753-1.793-2.708,1.813c-.169.113-.363.169-.557.169-.211,0-.423-.066-.6-.199-.34-.254-.482-.696-.354-1.1l.94-3.015-2.377-1.934c-.32-.271-.437-.713-.292-1.107.145-.393.52-.655.939-.655h2.999l1.062-2.852c.146-.391.52-.651.937-.651s.791.259.937.651l1.062,2.852h3l.002-.002Zm-15.351.204c.249-.265.503-.527.764-.789,2.611-2.611,5.482-4.629,8.084-5.681,2.259-.914,4.099-.969,4.919-.149.809.809.597,2.367.399,3.224-.125.538.21,1.075.749,1.2.542.127,1.075-.211,1.2-.749.646-2.79-.151-4.308-.933-5.089-1.449-1.45-3.965-1.554-7.083-.291-2.845,1.15-5.952,3.324-8.749,6.122-.277.276-.546.555-.808.835-.378.402-.357,1.035.045,1.413.193.181.439.271.684.271.267,0,.533-.106.729-.316Zm5.569,11.063c.445-.328.54-.954.212-1.398-.327-.444-.954-.539-1.398-.213-4.076,3.002-8.049,4.163-9.451,2.763-.593-.593-.628-1.586-.553-2.314.057-.55-.343-1.041-.892-1.098-.548-.048-1.041.343-1.097.893-.171,1.664.219,3.024,1.129,3.934.777.777,1.866,1.155,3.175,1.155,2.409,0,5.561-1.281,8.875-3.721Zm-5.795-7.401l-1.899-.7-.725-1.924c-.148-.442-.626-.681-1.068-.533-.251.084-.449.281-.533.533l-.717,1.906-1.905.718c-.442.148-.681.626-.533,1.068.084.251.281.449.533.533l1.923.724.699,1.898c.084.251.281.449.533.533.442.148.92-.091,1.068-.533l.707-1.916,1.918-.706c.251-.084.449-.281.533-.533.148-.442-.091-.92-.533-1.068Z"/></svg>,
 			"icon-no-result": props => <svg viewBox="0 0 25 25" width="1.1em" {...props}><path fill="currentColor" d="m15.5 6a1.5 1.5 0 0 1 0 3h-7a1.5 1.5 0 0 1 0-3zm8.061 17.561a1.5 1.5 0 0 1-2.122 0l-2.011-2.012a4.444 4.444 0 0 1-1.928.451 4.5 4.5 0 1 1 4.5-4.5 4.444 4.444 0 0 1-.451 1.928l2.012 2.011a1.5 1.5 0 0 1 0 2.122zm-6.061-4.561a1.5 1.5 0 1 0-1.5-1.5 1.5 1.5 0 0 0 1.5 1.5zm-6 2h-4a2.5 2.5 0 0 1-2.5-2.5v-13a2.5 2.5 0 0 1 2.5-2.5h11a.5.5 0 0 1 .5.5v7a1.5 1.5 0 0 0 3 0v-7a3.5 3.5 0 0 0-3.5-3.5h-11a5.506 5.506 0 0 0-5.5 5.5v13a5.506 5.506 0 0 0 5.5 5.5h4a1.5 1.5 0 0 0 0-3z"/></svg>,
             "icon-folder-open": props => <svg viewBox="0 0 24 24" width="1em" {...props}><path fill="currentColor" d="m0,18V5C0,2.794,1.794,1,4,1h2c.464,0,.928.109,1.342.316l3.155,1.578c.138.069.293.105.447.105h5.056c2.757,0,5,2.243,5,5h-10.976c-2.638,0-5.003,1.766-5.754,4.303l-2.673,9.339c-.977-.913-1.597-2.203-1.597-3.642Zm23.493-6.983c-.479-.643-1.209-1.012-2.008-1.025-.015,0-.027.008-.042.008h-11.419c-1.758,0-3.335,1.177-3.834,2.862l-2.818,9.843c.513.178,1.055.295,1.628.295h12.558c2.226,0,4.15-1.432,4.802-3.607l1.532-6.116c.234-.782.089-1.605-.398-2.26Z"/></svg>,
@@ -163,7 +156,7 @@
             "icon-pen": props => <svg viewBox="0 0 24 24" width="1.1em" {...props}><path fill="currentColor" d="m23.707,8.707l-2.293,2.293L13,2.586,15.293.293c.391-.391,1.023-.391,1.414,0l7,7c.391.391.391,1.023,0,1.414ZM11.19,3.604l-4.605,1.703c-1.488.551-2.637,1.791-3.073,3.317L.111,20.545c-.18.612-.134,1.254.109,1.821l7.848-7.848c-.044-.165-.068-.339-.068-.518,0-1.105.895-2,2-2s2,.895,2,2-.895,2-2,2c-.179,0-.353-.024-.518-.068l-7.848,7.848c.335.144.696.219,1.061.219.251,0,.504-.035.751-.108l11.884-3.377c1.521-.432,2.76-1.574,3.315-3.054l1.746-4.655L11.19,3.604Z"/></svg>,
             "icon-list-ul": props => <svg viewBox="0 0 24 24" width="1em" {...props}><path fill="currentColor" d="M8,7H22.5a1.5,1.5,0,0,0,0-3H8A1.5,1.5,0,0,0,8,7ZM22.5,11H8a1.5,1.5,0,0,0,0,3H22.5a1.5,1.5,0,0,0,0-3ZM22.5,18H8a1.5,1.5,0,0,0,0,3H22.5a1.5,1.5,0,0,0,0-3ZM2.5 3A2.5 2.5 0 1 0 2.5 8A2.5 2.5 0 1 0 2.5 3M2.5 9.5A2.5 2.5 0 1 0 2.5 14.5A2.5 2.5 0 1 0 2.5 9.5M2.5 16.5A2.5 2.5 0 1 0 2.5 21.5A2.5 2.5 0 1 0 2.5 16.5"/></svg>,
             "icon-house": props => <svg viewBox="0 0 512 512" width="1em" {...props}><path fill="currentColor" d="M490.134,185.472L338.966,34.304c-45.855-45.737-120.076-45.737-165.931,0L21.867,185.472C7.819,199.445-0.055,218.457,0,238.272v221.397C0.047,488.568,23.475,511.976,52.374,512h407.253c28.899-0.023,52.326-23.432,52.373-52.331V238.272C512.056,218.457,504.182,199.445,490.134,185.472zM448,448H341.334v-67.883c0-44.984-36.467-81.451-81.451-81.451h-7.765c-44.984,0-81.451,36.467-81.451,81.451V448H64V238.272c0.007-2.829,1.125-5.541,3.115-7.552L218.283,79.552c20.825-20.831,54.594-20.835,75.425-0.01L444.886,230.72c1.989,2.011,3.108,4.723,3.115,7.552V448z"/></svg>,
-            "icon-lock": props => <svg viewBox="0 0 508.779 508.779" width="0.8em" {...props}><path fill="currentColor" d="M403.723,180.395v-31.061C403.723,66.859,336.864,0,254.389,0S105.056,66.859,105.056,149.333v31.061c-39.236,20.023-63.952,60.334-64,104.384v106.667c0.071,64.772,52.561,117.263,117.333,117.333h192c64.772-0.071,117.263-52.561,117.333-117.333V284.779C467.675,240.729,442.959,200.417,403.723,180.395zM254.389,64c47.128,0,85.333,38.205,85.333,85.333v18.112H169.056v-18.112C169.056,102.205,207.261,64,254.389,64zM403.723,391.445c0,29.455-23.878,53.333-53.333,53.333h-192c-29.455,0-53.333-23.878-53.333-53.333V284.779c0-29.455,23.878-53.333,53.333-53.333h192c29.455,0,53.333,23.878,53.333,53.333V391.445zM243.723,295.445h21.333c17.673,0,32,14.327,32,32l0,0c0,17.673-14.327,32-32,32h-21.333c-17.673,0-32-14.327-32-32l0,0C211.723,309.772,226.05,295.445,243.723,295.445z"/></svg>,
+            "icon-lock": props => <svg viewBox="0 0 520 520" width="1em" {...props}><path fill="currentColor" d="M403.723,180.395v-31.061C403.723,66.859,336.864,0,254.389,0S105.056,66.859,105.056,149.333v31.061c-39.236,20.023-63.952,60.334-64,104.384v106.667c0.071,64.772,52.561,117.263,117.333,117.333h192c64.772-0.071,117.263-52.561,117.333-117.333V284.779C467.675,240.729,442.959,200.417,403.723,180.395zM254.389,64c47.128,0,85.333,38.205,85.333,85.333v18.112H169.056v-18.112C169.056,102.205,207.261,64,254.389,64zM403.723,391.445c0,29.455-23.878,53.333-53.333,53.333h-192c-29.455,0-53.333-23.878-53.333-53.333V284.779c0-29.455,23.878-53.333,53.333-53.333h192c29.455,0,53.333,23.878,53.333,53.333V391.445zM243.723,295.445h21.333c17.673,0,32,14.327,32,32l0,0c0,17.673-14.327,32-32,32h-21.333c-17.673,0-32-14.327-32-32l0,0C211.723,309.772,226.05,295.445,243.723,295.445z"/></svg>,
             
             // Share Icons
             "icon-whatsapp": props => <svg viewBox="0 0 24 24" width="0.92em" {...props}><path fill="currentColor" d="M20.463,3.488C18.217,1.24,15.231,0.001,12.05,0C5.495,0,0.16,5.334,0.157,11.892c-0.001,2.096,0.547,4.142,1.588,5.946L0.057,24l6.304-1.654c1.737,0.948,3.693,1.447,5.683,1.448h0.005c6.554,0,11.89-5.335,11.893-11.893C23.944,8.724,22.708,5.735,20.463,3.488zM12.05,21.785h-0.004c-1.774,0-3.513-0.477-5.031-1.378l-0.361-0.214l-3.741,0.981l0.999-3.648l-0.235-0.374c-0.99-1.574-1.512-3.393-1.511-5.26c0.002-5.45,4.437-9.884,9.889-9.884c2.64,0,5.122,1.03,6.988,2.898c1.866,1.869,2.893,4.352,2.892,6.993C21.932,17.351,17.498,21.785,12.05,21.785zM17.472,14.382c-0.297-0.149-1.758-0.868-2.031-0.967c-0.272-0.099-0.47-0.149-0.669,0.148s-0.767,0.967-0.941,1.166c-0.173,0.198-0.347,0.223-0.644,0.074c-0.297-0.149-1.255-0.462-2.39-1.475c-0.883-0.788-1.48-1.761-1.653-2.059s-0.018-0.458,0.13-0.606c0.134-0.133,0.297-0.347,0.446-0.521C9.87,9.97,9.919,9.846,10.019,9.647c0.099-0.198,0.05-0.372-0.025-0.521C9.919,8.978,9.325,7.515,9.078,6.92c-0.241-0.58-0.486-0.501-0.669-0.51C8.236,6.401,8.038,6.4,7.839,6.4c-0.198,0-0.52,0.074-0.792,0.372c-0.272,0.298-1.04,1.017-1.04,2.479c0,1.463,1.065,2.876,1.213,3.074c0.148,0.198,2.095,3.2,5.076,4.487c0.709,0.306,1.263,0.489,1.694,0.626c0.712,0.226,1.36,0.194,1.872,0.118c0.571-0.085,1.758-0.719,2.006-1.413c0.248-0.694,0.248-1.29,0.173-1.413C17.967,14.605,17.769,14.531,17.472,14.382z"/></svg>,
@@ -183,26 +176,46 @@
         };
 
         const ICONS_LIST = [
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/alien_1f47d.png", name: "Alien" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/robot_1f916.png", name: "Robot" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/ghost_1f47b.png", name: "Ghost" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/skull_1f480.png", name: "Skull" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/clown-face_1f921.png", name: "Clown" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/pizza_1f355.png", name: "Pizza" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/hamburger_1f354.png", name: "Burger" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/french-fries_1f35f.png", name: "Fries" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/popcorn_1f37f.png", name: "Popcorn" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/rocket_1f680.png", name: "Rocket" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/joystick_1f579-fe0f.png", name: "Arcade" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/video-game_1f3ae.png", name: "Console" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/musical-keyboard_1f3b9.png", name: "Keyboard" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/gem-stone_1f48e.png", name: "Gem" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/magic-wand_1fa84.png", name: "Magic" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/microbe_1f9a0.png", name: "Virus" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/fire_1f525.png", name: "Fire" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/star_2b50.png", name: "Star" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/fire_1f525.png", name: "Fire" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/light-bulb_1f4a1.png", name: "Idea" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/crown_1f451.png", name: "Crown" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/books_1f4da.png", name: "Books" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/money-bag_1f4b0.png", name: "Money" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/crown_1f451.png", name: "Crown" }
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/video-game_1f3ae.png", name: "Gaming" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png", name: "Tabletop" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/popcorn_1f37f.png", name: "Movies" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/television_1f4fa.png", name: "TV" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/musical-notes_1f3b6.png", name: "Music" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/364/artist-palette_1f3a8.png", name: "Art" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/soccer-ball_26bd.png", name: "Sports" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/trophy_1f3c6.png", name: "Trophy" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/hamburger_1f354.png", name: "Food" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/red-apple_1f34e.png", name: "Nature" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/dog-face_1f436.png", name: "Animals" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/globe-showing-americas_1f30e.png", name: "Earth" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/rocket_1f680.png", name: "Space" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/automobile_1f697.png", name: "Auto" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/airplane_2708-fe0f.png", name: "Travel" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/cityscape_1f3d9-fe0f.png", name: "City" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/house_1f3e0.png", name: "Home" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/shopping-bags_1f6cd-fe0f.png", name: "Brands" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/briefcase_1f4bc.png", name: "Work" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/gear_2699-fe0f.png", name: "Tech" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/microscope_1f52c.png", name: "Science" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/magic-wand_1fa84.png", name: "Magic" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/gem-stone_1f48e.png", name: "Gem" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/wrapped-gift_1f381.png", name: "Gift" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/party-popper_1f389.png", name: "Party" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/smiling-face-with-sunglasses_1f60e.png", name: "Celebs" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/bust-in-silhouette_1f464.png", name: "People" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/t-shirt_1f455.png", name: "Clothing" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/heart-suit_2665-fe0f.png", name: "Heart" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/camera_1f4f7.png", name: "Camera" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/magnifying-glass-tilted-right_1f50e.png", name: "Search" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/speech-balloon_1f4ac.png", name: "Quotes" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/crossed-swords_2694-fe0f.png", name: "Battle" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/hundred-points_1f4af.png", name: "100" }
         ];
 
         const AlertModal = ({ title, message, type, onClose }) => {
@@ -210,9 +223,9 @@
             const color = type === 'error' ? 'text-red-400' : 'text-green-400';
             const bg = type === 'error' ? 'bg-red-500/20' : 'bg-green-500/20';
             return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fadeIn">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
-                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl text-center">
+                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl text-center animate-slide-up">
                         <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${bg} ring-1 ring-white/10 mx-auto`}>
                             <FaIcon name={icon} className={`text-4xl ${color}`} />
                         </div>
@@ -227,9 +240,9 @@
         };
 
         const ConfirmModal = ({ title, message, onConfirm, onCancel }) => (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fadeIn">
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onCancel}></div>
-                <div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl text-center">
+                <div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl text-center animate-slide-up">
                     <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-red-500/20 ring-1 ring-white/10 mx-auto">
                         <FaIcon name="icon-trash-can" className="text-3xl text-red-400" />
                     </div>
@@ -274,9 +287,9 @@
             );
 
             return (
-                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
-                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 border border-white/10 flex flex-col">
+                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl flex flex-col animate-slide-up">
                         
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-display font-bold text-white">Share Category</h2>
@@ -321,9 +334,9 @@
             if (!isOpen) return null;
 
             return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center sm:p-6 bg-slate-950/95 sm:bg-black/70 backdrop-blur-xl sm:backdrop-blur-md animate-fade-in">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center sm:p-6 bg-slate-950/95 sm:bg-black/70 backdrop-blur-xl sm:backdrop-blur-md animate-fadeIn">
                     <div className="absolute inset-0 hidden sm:block" onClick={onClose}></div>
-                    <div className="relative flex flex-col w-full h-full sm:h-auto sm:max-w-4xl sm:max-h-[90vh] bg-slate-950/95 sm:rounded-3xl sm:border sm:border-white/10 sm:shadow-2xl overflow-hidden z-10">
+                    <div className="relative flex flex-col w-full h-full sm:h-auto sm:max-w-4xl sm:max-h-[90vh] bg-slate-950/95 sm:rounded-3xl sm:border sm:border-white/10 sm:shadow-2xl sm:animate-slide-up overflow-hidden z-10">
                         
                         <div className="flex-shrink-0 flex items-center justify-between p-6 pb-4 border-b border-white/5 bg-slate-900/50">
                             <div>
@@ -335,21 +348,30 @@
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 no-scrollbar relative">
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                        <div className="flex-1 overflow-y-auto p-4 sm:p-6 no-scrollbar relative">
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-4">
                                 {ICONS_LIST.map(iconObj => {
                                     const isSelected = currentSelection === iconObj.url;
                                     return (
                                         <button
                                             key={iconObj.url}
                                             onClick={() => { onSelect(iconObj.url); onClose(); }}
-                                            className={`relative overflow-hidden flex flex-col items-center pt-3 sm:pt-4 rounded-[1.5rem] transition-all duration-300 group aspect-square border ${isSelected ? 'bg-brand-500/10 border-brand-500 shadow-[inset_0_0_0_1px_rgba(139,92,246,1)]' : 'bg-slate-800/40 border-white/5 hover:bg-white/5 hover:border-white/10 backdrop-blur-md'}`}
+                                            className={`relative overflow-hidden flex flex-col items-center rounded-[1.25rem] sm:rounded-[1.5rem] transition-all duration-300 group aspect-square border ${isSelected ? 'bg-brand-500/10 border-brand-500' : 'bg-slate-800/40 border-white/5 hover:bg-white/5 hover:border-white/10 backdrop-blur-md'}`}
                                         >
-                                            <div className="flex-1 flex items-center justify-center pb-2">
-                                                <img src={iconObj.url} className={`w-10 h-10 transition-transform duration-300 drop-shadow-md ${isSelected ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110'}`} draggable="false" />
+                                            {isSelected && <div className="absolute inset-0 rounded-[1.25rem] sm:rounded-[1.5rem] shadow-[inset_0_0_0_1px_rgba(139,92,246,1)] pointer-events-none z-10"></div>}
+                                            
+                                            <div className="flex-1 flex items-center justify-center w-full relative z-0 mt-1">
+                                                <img 
+                                                    src={iconObj.url} 
+                                                    className={`w-[50%] h-[50%] sm:w-[55%] sm:h-[55%] object-contain transition-transform duration-300 drop-shadow-md ${isSelected ? 'scale-110 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:scale-110'}`} 
+                                                    draggable="false" 
+                                                />
                                             </div>
-                                            <div className="w-full bg-black/50 border-t border-white/5 py-1 text-center mt-auto">
-                                                <span className={`text-[10px] font-bold tracking-wide uppercase ${isSelected ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`}>{iconObj.name}</span>
+                                            
+                                            <div className="w-full h-8 sm:h-9 flex items-center justify-center bg-black/50 border-t border-white/5 relative z-0">
+                                                <span className={`text-[9px] sm:text-[10px] font-bold tracking-wider uppercase leading-none mt-[1px] ${isSelected ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`}>
+                                                    {iconObj.name}
+                                                </span>
                                             </div>
                                         </button>
                                     );
@@ -366,10 +388,10 @@
             const remainingCount = cat.words.length - 8;
 
             return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fade-in">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
-                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-6 border border-white/10 shadow-2xl transform transition-all flex flex-col">
-                        <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-95">
+                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl animate-slide-up transform transition-all flex flex-col">
+                        <button onClick={onClose} className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-95">
                             <FaIcon name="icon-xmark" className="" />
                         </button>
                         
@@ -378,14 +400,16 @@
                                 <img src={cat.icon} className="w-14 h-14 drop-shadow-md" />
                             </div>
                             <h2 className="text-2xl font-display font-bold text-white leading-tight">{cat.name}</h2>
-                            <div className="flex flex-col items-center justify-center gap-1 mt-2 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                            <div className="flex flex-col items-center justify-center gap-1 mt-2 text-[10px] font-bold uppercase tracking-widest text-white/60">
                                 <div className="flex items-center gap-3">
                                     <span>{cat.words?.length || 0} Words</span>
                                     {!cat.isPrivate && <span>•</span>}
-                                    {!cat.isPrivate && <span className="text-orange-400/80 flex items-center"><FaIcon name="icon-fire2" className="text-[10px] mr-1" />{cat.downloads || 0}</span>}
+                                    {!cat.isPrivate && <span className="text-white/60 flex items-center"><FaIcon name="icon-fire2" className="text-[10px] mr-1" />{cat.downloads || 0}</span>}
+                                    {!cat.isPrivate && <span>•</span>}
+                                    {!cat.isPrivate && <span className="text-white/60 flex items-center"><FaIcon name="icon-pen" className="text-[10px] mr-1" />{cat.edits || 0}</span>}
                                 </div>
                                 {cat.isPrivate && (
-                                    <div className="flex items-center text-orange-400/80 mt-1">
+                                    <div className="flex items-center text-white/60 mt-1">
                                         <FaIcon name="icon-lock" className="mr-1" /> Private (Link Only)
                                     </div>
                                 )}
@@ -412,28 +436,22 @@
                             </button>
                         </div>
                         
-                        <div className="flex bg-black/40 rounded-xl border border-white/5 p-1 mt-4">
-                            <button onClick={() => onShare(cat)} className="flex-1 py-3 text-white/60 hover:text-white flex flex-col items-center gap-1 active:scale-95 transition-all">
-                                <FaIcon name="icon-share" className="text-lg"/>
-                                <span className="text-[9px] font-bold tracking-widest uppercase">Share</span>
+                        <div className="w-full mt-4 flex gap-3 flex-shrink-0">
+                            <button onClick={() => onShare(cat)} className="flex-1 bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-white/5 active:scale-95 transition-all flex flex-col items-center justify-center gap-1.5 overflow-hidden">
+                                <FaIcon name="icon-share" className="text-lg text-white/50"/>
+                                <div className="text-white/40 text-[10px] uppercase font-bold tracking-widest truncate">Share</div>
                             </button>
                             {isMine && (
-                                <>
-                                    <div className="w-[1px] bg-white/5 my-2"></div>
-                                    <button onClick={() => onEdit(cat)} className="flex-1 py-3 text-white/60 hover:text-white flex flex-col items-center gap-1 active:scale-95 transition-all">
-                                        <FaIcon name="icon-pen" className="text-lg"/>
-                                        <span className="text-[9px] font-bold tracking-widest uppercase">Edit</span>
-                                    </button>
-                                </>
+                                <button onClick={() => onEdit(cat)} className="flex-1 bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-white/5 active:scale-95 transition-all flex flex-col items-center justify-center gap-1.5 overflow-hidden">
+                                    <FaIcon name="icon-pen" className="text-lg text-white/50"/>
+                                    <div className="text-white/40 text-[10px] uppercase font-bold tracking-widest truncate">Edit</div>
+                                </button>
                             )}
                             {(isMine || isSaved) && (
-                                <>
-                                    <div className="w-[1px] bg-white/5 my-2"></div>
-                                    <button onClick={() => onDelete({ id: cat.id, global: isMine })} className="flex-1 py-3 text-red-400/60 hover:text-red-400 flex flex-col items-center gap-1 active:scale-95 transition-all">
-                                        <FaIcon name={isMine ? "icon-trash-can" : "icon-xmark"} className="text-lg"/>
-                                        <span className="text-[9px] font-bold tracking-widest uppercase">{isMine ? 'Delete' : 'Remove'}</span>
-                                    </button>
-                                </>
+                                <button onClick={() => onDelete({ id: cat.id, global: isMine })} className="flex-1 bg-black/20 p-3 rounded-lg border border-white/5 hover:bg-red-500/10 hover:border-red-500/30 active:scale-95 transition-all flex flex-col items-center justify-center gap-1.5 overflow-hidden">
+                                    <FaIcon name={isMine ? "icon-trash-can" : "icon-xmark"} className="text-lg text-red-400/60"/>
+                                    <div className="text-red-400/60 text-[10px] uppercase font-bold tracking-widest truncate">{isMine ? 'Delete' : 'Remove'}</div>
+                                </button>
                             )}
                         </div>
                     </div>
@@ -508,6 +526,14 @@
 
             useEffect(() => { if (activeView === 'browse') fetchCategories(); }, [activeView, activeFilter, searchQuery]);
 
+            // Helper to prevent list flickering when changing tabs
+            const handleFilterChange = (newFilter) => {
+                if (newFilter === activeFilter) return;
+                setCategories([]); // Clear current list immediately
+                setIsLoading(true); // Show loader immediately
+                setActiveFilter(newFilter);
+            };
+
             const handleUpload = async () => {
                 if (!newCatName.trim()) { setError('Category name is required.'); return; }
                 const wordsArray = newCatWords.split(',').map(w => w.trim()).filter(w => w.length > 0);
@@ -518,11 +544,13 @@
                     const payload = { name: newCatName.trim(), words: wordsArray, icon: selectedIcon, isPrivate };
                     
                     if (editId) {
+                        payload.edits = firebase.firestore.FieldValue.increment(1);
                         await db.collection('communigories').doc(editId).update(payload);
                         setAlert({ title: 'Success', message: 'Category updated successfully!', type: 'success' });
                     } else {
                         const newDocId = generateCategoryId();
                         payload.downloads = 0;
+                        payload.edits = 0;
                         payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                         await db.collection('communigories').doc(newDocId).set(payload);
                         
@@ -535,7 +563,7 @@
                         setAlert({ title: 'Uploaded!', message: 'Your category is live and saved to your device.', type: 'success' });
                     }
                     setActiveView('browse');
-                    setActiveFilter(editId ? activeFilter : 'my_categories');
+                    handleFilterChange(editId ? activeFilter : 'my_categories');
                     setNewCatName(''); setNewCatWords(''); setIsPrivate(false); setEditId(null);
                 } catch (e) { setAlert({ title: 'Error', message: 'Failed to upload category.', type: 'error' }); }
                 setIsLoading(false);
@@ -606,44 +634,48 @@
 
             return (
                 <div className="w-full h-full text-slate-200 font-sans selection:bg-brand-500/30">
+                    
+                    {/* Background Elements at the absolute root */}
+                    <div className="fixed inset-0 bg-[#020617] -z-10"></div>
+                    <div className="absolute inset-0 pointer-events-none z-0">
+                        <div className="blob bg-brand-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
+                        <div className="blob bg-cyan-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
+                    </div>
+
+                    {/* Modals rendered OUTSIDE the animate-fade-in container to fix WebKit blur bug */}
+                    <IconSelectionModal 
+                        isOpen={isIconModalOpen} 
+                        onClose={() => setIsIconModalOpen(false)} 
+                        onSelect={setSelectedIcon} 
+                        currentSelection={selectedIcon} 
+                    />
+
+                    {alert && <AlertModal {...alert} onClose={() => setAlert(null)} />}
+                    {confirmDelete && (
+                        <ConfirmModal 
+                            title={confirmDelete.global ? "Delete Category?" : "Remove Category?"} 
+                            message={confirmDelete.global ? "Are you sure? Everyone using it will lose access." : "Remove this from your saved local categories? You can find it again in the community."} 
+                            onConfirm={executeDelete} 
+                            onCancel={() => setConfirmDelete(null)} 
+                        />
+                    )}
+                    {shareData && <CustomShareModal shareData={shareData} onClose={() => setShareData(null)} />}
+                    
+                    {selectedCategory && (
+                        <CategoryDetailsModal 
+                            cat={selectedCategory} 
+                            isMine={getMyIds().includes(selectedCategory.id)} 
+                            isSaved={getSavedIds().includes(selectedCategory.id)}
+                            onClose={() => setSelectedCategory(null)} 
+                            onEdit={triggerEdit} 
+                            onDelete={(deleteData) => setConfirmDelete(deleteData)} 
+                            onShare={triggerShare}
+                        />
+                    )}
+
+                    {/* Main Application Container */}
                     <div className="flex flex-col h-[100dvh] relative z-10 animate-fade-in">
                         
-                        <div className="fixed inset-0 bg-[#020617] -z-10"></div>
-                        <div className="absolute inset-0 pointer-events-none z-0">
-                            <div className="blob bg-brand-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
-                            <div className="blob bg-cyan-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
-                        </div>
-
-                        <IconSelectionModal 
-                            isOpen={isIconModalOpen} 
-                            onClose={() => setIsIconModalOpen(false)} 
-                            onSelect={setSelectedIcon} 
-                            currentSelection={selectedIcon} 
-                        />
-
-                        {alert && <AlertModal {...alert} onClose={() => setAlert(null)} />}
-                        {confirmDelete && (
-                            <ConfirmModal 
-                                title={confirmDelete.global ? "Delete Category?" : "Remove Category?"} 
-                                message={confirmDelete.global ? "Are you sure? Everyone using it will lose access." : "Remove this from your saved local categories? You can find it again in the community."} 
-                                onConfirm={executeDelete} 
-                                onCancel={() => setConfirmDelete(null)} 
-                            />
-                        )}
-                        {shareData && <CustomShareModal shareData={shareData} onClose={() => setShareData(null)} />}
-                        
-                        {selectedCategory && (
-                            <CategoryDetailsModal 
-                                cat={selectedCategory} 
-                                isMine={getMyIds().includes(selectedCategory.id)} 
-                                isSaved={getSavedIds().includes(selectedCategory.id)}
-                                onClose={() => setSelectedCategory(null)} 
-                                onEdit={triggerEdit} 
-                                onDelete={(deleteData) => setConfirmDelete(deleteData)} 
-                                onShare={triggerShare}
-                            />
-                        )}
-
                         <div className="absolute top-6 left-6 z-20">
                             <button 
                                 onClick={() => {
@@ -664,7 +696,7 @@
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+                        <div className={`flex-1 overflow-y-auto no-scrollbar ${activeView === 'upload' ? 'pb-32' : 'pb-10'}`}>
                             <div className="max-w-lg mx-auto p-6 pt-28">
                                 
                                 <div className="mb-10 text-center">
@@ -685,7 +717,7 @@
 												<FaIcon name="icon-compass" className="text-brand-400 mr-1" /> Navigation
 											</h2>
                                         </div>
-                                        <div className="p-4 grid grid-cols-2 gap-3">
+                                        <div className="p-4 grid grid-cols-4 sm:grid-cols-2 gap-2 sm:gap-3">
                                             {[
                                                 { id: 'trending', icon: 'icon-fire', label: 'Trending' },
                                                 { id: 'newest', icon: 'icon-sparkles', label: 'Newest' },
@@ -693,19 +725,19 @@
                                             ].map(tab => (
                                                 <button 
                                                     key={tab.id} 
-                                                    onClick={() => setActiveFilter(tab.id)}
-                                                    className={`flex items-center justify-center gap-2 py-4 rounded-xl text-sm font-bold transition-all active:scale-95 ${activeFilter === tab.id ? 'bg-brand-500/20 border-brand-500 text-white' : 'bg-white/5 border-transparent text-white/50 hover:bg-white/10 hover:text-white/80'}`}
+                                                    onClick={() => handleFilterChange(tab.id)}
+                                                    className={`flex items-center justify-center sm:gap-2 py-3 sm:py-4 rounded-xl text-sm font-bold transition-all active:scale-95 border ${activeFilter === tab.id ? 'bg-brand-500/20 border-transparent text-white' : 'bg-white/5 border-transparent text-white/50 hover:bg-white/10 hover:text-white/80'}`}
                                                 >
-                                                    <FaIcon name={tab.icon} className={activeFilter === tab.id ? 'text-brand-400' : ''} />
-                                                    <span>{tab.label}</span>
+                                                    <FaIcon name={tab.icon} className={`text-xl sm:text-base ${activeFilter === tab.id ? 'text-brand-400' : ''}`} />
+                                                    <span className="hidden sm:block">{tab.label}</span>
                                                 </button>
                                             ))}
                                             <button 
                                                 onClick={() => { setActiveView('upload'); setEditId(null); setNewCatName(''); setNewCatWords(''); setIsPrivate(false); setError('');}}
-                                                className="flex items-center justify-center gap-2 py-4 rounded-xl text-sm font-bold transition-all active:scale-95 border bg-white/5 border-transparent text-white/50 hover:bg-white/10 hover:text-white/80"
+                                                className="flex items-center justify-center sm:gap-2 py-3 sm:py-4 rounded-xl text-sm font-bold transition-all active:scale-95 border bg-white/5 border-transparent text-white/50 hover:bg-white/10 hover:text-white/80"
                                             >
-                                                <FaIcon name="icon-cloud-up" />
-                                                <span>Upload</span>
+                                                <FaIcon name="icon-cloud-up" className="text-xl sm:text-base" />
+                                                <span className="hidden sm:block">Upload</span>
                                             </button>
                                         </div>
                                     </section>
@@ -720,17 +752,17 @@
                                         </div>
                                         <div className="p-4 flex flex-col gap-4">
                                             
-                                            <div className="bg-black/20 border border-white/5 rounded-xl p-4 flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
+                                            <div className="bg-black/20 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                                <div className="flex items-center gap-4 w-full sm:w-auto">
                                                     <div className="w-14 h-14 rounded-[1rem] bg-black/20 border border-white/10 flex items-center justify-center flex-shrink-0">
                                                         <img src={selectedIcon} className="w-8 h-8 object-contain drop-shadow-md" draggable="false" />
                                                     </div>
                                                     <div>
                                                         <h3 className="font-bold text-white/90 text-sm">Category Icon</h3>
-                                                        <p className="text-white/40 text-[10px] uppercase tracking-wider mt-1">Shown in the vault</p>
+                                                        <p className="text-white/40 text-xs mt-1 leading-relaxed">The visual symbol for your category in the community feed.</p>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => setIsIconModalOpen(true)} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-all active:scale-95">
+                                                <button onClick={() => setIsIconModalOpen(true)} className="w-full sm:w-auto px-4 py-3 sm:py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-bold transition-all active:scale-95">
                                                     CHANGE
                                                 </button>
                                             </div>
@@ -743,18 +775,18 @@
 
                                             <div className="bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors relative z-10">
                                                 <textarea rows="5" placeholder="Spongebob, iCarly, Drake & Josh..." value={newCatWords} onChange={e => {setNewCatWords(e.target.value); setError('');}}
-                                                    className="w-full bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white resize-none leading-relaxed"
+                                                    className="w-full bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white resize-none leading-relaxed no-scrollbar"
                                                 ></textarea>
                                             </div>
 
                                             <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-xl p-4 transition-all">
                                                 <div className="flex items-center gap-4 pr-4">
-                                                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 flex-shrink-0">
-                                                        <FaIcon name="icon-lock" className="text-xl" />
+                                                    <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
+                                                        <FaIcon name="icon-lock" className="text-lg" />
                                                     </div>
                                                     <div>
                                                         <h3 className="font-bold text-white/90 text-sm">Private Category</h3>
-                                                        <p className="text-white/40 text-[10px] mt-1 leading-relaxed uppercase tracking-wider">Hide from public feed</p>
+                                                        <p className="text-white/40 text-xs mt-1 leading-relaxed">Hides your category from the public community feed. Only accessible via share link.</p>
                                                     </div>
                                                 </div>
                                                 <button 
@@ -775,17 +807,12 @@
                                             </div>
                                         </div>
 
-                                        <div className="text-center py-3 bg-black/50 border-t border-white/5 animate-fade-in">
+                                        <div className="text-center py-3 bg-black/50 border-t border-white/5">
                                             <p className="text-xs text-white/60 font-semibold px-4 flex items-center justify-center gap-2">
                                                 <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                                                    Current Count: <span className={currentWordCount >= 10 ? "text-green-400" : "text-brand-400"}>{currentWordCount} / 10 MIN</span>
+                                                    Current Count: <span className={currentWordCount >= 10 ? "text-brand-400" : "text-brand-400"}>{currentWordCount} / 10 MIN</span>
                                                 </span>
                                             </p>
-                                            {editId && (
-                                                <button onClick={() => { setEditId(null); setNewCatName(''); setNewCatWords(''); setIsPrivate(false); setActiveView('browse'); setActiveFilter('my_categories'); }} className="w-full text-white/50 hover:text-white text-[10px] uppercase tracking-widest font-bold active:scale-95 transition-all mt-3 py-2">
-                                                    CANCEL EDIT
-                                                </button>
-                                            )}
                                         </div>
                                     </section>
                                 ) : (
@@ -800,7 +827,6 @@
                                         {isLoading ? (
                                             <div className="text-center py-20 flex flex-col items-center justify-center animate-fade-in">
                                                 <svg className="sleek-spinner w-12 h-12 text-brand-500 drop-shadow-sm mb-6" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20"></circle></svg>
-                                                <p className="text-white/40 font-bold tracking-widest uppercase text-xs">Loading Categories...</p>
                                             </div>
                                         ) : categories.length === 0 ? (
                                             <div className="text-center py-20 flex flex-col items-center justify-center animate-fade-in">
@@ -813,7 +839,7 @@
                                                 </p>
                                                 {activeFilter === 'my_categories' && !searchQuery && (
                                                     <button 
-                                                        onClick={() => setActiveFilter('trending')}
+                                                        onClick={() => handleFilterChange('trending')}
                                                         className="mt-6 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs tracking-wider uppercase rounded-xl transition-all active:scale-95"
                                                     >
                                                         Browse Trending
@@ -837,8 +863,9 @@
                                                         className="relative overflow-hidden flex flex-col items-center justify-center gap-3 p-5 rounded-[1.5rem] transition-all duration-300 group min-h-[130px] border bg-slate-800/40 border-white/5 hover:bg-white/5 hover:border-white/10 backdrop-blur-md active:scale-95"
                                                     >
                                                         {!cat.isPrivate && (
-                                                            <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md text-[10px] font-bold text-white flex items-center gap-1.5 shadow-sm border border-white/10 z-20">
-                                                                <FaIcon name="icon-fire" className="text-orange-400 text-[10px]" /> {cat.downloads || 0}
+                                                            <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-md text-[10px] font-bold text-white flex items-center gap-2.5 shadow-sm border border-white/10 z-20">
+                                                                <span className="flex items-center gap-1 text-white/50"><FaIcon name="icon-fire" className="text-white/60 text-[10px]" /> {cat.downloads || 0}</span>
+                                                                <span className="flex items-center gap-1 text-white/50"><FaIcon name="icon-pen" className="text-[10px]" /> {cat.edits || 0}</span>
                                                             </div>
                                                         )}
                                                         {cat.isPrivate && (
