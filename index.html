@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -617,6 +618,18 @@
 
         const app1 = firebase.initializeApp(firebaseConfig1, "APP1");
         const app2 = firebase.initializeApp(firebaseConfig2, "APP2");
+
+        const firebaseConfigComm = {
+          apiKey: "AIzaSyChul9YK3HepgMSy4qhf9aOO3AZT5GE8m8",
+          authDomain: "commcates.firebaseapp.com",
+          projectId: "commcates",
+          storageBucket: "commcates.firebasestorage.app",
+          messagingSenderId: "747004278462",
+          appId: "1:747004278462:web:208ac38bfb8fa7479890ef",
+          measurementId: "G-VKSRZTND5C"
+        };
+        const commApp = firebase.initializeApp(firebaseConfigComm, "COMMCATES");
+        const commDb = commApp.firestore();
 
         const ptDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
         const ptHour = ptDate.getHours();
@@ -1329,6 +1342,9 @@
                      <div className="absolute top-6 left-6 z-20 flex gap-3">
                         <button onClick={() => window.open("https://discord.gg/m9WrJxGKtr", "_blank")} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
                             <FaIcon name="icon-discord" className="" />
+                        </button>
+                        <button onClick={() => window.location.href = '/communigories'} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
+                            <FaIcon name="icon-layers" className="" />
                         </button>
                         {isAndroid && (
                             <button 
@@ -2770,6 +2786,11 @@
             "icon-earth-americas": (props) => (
                 <svg viewBox="0 0 25 25" width="1em" {...props}>
                     <path fill="currentColor" d="m11.57 20.99c-4.119-.193-7.465-3.124-8.34-6.99h3.42c.134.979.352 1.969.678 2.966.255.795 1.125 1.217 1.892.96.787-.257 1.217-1.104.96-1.892-.224-.686-.392-1.365-.506-2.034h.326c.828 0 1.5-.671 1.5-1.5s-.672-1.5-1.5-1.5h-.454c.249-2.842 1.497-5.346 2.454-6.894.712 1.149 1.583 2.82 2.085 4.768.203.809 1.046 1.286 1.827 1.078.802-.207 1.284-1.025 1.077-1.827-.453-1.758-1.148-3.306-1.823-4.543 2.991 1.136 5.27 3.828 5.741 7.13.114.824.894 1.392 1.697 1.272.82-.117 1.391-.877 1.273-1.697-.837-5.864-5.943-10.287-11.877-10.287-6.603.014-12.004 5.374-12 12 .003 6.355 5.043 11.756 11.501 11.988.796 0 1.46-.626 1.497-1.43.039-.828-.601-1.53-1.428-1.569zm-2.74-17.402c-1.023 1.875-2.084 4.469-2.289 7.412h-3.482c.379-3.408 2.669-6.239 5.771-7.412zm14.731 17.852-2.145-2.145c.361-.691.584-1.463.584-2.295 0-2.757-2.243-5-5-5s-5 2.243-5 5 2.243 5 5 5c.831 0 1.604-.223 2.295-.584l2.145 2.145c.293.293.677.439 1.061.439s.768-.146 1.061-.439c.586-.585.586-1.536 0-2.121zm-6.561-2.439c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2z" />
+                </svg>
+            ), 
+			"icon-layers": (props) => (
+                <svg viewBox="0 0 25 25" width="1em" {...props}>
+                    <path fill="currentColor" d="M24,8.5c0-.524-.274-1.012-.724-1.283L13.864,1.521c-1.15-.695-2.578-.697-3.728,0L.724,7.217c-.449,.271-.724,.759-.724,1.283s.274,1.012,.724,1.283l9.412,5.696c.575,.348,1.22,.522,1.864,.522s1.289-.174,1.863-.522l9.413-5.696c.449-.271,.724-.759,.724-1.283Zm-11.69,4.413c-.19,.114-.428,.114-.62,0l-7.292-4.413,7.292-4.413h0c.189-.115,.427-.116,.62,0l7.292,4.413-7.293,4.413Zm11.69,6.587c0,.828-.671,1.5-1.5,1.5h-1.5v1.5c0,.828-.671,1.5-1.5,1.5s-1.5-.672-1.5-1.5v-1.5h-1.5c-.829,0-1.5-.672-1.5-1.5s.671-1.5,1.5-1.5h1.5v-1.5c0-.828,.671-1.5,1.5-1.5s1.5,.672,1.5,1.5v1.5h1.5c.829,0,1.5,.672,1.5,1.5Zm-11.214,1.771c-.281,.469-.778,.729-1.288,.729-.263,0-.529-.068-.771-.214L.822,15.843c-.71-.426-.94-1.348-.514-2.058,.426-.711,1.348-.942,2.058-.515l9.906,5.943c.71,.426,.94,1.348,.514,2.058Z" />
                 </svg>
             ), 
             "icon-mobile-screen": (props) => (
@@ -5001,6 +5022,7 @@
 
             const [isOnlineStatus, setIsOnlineStatus] = useState(navigator.onLine);
             const [wordBank, setWordBank] = useState(null);
+            const [customCategories, setCustomCategories] = useState({});
 
             useEffect(() => {
                 const fetchWordBank = async () => {
@@ -5018,7 +5040,49 @@
                         const objectString = text.substring(startIndex, endIndex + 1);
 
                         const getObject = new Function('return ' + objectString);
-                        const bank = getObject();
+                        let bank = getObject();
+
+                        // 1. Load permanently saved community categories from LocalStorage
+                        const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
+                        Object.keys(savedComms).forEach(id => {
+                            const cat = savedComms[id];
+                            bank[cat.name] = cat.words;
+                            setCustomCategories(prev => ({...prev, [cat.name]: cat.icon}));
+                            CATEGORY_ICONS[cat.name] = cat.icon;
+                        });
+
+                        // 2. Load NEW Communigory if in URL
+                        const params = new URLSearchParams(window.location.search);
+                        const commId = params.get('communigory');
+                        const targetMode = params.get('mode');
+
+                        if (commId && commId !== 'open') {
+                            try {
+                                const doc = await commDb.collection('communigories').doc(commId).get();
+                                if (doc.exists) {
+                                    const data = doc.data();
+                                    bank[data.name] = data.words;
+                                    setCustomCategories(prev => ({...prev, [data.name]: data.icon}));
+                                    CATEGORY_ICONS[data.name] = data.icon;
+                                    
+                                    // Save it permanently to device
+                                    savedComms[commId] = { id: commId, name: data.name, icon: data.icon, words: data.words };
+                                    localStorage.setItem('saved_communigories', JSON.stringify(savedComms));
+
+                                    // Increment downloads silently
+                                    commDb.collection('communigories').doc(commId).update({
+                                        downloads: firebase.firestore.FieldValue.increment(1)
+                                    }).catch(()=>{});
+
+                                    // Clean URL
+                                    window.history.replaceState({}, document.title, window.location.pathname);
+                                    
+                                    // Auto-route to selected game mode
+                                    if (targetMode === 'local') setTimeout(() => setGameMode('local'), 100);
+                                    if (targetMode === 'online') setTimeout(() => setGameMode('online'), 100);
+                                }
+                            } catch(e) { console.error("Failed to load community category:", e); }
+                        }
                         
                         setWordBank(bank);
                     } catch (error) {
@@ -5111,8 +5175,9 @@
                 };
 
                 const activeWordBank = getActiveWordBank(wordBank);
-                const regularCategories = Object.keys(wordBank).filter(c => c !== 'Supercell' && c !== 'Halloween' && c !== 'Christmas');
-                const displayCategories = ['Supercell', ...seasonalCategories, ...regularCategories];
+                const customCatNames = Object.keys(customCategories);
+                const regularCategories = Object.keys(wordBank).filter(c => c !== 'Supercell' && c !== 'Halloween' && c !== 'Christmas' && !customCatNames.includes(c));
+                const displayCategories = ['Supercell', ...seasonalCategories, ...customCatNames, ...regularCategories];
                 const totalWords = Object.values(wordBank).reduce((sum, category) => sum + category.length, 0);
                 const roundedWordCount = Math.floor(totalWords / 250) * 250;
 
@@ -5427,6 +5492,18 @@
                         const previousData = latestLobbyData.current;
                         setLobbyData(data);
                         
+                        // Load custom category for guests if the lobby is using one
+                        if (data.customCategoryId && !customCategories[data.customCategoryId]) {
+                            commDb.collection('communigories').doc(data.customCategoryId).get().then(docSnap => {
+                                if (docSnap.exists) {
+                                    const catData = docSnap.data();
+                                    setWordBank(prev => ({...prev, [catData.name]: catData.words}));
+                                    setCustomCategories(prev => ({...prev, [data.customCategoryId]: true, [catData.name]: catData.icon}));
+                                    CATEGORY_ICONS[catData.name] = catData.icon;
+                                }
+                            });
+                        }
+
                         if (previousData && data.gameState !== previousData.gameState) {
                             if (previousData.gameState === 'waiting' && data.gameState === 'reveal') {
                                 audioManagerRef.current.playSound(data.isRandomMode ? 'startRandomMission' : 'startMission');
@@ -5697,8 +5774,12 @@
                 const expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + 1);
                 
+                const params = new URLSearchParams(window.location.search);
+                const commId = params.get('communigory');
+
                 await lobbyRef.set({
                     hostId: user.uid, password: newPassword, category: 'Mystery Mode',
+                    customCategoryId: (commId && commId !== 'open') ? commId : null,
                     isRandomMode: true, speakCategory: false, gameState: 'waiting',
                     isFakeWordMode: false,
                     enableTwoImposters: false, notifyImposterOnVote: false,
