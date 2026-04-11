@@ -687,50 +687,58 @@
             const getSavedIds = () => { try { return Object.keys(JSON.parse(localStorage.getItem('saved_communigories') || '{}')); } catch { return []; } };
 
             const fetchCategories = async (filterToFetch) => {
-                if (categoriesCache[filterToFetch] && !searchQuery) {
-                    setCategories(categoriesCache[filterToFetch]);
-                    setIsLoading(false);
-                } else {
-                    setIsLoading(true);
-                }
+				setIsLoading(true);
 
-                try {
-                    let query = db.collection('communigories');
-                    // Increased limits to 200 to prevent edge case where public/valid items get buried
-                    if (filterToFetch === 'trending') query = query.orderBy('downloads', 'desc').limit(200);
-                    else if (filterToFetch === 'newest') query = query.orderBy('createdAt', 'desc').limit(200);
+				// Step 2: Check if we can use cached data for a near-instant load.
+				if (categoriesCache[filterToFetch] && !searchQuery) {
+					setCategories(categoriesCache[filterToFetch]);
+					setIsLoading(false);
+					return;
+				}
+				
+				// Step 3: If not using cache, clear the current categories. 
+				// This is now safe because the loading spinner is already visible.
+				setCategories([]);
 
-                    const snapshot = await query.get();
-                    let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				try {
+					let query = db.collection('communigories');
+					if (filterToFetch === 'trending') query = query.orderBy('downloads', 'desc').limit(200);
+					else if (filterToFetch === 'newest') query = query.orderBy('createdAt', 'desc').limit(200);
 
-                    if (filterToFetch === 'my_categories') {
-                        const myIds = getMyIds();
-                        const savedIds = getSavedIds();
-                        const allRelevantIds = [...new Set([...myIds, ...savedIds])];
-                        results = results.filter(cat => allRelevantIds.includes(cat.id));
-                    } else {
-                        // Exclude private categories from public feeds
-                        results = results.filter(cat => !cat.isPrivate);
-                    }
+					const snapshot = await query.get();
+					let results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                    if (searchQuery) {
-                        results = results.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
-                    }
-                    
-                    setCategories(results);
-                    
-                    if (!searchQuery) {
-                        setCategoriesCache(prev => ({ ...prev, [filterToFetch]: results }));
-                    }
-                } catch (e) { 
-                    console.error("Fetch Error:", e);
-                    // Only throw alert if we don't have cached data to show
-                    if (!categoriesCache[filterToFetch]) {
-                        setAlert({ title: 'Connection Lost', message: 'Failed to load community categories. Check your internet connection.', type: 'error' }); 
-                    }
-                }
-                setIsLoading(false);
-            };
+					if (filterToFetch === 'my_categories') {
+						const myIds = getMyIds();
+						const savedIds = getSavedIds();
+						const allRelevantIds = [...new Set([...myIds, ...savedIds])];
+						// Fetch from local storage first for offline/faster access
+						const savedData = Object.values(JSON.parse(localStorage.getItem('saved_communigories') || '{}'));
+						const onlineData = results.filter(cat => allRelevantIds.includes(cat.id) && !savedData.some(s => s.id === cat.id));
+						results = [...savedData, ...onlineData];
+					} else {
+						results = results.filter(cat => !cat.isPrivate);
+					}
+
+					if (searchQuery) {
+						results = results.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+					}
+					
+					setCategories(results);
+					
+					if (!searchQuery) {
+						setCategoriesCache(prev => ({ ...prev, [filterToFetch]: results }));
+					}
+				} catch (e) { 
+					console.error("Fetch Error:", e);
+					if (!categoriesCache[filterToFetch] || categoriesCache[filterToFetch].length === 0) {
+						setAlert({ title: 'Connection Lost', message: 'Failed to load community categories. Check your internet connection.', type: 'error' }); 
+					}
+				} finally {
+					// Step 4: Always ensure loading is set to false after the operation completes.
+					setIsLoading(false);
+				}
+			};
 
             useEffect(() => { 
                 if (activeView === 'browse') {
