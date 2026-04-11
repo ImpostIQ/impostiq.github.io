@@ -815,8 +815,9 @@
                         localStorage.setItem('saved_communigories', JSON.stringify(savedComms));
                     }
                     
-                    // Invalidate all caches
                     setCategoriesCache({ trending: null, newest: null, my_categories: null });
+                    
+                    setCategories(prev => prev.filter(c => c.id !== id));
                     
                     setAlert({ title: global ? 'Deleted' : 'Removed', message: global ? 'Category deleted from community successfully.' : 'Category removed from your library.', type: 'success' });
                     setConfirmDelete(null);
