@@ -712,10 +712,12 @@
 						const myIds = getMyIds();
 						const savedIds = getSavedIds();
 						const allRelevantIds = [...new Set([...myIds, ...savedIds])];
-						// Fetch from local storage first for offline/faster access
-						const savedData = Object.values(JSON.parse(localStorage.getItem('saved_communigories') || '{}'));
-						const onlineData = results.filter(cat => allRelevantIds.includes(cat.id) && !savedData.some(s => s.id === cat.id));
-						results = [...savedData, ...onlineData];
+						
+						const onlineData = results.filter(cat => allRelevantIds.includes(cat.id));
+						const savedData = Object.values(JSON.parse(localStorage.getItem('saved_communigories') || '{}'))
+							.filter(s => !onlineData.some(cat => cat.id === s.id));
+							
+						results = [...onlineData, ...savedData];
 					} else {
 						results = results.filter(cat => !cat.isPrivate);
 					}
