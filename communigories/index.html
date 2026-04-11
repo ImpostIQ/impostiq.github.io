@@ -148,7 +148,15 @@
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
         
-        .sleek-spinner circle { stroke: currentColor; stroke-width: 4; stroke-dasharray: 1, 200; stroke-dashoffset: 0; animation: sleek-dash 1.5s ease-in-out infinite; stroke-linecap: round; fill: none; }
+        .sleek-spinner circle {
+            stroke: currentColor;
+            stroke-width: 5; 
+            stroke-dasharray: 1, 200;
+            stroke-dashoffset: 0;
+            animation: sleek-dash 1.5s ease-in-out infinite;
+            stroke-linecap: round;
+            fill: none;
+        }
         @keyframes sleek-rotate { 100% { transform: rotate(360deg); } }
         @keyframes sleek-dash { 0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; } 50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; } 100% { stroke-dasharray: 90, 200; stroke-dashoffset: -124px; } }
         .sleek-spinner { animation: sleek-rotate 2s linear infinite; }
