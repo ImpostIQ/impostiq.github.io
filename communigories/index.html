@@ -822,7 +822,6 @@
                     setAlert({ title: global ? 'Deleted' : 'Removed', message: global ? 'Category deleted from community successfully.' : 'Category removed from your library.', type: 'success' });
                     setConfirmDelete(null);
                     setSelectedCategory(null);
-                    fetchCategories(activeFilter);
                 } catch (e) { setAlert({ title: 'Error', message: 'Failed to delete category.', type: 'error' }); }
             };
 
