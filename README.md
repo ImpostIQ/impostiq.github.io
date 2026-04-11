@@ -58,6 +58,24 @@ Hanging out in person? You only need **one phone** to play.
 
 <br>
 
+### <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/open-file-folder_1f4c2.png" width="28" align="absmiddle"></picture> **Communigories (Custom Category Packs Created by the Impostiq Community)**
+
+<p align="center">
+  <picture>
+    <img draggable="false" src="https://i.ibb.co/DjZwkcV/line-1024x5.png" style="width: 100%; max-width: 887px; display: block; margin: 0 auto;">
+  </picture>
+</p>
+
+Tired of the standard 28 categories? Enter **Communigories**, a dynamic global community vault where players can create, share, and discover custom user-generated categories!
+
+*   **Create Your Own:** Build custom word banks (minimum 10 words), assign a 3D visual icon, and upload them to the community feed.
+*   **Trending & Newest:** Browse hundreds of unique packs created by players around the world, sorted by popularity (downloads) and release date.
+*   **Private Categories:** Hosting an inside-joke game? Toggle "Private" to hide your category from the public feed, making it accessible only via a direct share link.
+*   **Instant Deep Linking:** Found a category you love? Instantly launch a Local or Online lobby utilizing that specific custom word bank with a single click. The game engine will seamlessly pull it directly into your active word bank.
+*   **Personal Library:** Save your favorite Communigories to your local device to easily access and manage them for future game nights.
+
+<br>
+
 ### <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png" width="28" align="absmiddle"></picture> **Game Settings & Customization**
 
 <p align="center">
@@ -145,7 +163,9 @@ The game engine automatically transforms based on the time of year, changing the
 
 *   **Frontend:** React 18, Tailwind CSS, Framer Motion (for dynamic 3D card tilt physics).
 *   **Backend:** Firebase Firestore (Real-time NoSQL state management) & Firebase Auth.
-*   **Infrastructure:** Time-based Database Load Balancing (Swaps between Firebase instances at 12:00 PT to prevent rate limits).
+*   **Infrastructure & Load Balancing:** Time-based Database Load Balancing (Swaps between primary Firebase instances at 12:00 PT to prevent active game rate limits).
+*   **Communigories Architecture:** User-generated categories are pushed to a completely separate, dedicated Firebase instance to safely handle public uploads, votes, and queries without congesting live game servers. 
+*   **Offline Persistence:** The Communigories vault enables Firestore offline persistence heavily speeding up subsequent loads and enabling category caching.
 *   **Audio Engine:** Custom-built `audioManager` for parallel SFX and looping music states.
 
 <br>
