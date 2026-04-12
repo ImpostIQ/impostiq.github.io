@@ -2326,7 +2326,7 @@
                                         const isTurnOrder = lobbyData.gameState === 'reveal';
 
                                         return (
-                                            <div key={p.id} className={`flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-xl border border-transparent transition-colors duration-200 ${p.id === user.uid ? 'bg-white/10 !border-white/10 shadow-sm' : 'bg-white/5 hover:bg-white/10'}`}>
+                                            <div key={p.id} className={`flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-xl border transition-all ${p.id === user.uid ? 'bg-white/10 border-white/10 shadow-sm' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
                                                 {isTurnOrder ? (
                                                     <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-brand-500/20 text-brand-400 font-mono font-bold text-sm rounded-lg border border-brand-500/20">
                                                         {index + 1}
@@ -5500,30 +5500,8 @@
                         const previousData = latestLobbyData.current;
                         setLobbyData(data);
                         
-                        // Load custom categories for guests so they can see icons and vote
-                        if (data.hostCustomCategories) {
-                            data.hostCustomCategories.forEach(catInfo => {
-                                if (!customCategories[catInfo.name]) {
-                                    CATEGORY_ICONS[catInfo.name] = catInfo.icon;
-                                    setCustomCategories(prev => ({...prev, [catInfo.name]: catInfo.icon}));
-                                    
-                                    commDb.collection('communigories').doc(catInfo.id).get().then(docSnap => {
-                                        if (docSnap.exists) {
-                                            const catData = docSnap.data();
-                                            setWordBank(prev => ({...prev, [catData.name]: catData.words}));
-                                            
-                                            // Automatically save to guest's local device so they keep the category!
-                                            try {
-                                                const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
-                                                savedComms[catInfo.id] = { id: catInfo.id, name: catData.name, icon: catData.icon, words: catData.words };
-                                                localStorage.setItem('saved_communigories', JSON.stringify(savedComms));
-                                            } catch(e) {}
-                                        }
-                                    }).catch(err => console.error("Failed to sync custom category:", err));
-                                }
-                            });
-                        } else if (data.customCategoryId && !customCategories[data.customCategoryId]) {
-                            // Legacy fallback for old active lobbies
+                        // Load custom category for guests if the lobby is using one
+                        if (data.customCategoryId && !customCategories[data.customCategoryId]) {
                             commDb.collection('communigories').doc(data.customCategoryId).get().then(docSnap => {
                                 if (docSnap.exists) {
                                     const catData = docSnap.data();
@@ -5804,17 +5782,12 @@
                 const expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + 1);
                 
-                // Share all of the host's locally saved custom categories with the lobby
-                const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
-                const hostCustomCategories = Object.values(savedComms).map(cat => ({
-                    id: cat.id,
-                    name: cat.name,
-                    icon: cat.icon
-                }));
+                const params = new URLSearchParams(window.location.search);
+                const commId = params.get('communigory');
 
                 await lobbyRef.set({
                     hostId: user.uid, password: newPassword, category: 'Mystery Mode',
-                    hostCustomCategories: hostCustomCategories,
+                    customCategoryId: (commId && commId !== 'open') ? commId : null,
                     isRandomMode: true, speakCategory: false, gameState: 'waiting',
                     isFakeWordMode: false,
                     enableTwoImposters: false, notifyImposterOnVote: false,
