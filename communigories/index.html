@@ -167,7 +167,17 @@
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="fixed inset-0 bg-[#020617] -z-10"></div>
+    <div class="absolute inset-0 pointer-events-none z-0">
+        <div class="blob bg-brand-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
+        <div class="blob bg-cyan-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%]" style="animation-delay: 2s;"></div>
+    </div>
+    
+    <div id="root">
+        <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;">
+            <svg class="sleek-spinner w-12 h-12 text-brand-500 drop-shadow-sm" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20"></circle></svg>
+        </div>
+    </div>
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
@@ -993,15 +1003,8 @@
 
             return (
                 <div className="w-full h-full text-slate-200 font-sans selection:bg-brand-500/30">
-                    
-                    {/* Background Elements at the absolute root */}
-                    <div className="fixed inset-0 bg-[#020617] -z-10"></div>
-                    <div className="absolute inset-0 pointer-events-none z-0">
-                        <div className="blob bg-brand-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
-                        <div className="blob bg-cyan-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
-                    </div>
 
-                    <IconSelectionModal 
+                    <IconSelectionModal
                         isOpen={isIconModalOpen} 
                         onClose={() => setIsIconModalOpen(false)} 
                         onSelect={setSelectedIcon} 
@@ -1038,7 +1041,7 @@
                     )}
 
                     {/* Main Application Container */}
-                    <div className="flex flex-col h-[100dvh] relative z-10 animate-fade-in">
+                    <div className="flex flex-col h-[100dvh] relative z-10">
                         
                         <div className="absolute top-6 left-6 z-20">
                             <button 
@@ -1218,8 +1221,19 @@
                                         </div>
 
                                         {isLoading ? (
-                                            <div className="text-center py-20 flex flex-col items-center justify-center animate-fade-in">
-                                                <svg className="sleek-spinner w-12 h-12 text-brand-500 drop-shadow-sm mb-6" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20"></circle></svg>
+                                            <div className="grid grid-cols-2 gap-4 animate-pulse">
+                                                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                                                    <div key={i} className="relative overflow-hidden flex flex-col items-center rounded-[1.5rem] min-h-[133px] border bg-slate-800/40 border-white/5 backdrop-blur-md">
+                                                        <div className="w-full py-2 bg-black/50 border-b border-white/5 h-8 flex justify-center items-center gap-4">
+                                                            <div className="w-6 h-3 bg-white/10 rounded"></div>
+                                                            <div className="w-6 h-3 bg-white/10 rounded"></div>
+                                                        </div>
+                                                        <div className="relative flex-1 w-full flex flex-col items-center justify-center gap-3 p-4">
+                                                            <div className="w-10 h-10 rounded-full bg-white/10"></div>
+                                                            <div className="w-20 h-3 rounded bg-white/10"></div>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         ) : categories.length === 0 ? (
                                             <div className="text-center py-20 flex flex-col items-center justify-center animate-fade-in">
