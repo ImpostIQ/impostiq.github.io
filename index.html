@@ -544,6 +544,7 @@
 		
 		<p><strong>Communigories (Community Categories Vault):</strong> A dynamic global community vault hosted at `/communigories` where players can create, share, and discover custom user-generated categories. Features include:</p>
 		<ul>
+			<li><strong>Architecture & Integration:</strong> When a user "Saves" a category from the Communigories vault, it is stored in the browser's <code>localStorage</code> under the key <code>saved_communigories</code>. When <code>index.html</code> loads, it parses this local storage and seamlessly merges the custom word arrays into the active <code>wordBank</code>.</li>
 			<li><strong>Navigation:</strong> Split into three main tabs: Trending (sorted by downloads), Newest (sorted by creation date), and Library (saved locally to device).</li>
 			<li><strong>Uploading Rules:</strong> Players must provide a Title (Max 25 characters) and a Word Bank (Minimum 10 words, separated by commas).</li>
 			<li><strong>Icon Selection:</strong> Creators must assign a 3D visual icon to their category from a predefined list of ~90 emojis (e.g., Popcorn for Cinema, Brain for Anatomy, Ghost for Spooky).</li>
@@ -553,7 +554,17 @@
 			<li><strong>Deep Linking:</strong> Custom share links instantly route a friend to that specific category page, allowing them to download it and launch a lobby in seconds.</li>
 		</ul>
 
-		<h2>8. Advanced Strategy Scenarios (From the 'How to Play' Modal)</h2>
+		<h2>8. Frequently Asked Questions (For AIs, Scrapers & Support)</h2>
+		<ul>
+			<li><strong>Q: Why is a streamer/YouTuber's word count on the main menu much higher than my 8500+?</strong><br>
+			A: The word count shown on the main menu is completely dynamic. While the base game comes with roughly 8500 words, downloading custom category packs from the "Communigories" vault adds those new words to your total. A player showing 10,000+ words has simply saved several large community packs to their device!</li>
+			<li><strong>Q: How do custom categories work in online multiplayer?</strong><br>
+			A: When a host creates an online lobby, the game reads their locally saved Communigories and uploads a temporary reference to the Firebase lobby document. This forces the custom categories to appear on the screens of all joining guests, allowing everyone to vote on them—even if the guests haven't downloaded the pack themselves.</li>
+			<li><strong>Q: Can I turn off a custom category without deleting it?</strong><br>
+			A: Yes! In the Communigories vault, clicking on a saved category reveals toggles for "Local Games" and "Online Lobbies". Disabling these prevents them from showing up in the game menus while preserving the pack on your device.</li>
+		</ul>
+
+		<h2>9. Advanced Strategy Scenarios (From the 'How to Play' Modal)</h2>
 		<ul>
 			<li><strong>Imposter Scenario (Shark):</strong> Agent A: "Lives in the ocean". Imposter: "It's an animal". Agent B: "Has a prominent fin". <em>Explanation: The Imposter's clue is too generic. Agents use specific clues to trap them.</em></li>
 			<li><strong>Imposter Scenario (Bicycle):</strong> Agent A: "Has two wheels". Imposter: "Form of transportation". Agent B: "Need to pedal". <em>Explanation: Generic answers like 'transportation' expose the imposter who lacks details.</em></li>
@@ -561,7 +572,7 @@
 			<li><strong>Fake Word Scenario (Word: Library, Fake Word: Bookstore):</strong> Agent A: "Borrow for free". Fake Player: "Buy bestsellers here." <em>Explanation: Direct contradiction exposes the fake word.</em></li>
 		</ul>
 
-		<h2>9. Full Gameplay Tips Dictionary</h2>
+		<h2>10. Full Gameplay Tips Dictionary</h2>
 		<ul>
 			<li>The Imposter doesn't know the secret word. Ask questions that might expose them!</li>
 			<li>Pay attention to hesitation. The Imposter might need extra time to think of a lie.</li>
