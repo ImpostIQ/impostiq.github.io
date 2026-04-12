@@ -5046,6 +5046,7 @@
             essentialAudioUrls.add(AUDIO_URLS.cardFlip);
             essentialAudioUrls.add(AUDIO_URLS.startMission);
             essentialAudioUrls.add(AUDIO_URLS.mainMenuMusic);
+            essentialAudioUrls.add(AUDIO_URLS.communigoriesMusic);
             
             const imagePromises = Array.from(imageUrls).map(src => {
                 return new Promise(resolve => {
@@ -6357,11 +6358,11 @@
                     {showImposterVoteNotification && <ImposterVoteNotificationModal onClose={() => setShowImposterVoteNotification(false)} />}
                     {showExitConfirmModal && <ExitLobbyConfirmModal onConfirm={() => { setShowExitConfirmModal(false); handleBackToHome(); }} onCancel={() => setShowExitConfirmModal(false)} />}
                     
-                    <div 
-                        className={`fixed inset-0 bg-[#020617] transition-opacity duration-300 ease-in-out ${showCommunigories ? 'opacity-100 pointer-events-auto z-[150]' : 'opacity-0 pointer-events-none -z-50'}`}
-                    >
-                        <iframe src="/communigories" className="w-full h-full border-none block" title="Communigories" />
-                    </div>
+                    {showCommunigories && (
+                        <div className="fixed inset-0 bg-[#020617] z-[150]">
+                            <iframe src="/communigories" className="w-full h-full border-none block" title="Communigories" />
+                        </div>
+                    )}
                     
                     {renderContent()}
                 </div>
