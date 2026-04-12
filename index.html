@@ -735,6 +735,7 @@
             halloweenMainMenuMusic: "https://impostiq.github.io/sound/halloweenmainmenmus.mp3",
             categorySelectionMusic: "https://impostiq.github.io/sound/catselmus.mp3",
             timerMusic: "https://impostiq.github.io/sound/timermus.mp3",
+			communigoriesMusic: "https://impostiq.github.io/sound/communigories.mp3",
             
             categories: {
                 Supercell: "https://impostiq.github.io/sound/voicelines/supercell.mp3",
@@ -5471,7 +5472,7 @@
                     getSound: function(name) { return this.sounds[name]; }
                 };
             
-                const musicTracks = ['mainMenuMusic', 'categorySelectionMusic', 'timerMusic', 'christmasMainMenuMusic', 'halloweenMainMenuMusic'];
+                const musicTracks = ['mainMenuMusic', 'categorySelectionMusic', 'timerMusic', 'christmasMainMenuMusic', 'halloweenMainMenuMusic', 'communigoriesMusic'];
                 
                 Object.entries(AUDIO_URLS).forEach(([key, value]) => {
                     if (typeof value === 'string') {
@@ -5543,7 +5544,9 @@
                 
                 let targetMusic = null;
 
-                if (gameMode === 'select' || (gameMode === 'online' && !lobbyId)) {
+                if (showCommunigories) {
+                    targetMusic = 'communigoriesMusic';
+                } else if (gameMode === 'select' || (gameMode === 'online' && !lobbyId)) {
                     if (currentSeason === 'christmas') {
                         targetMusic = 'christmasMainMenuMusic';
                     } else if (currentSeason === 'halloween') {
@@ -5563,7 +5566,7 @@
                     audioManagerRef.current.stopMusic();
                 }
 
-            }, [isLoading, gameMode, localGameState, lobbyId, lobbyData?.gameState, audioManagerRef.current?.isUnlocked, currentSeason]);
+            }, [isLoading, gameMode, localGameState, lobbyId, lobbyData?.gameState, audioManagerRef.current?.isUnlocked, currentSeason, showCommunigories]);
             
             useEffect(() => {
                 const handleVisibilityChange = () => {
@@ -6354,11 +6357,11 @@
                     {showImposterVoteNotification && <ImposterVoteNotificationModal onClose={() => setShowImposterVoteNotification(false)} />}
                     {showExitConfirmModal && <ExitLobbyConfirmModal onConfirm={() => { setShowExitConfirmModal(false); handleBackToHome(); }} onCancel={() => setShowExitConfirmModal(false)} />}
                     
-                    {showCommunigories && (
-                        <div className="fixed inset-0 z-[150] bg-[#020617]">
-                            <iframe src="/communigories" className="w-full h-full border-none block" title="Communigories" />
-                        </div>
-                    )}
+                    <div 
+                        className={`fixed inset-0 bg-[#020617] transition-opacity duration-300 ease-in-out ${showCommunigories ? 'opacity-100 pointer-events-auto z-[150]' : 'opacity-0 pointer-events-none -z-50'}`}
+                    >
+                        <iframe src="/communigories" className="w-full h-full border-none block" title="Communigories" />
+                    </div>
                     
                     {renderContent()}
                 </div>
