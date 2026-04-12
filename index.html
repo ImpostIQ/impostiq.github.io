@@ -5500,8 +5500,30 @@
                         const previousData = latestLobbyData.current;
                         setLobbyData(data);
                         
-                        // Load custom category for guests if the lobby is using one
-                        if (data.customCategoryId && !customCategories[data.customCategoryId]) {
+                        // Load custom categories for guests so they can see icons and vote
+                        if (data.hostCustomCategories) {
+                            data.hostCustomCategories.forEach(catInfo => {
+                                if (!customCategories[catInfo.name]) {
+                                    CATEGORY_ICONS[catInfo.name] = catInfo.icon;
+                                    setCustomCategories(prev => ({...prev, [catInfo.name]: catInfo.icon}));
+                                    
+                                    commDb.collection('communigories').doc(catInfo.id).get().then(docSnap => {
+                                        if (docSnap.exists) {
+                                            const catData = docSnap.data();
+                                            setWordBank(prev => ({...prev, [catData.name]: catData.words}));
+                                            
+                                            // Automatically save to guest's local device so they keep the category!
+                                            try {
+                                                const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
+                                                savedComms[catInfo.id] = { id: catInfo.id, name: catData.name, icon: catData.icon, words: catData.words };
+                                                localStorage.setItem('saved_communigories', JSON.stringify(savedComms));
+                                            } catch(e) {}
+                                        }
+                                    }).catch(err => console.error("Failed to sync custom category:", err));
+                                }
+                            });
+                        } else if (data.customCategoryId && !customCategories[data.customCategoryId]) {
+                            // Legacy fallback for old active lobbies
                             commDb.collection('communigories').doc(data.customCategoryId).get().then(docSnap => {
                                 if (docSnap.exists) {
                                     const catData = docSnap.data();
@@ -5782,12 +5804,17 @@
                 const expiryDate = new Date();
                 expiryDate.setDate(expiryDate.getDate() + 1);
                 
-                const params = new URLSearchParams(window.location.search);
-                const commId = params.get('communigory');
+                // Share all of the host's locally saved custom categories with the lobby
+                const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
+                const hostCustomCategories = Object.values(savedComms).map(cat => ({
+                    id: cat.id,
+                    name: cat.name,
+                    icon: cat.icon
+                }));
 
                 await lobbyRef.set({
                     hostId: user.uid, password: newPassword, category: 'Mystery Mode',
-                    customCategoryId: (commId && commId !== 'open') ? commId : null,
+                    hostCustomCategories: hostCustomCategories,
                     isRandomMode: true, speakCategory: false, gameState: 'waiting',
                     isFakeWordMode: false,
                     enableTwoImposters: false, notifyImposterOnVote: false,
