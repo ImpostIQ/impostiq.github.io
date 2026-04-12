@@ -2364,7 +2364,7 @@
                                         const isTurnOrder = lobbyData.gameState === 'reveal';
 
                                         return (
-                                            <div key={p.id} className={`flex items-center gap-3 px-4 py-3 min-h-[52px] rounded-xl border transition-all ${p.id === user.uid ? 'bg-white/10 border-white/10 shadow-sm' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
+                                            <div key={p.id} className={`flex items-center gap-3 px-4 h-[58px] rounded-xl border transition-all ${p.id === user.uid ? 'bg-white/10 border-transparent shadow-sm' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
                                                 {isTurnOrder ? (
                                                     <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-brand-500/20 text-brand-400 font-mono font-bold text-sm rounded-lg border border-brand-500/20">
                                                         {index + 1}
