@@ -127,6 +127,18 @@
     <style>
         * { -webkit-tap-highlight-color: transparent; }
         *:focus { outline: none !important; }
+        
+        input, textarea {
+            caret-color: #8b5cf6; 
+        }
+        ::selection {
+            background: rgba(139, 92, 246, 0.4);
+            color: #ffffff;
+        }
+        ::-moz-selection {
+            background: rgba(139, 92, 246, 0.4);
+            color: #ffffff;
+        }
         html, body { position: fixed; inset: 0; overflow: hidden; background-color: #020617; color: #f8fafc; touch-action: none; user-select: none; -webkit-user-select: none; }
         img { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; pointer-events: none; }
         
