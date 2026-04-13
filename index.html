@@ -1370,7 +1370,7 @@
                         <button onClick={() => window.open("https://discord.gg/m9WrJxGKtr", "_blank")} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
                             <FaIcon name="icon-discord" className="" />
                         </button>
-                        <button onClick={() => { audioManager.playSound('uiClick'); onShowCommunigories(); }} className="relative w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all group">
+                        <button onClick={() => { audioManager.playSound('uiClick'); audioManager.playMusic('communigoriesMusic'); onShowCommunigories(); }} className="relative w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all group">
                             <FaIcon name="icon-layers" className="" />
                             <div className="absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
                                 Discover Custom Categories
@@ -5046,6 +5046,7 @@
             essentialAudioUrls.add(AUDIO_URLS.cardFlip);
             essentialAudioUrls.add(AUDIO_URLS.startMission);
             essentialAudioUrls.add(AUDIO_URLS.mainMenuMusic);
+			essentialAudioUrls.add(AUDIO_URLS.communigoriesMusic);
             
             const imagePromises = Array.from(imageUrls).map(src => {
                 return new Promise(resolve => {
@@ -5197,9 +5198,11 @@
 
             useEffect(() => {
                 const handleMessage = (event) => {
-                    // Listen for the iframe telling us to close
                     if (event.data === 'CLOSE_COMMUNIGORIES') {
                         setShowCommunigories(false);
+                        if (audioManagerRef.current) {
+                            audioManagerRef.current.playMusic(currentSeason === 'christmas' ? 'christmasMainMenuMusic' : (currentSeason === 'halloween' ? 'halloweenMainMenuMusic' : 'mainMenuMusic'));
+                        }
                         // Refresh local categories instantly so new downloads show up
                         window.dispatchEvent(new Event('storage'));
                     }
