@@ -1277,34 +1277,45 @@
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="grid grid-cols-2 gap-4">
-                                                {displayedCategories.slice(0, 250).map(cat => (
-                                                    <button 
-                                                        key={cat.id} 
-                                                        onClick={() => { playSound('openInfo'); setSelectedCategory(cat); }}
-                                                        className="relative overflow-hidden flex flex-col items-center rounded-[1.5rem] transition-transform duration-200 group min-h-[130px] border bg-slate-800/40 border-white/5 hover:bg-white/5 hover:border-white/10 backdrop-blur-md active:scale-95"
-                                                    >
-                                                        {!cat.isPrivate && (
-                                                            <div className="w-full text-center py-2 bg-black/50 border-b border-white/5">
-                                                                <div className="flex justify-center items-center gap-4 text-[10px] font-bold text-white/60 tracking-wider">
-                                                                    <span className="flex items-center gap-1.5"><FaIcon name="icon-fire" className="text-white/60" /> {cat.downloads || 0}</span>
-                                                                    <span className="flex items-center gap-1.5"><FaIcon name="icon-pen" className="text-white/60" /> {cat.edits || 0}</span>
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                        
-                                                        <div className="relative flex-1 w-full flex flex-col items-center justify-center gap-3 p-4">
-                                                            {cat.isPrivate && (
-                                                                <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm p-1.5 rounded-md text-[10px] font-bold text-white/50 flex items-center shadow-sm border border-white/10 z-20">
-                                                                    <FaIcon name="icon-lock" className="text-[10px]" />
+                                            <>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    {displayedCategories.slice(0, 200).map(cat => (
+                                                        <button 
+                                                            key={cat.id} 
+                                                            onClick={() => { playSound('openInfo'); setSelectedCategory(cat); }}
+                                                            className="relative overflow-hidden flex flex-col items-center rounded-[1.5rem] transition-transform duration-200 group min-h-[130px] border bg-slate-800/40 border-white/5 hover:bg-white/5 hover:border-white/10 backdrop-blur-md active:scale-95"
+                                                        >
+                                                            {!cat.isPrivate && (
+                                                                <div className="w-full text-center py-2 bg-black/50 border-b border-white/5">
+                                                                    <div className="flex justify-center items-center gap-4 text-[10px] font-bold text-white/60 tracking-wider">
+                                                                        <span className="flex items-center gap-1.5"><FaIcon name="icon-fire" className="text-white/60" /> {cat.downloads || 0}</span>
+                                                                        <span className="flex items-center gap-1.5"><FaIcon name="icon-pen" className="text-white/60" /> {cat.edits || 0}</span>
+                                                                    </div>
                                                                 </div>
                                                             )}
-                                                            <img src={cat.icon} className="w-10 h-10 transition-transform duration-300 drop-shadow-md opacity-60 group-hover:opacity-100 group-hover:scale-110" alt="" draggable="false" />
-                                                            <span className="text-xs font-bold tracking-wide text-white text-center leading-tight">{cat.name}</span>
+                                                            
+                                                            <div className="relative flex-1 w-full flex flex-col items-center justify-center gap-3 p-4">
+                                                                {cat.isPrivate && (
+                                                                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm p-1.5 rounded-md text-[10px] font-bold text-white/50 flex items-center shadow-sm border border-white/10 z-20">
+                                                                        <FaIcon name="icon-lock" className="text-[10px]" />
+                                                                    </div>
+                                                                )}
+                                                                <img src={cat.icon} className="w-10 h-10 transition-transform duration-300 drop-shadow-md opacity-60 group-hover:opacity-100 group-hover:scale-110" alt="" draggable="false" />
+                                                                <span className="text-xs font-bold tracking-wide text-white text-center leading-tight">{cat.name}</span>
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                {displayedCategories.length > 250 && (
+                                                    <div className="mt-8 mb-4 text-center animate-fadeIn">
+                                                        <div className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/5 shadow-sm">
+                                                            <span className="text-white/50 text-[11px] font-bold tracking-wide">
+                                                                Showing 250 of {displayedCategories.length} • Search to refine
+                                                            </span>
                                                         </div>
-                                                    </button>
-                                                ))}
-                                            </div>
+                                                    </div>
+                                                )}
+                                            </>
                                         )}
                                     </div>
                                 )}
