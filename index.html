@@ -5145,7 +5145,10 @@
                                         savedComms[commId] = { id: commId, name: data.name, icon: data.icon, words: data.words, useLocal: true, useOnline: true };
                                         localStorage.setItem('saved_communigories', JSON.stringify(savedComms));
                                         
-                                        const downloaded = JSON.parse(localStorage.getItem('downloaded_tracker') || '[]');
+                                        let downloaded = [];
+                                        try { downloaded = JSON.parse(localStorage.getItem('downloaded_tracker') || '[]'); } catch(e){}
+                                        if (!Array.isArray(downloaded)) downloaded = [];
+                                        
                                         if (!downloaded.includes(commId)) {
                                             downloaded.push(commId);
                                             localStorage.setItem('downloaded_tracker', JSON.stringify(downloaded));
