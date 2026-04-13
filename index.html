@@ -6363,13 +6363,19 @@
                     {showImposterVoteNotification && <ImposterVoteNotificationModal onClose={() => setShowImposterVoteNotification(false)} />}
                     {showExitConfirmModal && <ExitLobbyConfirmModal onConfirm={() => { setShowExitConfirmModal(false); handleBackToHome(); }} onCancel={() => setShowExitConfirmModal(false)} />}
                     
+                    {showCommunigories && (
+                        <style>{`.blob, .liquid-blob, .animate-pulse-slow, .animate-float { animation-play-state: paused !important; visibility: hidden !important; }`}</style>
+                    )}
+
                     <div 
                         className={`fixed inset-0 bg-[#020617] z-[150] ${showCommunigories ? 'block' : 'hidden'}`}
                     >
                         <iframe src="/communigories" className="w-full h-full border-none block" title="Communigories" />
                     </div>
                     
-                    {renderContent()}
+                    <div className={showCommunigories ? "hidden" : ""} style={{ height: '100%', width: '100%' }}>
+                        {renderContent()}
+                    </div>
                 </div>
             );
         };
