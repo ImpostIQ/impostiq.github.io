@@ -212,6 +212,18 @@
             outline: none !important;
         }
 
+        input, textarea {
+            caret-color: #8b5cf6; 
+        }
+        ::selection {
+            background: rgba(139, 92, 246, 0.4);
+            color: #ffffff;
+        }
+        ::-moz-selection {
+            background: rgba(139, 92, 246, 0.4);
+            color: #ffffff;
+        }
+
 		html, body {
             position: fixed;
             inset: 0;
@@ -4045,10 +4057,19 @@
                                 lastShakeTime = currentTime;
                                 
                                 if (shakeCount >= 6 && !isDizzy) {
-                                    setIsDizzy(true);
-                                    if (navigator.vibrate) navigator.vibrate([50, 50, 50, 50, 100]);
-                                    window.removeEventListener('devicemotion', handleMotion);
-                                }
+									setIsDizzy(true);
+									
+									if (navigator.vibrate) {
+										navigator.vibrate([
+											30, 40, 30, 40, 30, 40,  
+											60, 60, 80, 80,          
+											120, 100, 200, 150,      
+											400                      
+										]);
+									}
+									
+									window.removeEventListener('devicemotion', handleMotion);
+								}
                             }
                         }
                     }
