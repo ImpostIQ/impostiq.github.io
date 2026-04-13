@@ -763,13 +763,18 @@
                             results = [...onlineData, ...savedData];
                         }
                     } else {
-                        let query = db.collection('communigories');
-                        if (filterToFetch === 'trending') query = query.orderBy('downloads', 'desc');
-                        else if (filterToFetch === 'newest') query = query.orderBy('createdAt', 'desc');
+						let query = db.collection('communigories')
+							.where('isPrivate', '==', false)
+							.limit(500)
 
-                        const snapshot = await query.get();
-                        results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        results = results.filter(cat => !cat.isPrivate);
+						if (filterToFetch === 'trending') {
+							query = query.orderBy('downloads', 'desc');
+						} else if (filterToFetch === 'newest') {
+							query = query.orderBy('createdAt', 'desc');
+						}
+
+						const snapshot = await query.get();
+						results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     }
                     
                     // Race condition check: If user switched tabs while fetching, discard these results!
@@ -1279,7 +1284,7 @@
                                         ) : (
                                             <>
                                                 <div className="grid grid-cols-2 gap-4">
-                                                    {displayedCategories.slice(0, 200).map(cat => (
+                                                    {displayedCategories.map(cat => (
                                                         <button 
                                                             key={cat.id} 
                                                             onClick={() => { playSound('openInfo'); setSelectedCategory(cat); }}
@@ -1306,15 +1311,15 @@
                                                         </button>
                                                     ))}
                                                 </div>
-                                                {displayedCategories.length > 200 && (
-                                                    <div className="mt-8 mb-4 text-center animate-fadeIn">
-                                                        <div className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/5 shadow-sm">
-                                                            <span className="text-white/50 text-[11px] font-bold tracking-wide">
-                                                                Showing 200 of {displayedCategories.length} • Search to refine
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                {displayedCategories.length >= 500 && (
+													<div className="mt-8 mb-4 text-center animate-fadeIn">
+														<div className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 shadow-sm">
+															<span className="text-white/50 text-[11px] font-bold tracking-wide">
+																Showing the top 500 results. Use search to find specific categories.
+															</span>
+														</div>
+													</div>
+												)}
                                             </>
                                         )}
                                     </div>
