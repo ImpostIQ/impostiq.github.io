@@ -2536,7 +2536,7 @@
 
                                         <Tooltip
 											className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all ${(!isHost || isCustomCategoryLeading) ? 'opacity-50' : ''}`}
-											text={isCustomCategoryLeading ? "Voice lines are unavailable for custom categories" : (!isHost ? "Only the host can change settings" : "")}
+											text={!isHost ? "Only the host can change settings" : (isCustomCategoryLeading ? customCategoryWarning : "")}
 										    isDisabled={!isHost || isCustomCategoryLeading}
 										>
 											<div className="flex items-center gap-4 pr-4">
