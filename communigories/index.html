@@ -1195,7 +1195,7 @@
                                             </div>
 
                                             <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors pr-4 relative z-10">
-                                                <input type="text" maxLength="25" placeholder="Category Name" value={newCatName} onChange={e => {setNewCatName(e.target.value); setError('');}}
+                                                <input type="text" maxLength="25" placeholder="Category Name" value={newCatName} onChange={e => {setNewCatName(e.target.value.slice(0, 25)); setError('');}}
                                                     className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
                                                 />
                                                 <span className="text-xs font-bold text-white/30 tracking-wider">{newCatName.length}/25</span>
