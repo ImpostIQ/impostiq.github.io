@@ -3584,13 +3584,20 @@
 
             const holdTimerRef = useRef(null);
             const holdSpeedRef = useRef(300);
+            const lastPressTimeRef = useRef(0);
+
+            const stopTimerHold = () => {
+                if (holdTimerRef.current) {
+                    clearTimeout(holdTimerRef.current);
+                    holdTimerRef.current = null;
+                }
+            };
 
             const handleTimerChange = (increment) => {
                 setTimerMinutes(prev => {
                     const next = prev + increment;
                     const boundedNext = increment > 0 ? Math.min(15, next) : Math.max(1, next);
                     
-                    // Only play sound and vibrate if the value actually changed
                     if (prev !== boundedNext) {
                         if (audioManager) audioManager.playSound('uiClick');
                         if (navigator.vibrate) navigator.vibrate(5);
@@ -3601,24 +3608,23 @@
             };
 
             const startTimerHold = (increment) => {
-                handleTimerChange(increment); // Initial immediate click
-                holdSpeedRef.current = 400; // Start delay
+                const now = Date.now();
+                // Block simulated mouse events that follow touch events by a few milliseconds
+                if (now - lastPressTimeRef.current < 100) return;
+                lastPressTimeRef.current = now;
+
+                stopTimerHold(); // CRITICAL: Unconditionally kill any rogue timers
+                
+                handleTimerChange(increment); 
+                holdSpeedRef.current = 400; 
                 
                 const tick = () => {
                     handleTimerChange(increment);
-                    // Accelerate by reducing delay (minimum 70ms limit)
                     holdSpeedRef.current = Math.max(70, holdSpeedRef.current * 0.8);
                     holdTimerRef.current = setTimeout(tick, holdSpeedRef.current);
                 };
                 
                 holdTimerRef.current = setTimeout(tick, holdSpeedRef.current);
-            };
-
-            const stopTimerHold = () => {
-                if (holdTimerRef.current) {
-                    clearTimeout(holdTimerRef.current);
-                    holdTimerRef.current = null;
-                }
             };
 
             useEffect(() => {
@@ -4004,6 +4010,7 @@
                                             </div>
                                             <button 
                                                 onClick={() => {
+                                                    stopTimerHold(); // Kill any stuck timer holds
                                                     setTimerEnabled(!timerEnabled);
                                                     audioManager.playSound(!timerEnabled ? 'switchOn' : 'switchOff');
                                                     if(navigator.vibrate) navigator.vibrate(10);
@@ -4019,9 +4026,11 @@
                                                     onMouseDown={() => startTimerHold(-1)}
                                                     onMouseUp={stopTimerHold}
                                                     onMouseLeave={stopTimerHold}
-                                                    onTouchStart={(e) => { e.preventDefault(); startTimerHold(-1); }}
-                                                    onTouchEnd={(e) => { e.preventDefault(); stopTimerHold(); }}
+                                                    onTouchStart={(e) => { e.preventDefault(); e.stopPropagation(); startTimerHold(-1); }}
+                                                    onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); stopTimerHold(); }}
                                                     onTouchCancel={stopTimerHold}
+                                                    onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); return false; }}
+                                                    style={{ WebkitTouchCallout: 'none' }}
                                                     className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white select-none touch-none"
                                                 >
                                                     <FaIcon name="icon-minus" className="pointer-events-none" />
@@ -4034,9 +4043,11 @@
                                                     onMouseDown={() => startTimerHold(1)}
                                                     onMouseUp={stopTimerHold}
                                                     onMouseLeave={stopTimerHold}
-                                                    onTouchStart={(e) => { e.preventDefault(); startTimerHold(1); }}
-                                                    onTouchEnd={(e) => { e.preventDefault(); stopTimerHold(); }}
+                                                    onTouchStart={(e) => { e.preventDefault(); e.stopPropagation(); startTimerHold(1); }}
+                                                    onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); stopTimerHold(); }}
                                                     onTouchCancel={stopTimerHold}
+                                                    onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); return false; }}
+                                                    style={{ WebkitTouchCallout: 'none' }}
                                                     className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-white/70 hover:text-white select-none touch-none"
                                                 >
                                                     <FaIcon name="icon-plus" className="pointer-events-none" />
