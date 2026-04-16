@@ -3584,14 +3584,7 @@
 
             const holdTimerRef = useRef(null);
             const holdSpeedRef = useRef(300);
-            const lastPressTimeRef = useRef(0);
-
-            const stopTimerHold = () => {
-                if (holdTimerRef.current) {
-                    clearTimeout(holdTimerRef.current);
-                    holdTimerRef.current = null;
-                }
-            };
+            const isHoldingRef = useRef(false); // The new "kill switch" flag
 
             const handleTimerChange = (increment) => {
                 setTimerMinutes(prev => {
@@ -3607,18 +3600,25 @@
                 });
             };
 
-            const startTimerHold = (increment) => {
-                const now = Date.now();
-                // Block simulated mouse events that follow touch events by a few milliseconds
-                if (now - lastPressTimeRef.current < 100) return;
-                lastPressTimeRef.current = now;
+            const stopTimerHold = () => {
+                isHoldingRef.current = false; // De-authorize ALL running loops
+                if (holdTimerRef.current) {
+                    clearTimeout(holdTimerRef.current);
+                    holdTimerRef.current = null;
+                }
+            };
 
-                stopTimerHold(); // CRITICAL: Unconditionally kill any rogue timers
+            const startTimerHold = (increment) => {
+                stopTimerHold(); // Kill any and all previous loops unconditionally
+                isHoldingRef.current = true; // Authorize the NEW loop to run
                 
                 handleTimerChange(increment); 
                 holdSpeedRef.current = 400; 
                 
                 const tick = () => {
+                    // This check is the crucial fix. Ghost loops will fail this check and die.
+                    if (!isHoldingRef.current) return;
+                    
                     handleTimerChange(increment);
                     holdSpeedRef.current = Math.max(70, holdSpeedRef.current * 0.8);
                     holdTimerRef.current = setTimeout(tick, holdSpeedRef.current);
