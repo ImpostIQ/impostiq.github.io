@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Communigories • Impostiq</title>
-    <meta name="description" content="Discover and share custom user-generated word categories for Impostiq. Browse hundreds of unique community packs or create your own to play with friends online and locally!">
+    <meta name="description" content="Communigories is a feature of the social deduction game Impostiq. Discover, share, and download custom user-generated word categories to play with friends online and locally!">
     <meta property="og:site_name" content="Impostiq">
     <meta name="apple-mobile-web-app-title" content="Impostiq">
     
     <meta property="og:title" content="Communigories • Impostiq" />
-    <meta property="og:description" content="Explore custom user-generated categories for Impostiq! Upload your own or find the perfect word bank for your next game." />
+    <meta property="og:description" content="Communigories is a feature of the social deduction game Impostiq. Discover, share, and download custom user-generated word categories to play with friends!" />
     <meta property="og:url" content="https://impostiq.github.io/communigories" />
-    <meta property="og:image" id="og-image" content="https://impostiq.github.io/imageicon1024.png" />
+	
+    <meta name="thumbnail" content="https://impostiq.github.io/displayimage512.png" />
+    
+    <meta property="og:image" id="og-image" content="https://impostiq.github.io/ogimage.png" />
     <meta property="og:type" content="website" />
     
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Communigories • Impostiq" />
-    <meta name="twitter:description" content="Explore custom user-generated categories for Impostiq! Upload your own or find the perfect word bank for your next game." />
-    <meta name="twitter:image" id="twitter-image" content="https://impostiq.github.io/imageicon1024.png" />
+    <meta name="twitter:description" content="Communigories is a feature of the social deduction game Impostiq. Discover, share, and download custom user-generated word categories to play with friends!" />
+    <meta name="twitter:image" id="twitter-image" content="https://impostiq.github.io/ogimage.png" />
 
     <script type="application/ld+json">
     [
@@ -25,14 +28,22 @@
         "@context": "https://schema.org",
         "@type": "WebPage",
         "name": "Communigories • Impostiq",
-        "description": "The community vault for Impostiq. Discover, share, and play custom user-generated categories for the ultimate social deduction game.",
-        "url": "https://impostiq.github.io/communigories"
+        "description": "Communigories is a built-in feature of the social deduction game Impostiq. Discover, share, and download custom user-generated word categories.",
+        "url": "https://impostiq.github.io/communigories",
+        "image": "https://impostiq.github.io/displayimage512.png",
+        "isPartOf": {
+          "@type": "VideoGame",
+          "name": "Impostiq",
+          "url": "https://impostiq.github.io"
+        }
       }
     ]
     </script>
     
+    <link rel="icon" href="https://impostiq.github.io/imageicon1024.png" sizes="any">
+    
     <link rel="icon" href="https://impostiq.github.io/favicon192.png" sizes="192x192" type="image/png">
-	<link rel="apple-touch-icon" href="https://impostiq.github.io/favicon.png">
+	<link rel="apple-touch-icon" href="https://impostiq.github.io/favicon192.png">
 
 	<script>
 		if (window.location.pathname.endsWith('/') && window.location.pathname.length > 1) {
@@ -179,6 +190,10 @@
     </style>
 </head>
 <body>
+    <noscript>
+        <h1>Communigories • Impostiq</h1>
+        <p>Communigories is a built-in feature and community vault for the social deduction game Impostiq. It is not a separate game. Players can use this section to discover, share, and download custom user-generated word categories to use in their Impostiq matches. Browse hundreds of unique community packs or create your own to play with friends online and locally!</p>
+    </noscript>
     <div class="fixed inset-0 bg-[#020617] -z-10"></div>
     <div class="absolute inset-0 pointer-events-none z-0">
         <div class="blob bg-brand-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
@@ -1268,7 +1283,7 @@
                                                 ))}
                                             </div>
                                         ) : displayedCategories.length === 0 ? (
-                                            <div className="text-center py-20 flex flex-col items-center justify-center animate-fade-in">
+                                            <div className="text-center py-20 flex flex-col items-center justify-center animate-fade-in" data-nosnippet="true">
                                                 <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-white/10 shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]">
                                                     <FaIcon name={emptyIcon} className="text-white/30 text-4xl" />
                                                 </div>
