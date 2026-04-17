@@ -248,6 +248,7 @@
             "icon-search": props => <svg viewBox="0 0 550 550" width="1.3em" {...props}><path fill="currentColor" d="M504.352,459.061l-99.435-99.477c74.402-99.427,54.115-240.344-45.312-314.746S119.261-9.277,44.859,90.15S-9.256,330.494,90.171,404.896c79.868,59.766,189.565,59.766,269.434,0l99.477,99.477c12.501,12.501,32.769,12.501,45.269,0c12.501-12.501,12.501-32.769,0-45.269L504.352,459.061zM225.717,385.696c-88.366,0-160-71.634-160-160s71.634-160,160-160s160,71.634,160,160C385.623,314.022,314.044,385.602,225.717,385.696z"/></svg>,
             "icon-no-results": props => <svg viewBox="0 0 560 520" width="1.3em" {...props}><path fill="currentColor" d="M504.352,459.061l-99.435-99.477c74.402-99.427,54.115-240.344-45.312-314.746S119.261-9.277,44.859,90.15S-9.256,330.494,90.171,404.896c79.868,59.766,189.565,59.766,269.434,0l99.477,99.477c12.501,12.501,32.769,12.501,45.269,0c12.501-12.501,12.501-32.769,0-45.269L504.352,459.061zM225.717,385.696c-88.366,0-160-71.634-160-160s71.634-160,160-160s160,71.634,160,160C385.623,314.022,314.044,385.602,225.717,385.696z"/></svg>,
             "icon-chevron-left": props => <svg viewBox="0 0 25 25" width="1.3em" {...props}><path fill="currentColor" d="M10.957,12.354a.5.5,0,0,1,0-.708l4.586-4.585a1.5,1.5,0,0,0-2.121-2.122L8.836,9.525a3.505,3.505,0,0,0,0,4.95l4.586,4.586a1.5,1.5,0,0,0,2.121-2.122Z"/></svg>,
+            "icon-chevron-up": props => <svg viewBox="0.2 1 24 24" width="1.3em" {...props}><path fill="currentColor" d="M18.061,9.525,14.475,5.939a3.585,3.585,0,0,0-4.95,0L5.939,9.525a1.5,1.5,0,0,0,2.122,2.121L10.5,9.207V19a1.5,1.5,0,0,0,3,0V9.207l2.439,2.439a1.5,1.5,0,0,0,2.122-2.121Z"/></svg>,
             "icon-circle-exclamation": props => <svg viewBox="0 0 540 510" width="1em" {...props}><path fill="currentColor" d="M256,512c141.385,0,256-114.615,256-256S397.385,0,256,0S0,114.615,0,256C0.153,397.322,114.678,511.847,256,512zM234.667,128c0-11.782,9.551-21.333,21.333-21.333c11.782,0,21.333,9.551,21.333,21.333v170.667c0,11.782-9.551,21.333-21.333,21.333c-11.782,0-21.333-9.551-21.333-21.333V128zM256,384c11.782,0,21.333,9.551,21.333,21.333s-9.551,21.333-21.333,21.333c-11.782,0-21.333-9.551-21.333-21.333S244.218,384,256,384z"/></svg>,
             "icon-check-circle": props => <svg viewBox="0 0 24 24" width="1em" {...props}><path fill="currentColor" d="m12,0C5.383,0,0,5.383,0,12s5.383,12,12,12,12-5.383,12-12S18.617,0,12,0Zm6.2,10.512l-4.426,4.345c-.783.768-1.791,1.151-2.8,1.151-.998,0-1.996-.376-2.776-1.129l-1.899-1.867c-.394-.387-.399-1.02-.012-1.414.386-.395,1.021-.4,1.414-.012l1.893,1.861c.776.75,2.001.746,2.781-.018l4.425-4.344c.393-.388,1.024-.381,1.414.013.387.394.381,1.027-.014,1.414Z"/></svg>,
             "icon-pen": props => <svg viewBox="0 0 24 24" width="1.1em" {...props}><path fill="currentColor" d="m23.707,8.707l-2.293,2.293L13,2.586,15.293.293c.391-.391,1.023-.391,1.414,0l7,7c.391.391.391,1.023,0,1.414ZM11.19,3.604l-4.605,1.703c-1.488.551-2.637,1.791-3.073,3.317L.111,20.545c-.18.612-.134,1.254.109,1.821l7.848-7.848c-.044-.165-.068-.339-.068-.518,0-1.105.895-2,2-2s2,.895,2,2-.895,2-2,2c-.179,0-.353-.024-.518-.068l-7.848,7.848c.335.144.696.219,1.061.219.251,0,.504-.035.751-.108l11.884-3.377c1.521-.432,2.76-1.574,3.315-3.054l1.746-4.655L11.19,3.604Z"/></svg>,
@@ -667,6 +668,24 @@
             const [confirmDelete, setConfirmDelete] = useState(null);
             const [selectedCategory, setSelectedCategory] = useState(null);
             const [shareData, setShareData] = useState(null);
+
+            const [showScrollTop, setShowScrollTop] = useState(false);
+            const scrollContainerRef = useRef(null);
+
+            const handleScroll = (e) => {
+                if (e.target.scrollTop > 300) {
+                    setShowScrollTop(true);
+                } else {
+                    setShowScrollTop(false);
+                }
+            };
+
+            const scrollToTop = () => {
+                if (scrollContainerRef.current) {
+                    scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                playSound('uiClick');
+            };
 
             // --- AUDIO & MUTE SYNC ---
             const AUDIO_URLS = {
@@ -1139,7 +1158,11 @@
                             )}
                         </div>
 
-                        <div className={`flex-1 overflow-y-auto no-scrollbar ${activeView === 'upload' ? 'pb-32' : 'pb-10'}`}>
+                        <div 
+                            ref={scrollContainerRef}
+                            onScroll={handleScroll}
+                            className={`flex-1 overflow-y-auto no-scrollbar ${activeView === 'upload' ? 'pb-32' : 'pb-10'}`}
+                        >
                             <div className="max-w-lg mx-auto p-6 pt-28">
                                 
                                 <div className="mb-8 text-center">
@@ -1353,6 +1376,14 @@
                                 )}
                             </div>
                         </div>
+
+                        {/* Scroll to Top Button */}
+                        <button 
+                            onClick={scrollToTop}
+                            className={`fixed right-6 z-40 w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all duration-300 shadow-md ${showScrollTop ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-10 pointer-events-none'} ${activeView === 'upload' ? 'bottom-[100px]' : 'bottom-6'}`}
+                        >
+                            <FaIcon name="icon-chevron-up" className="text-xl" />
+                        </button>
 
                         {/* Fixed Bottom Bar - Upload Button */}
                         {activeView === 'upload' && (
