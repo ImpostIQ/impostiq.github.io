@@ -21,7 +21,7 @@
         "@context": "https://schema.org",
         "@type": "VideoGame",
         "name": "Impostiq • Find the Spy",
-        "image": "https://impostiq.github.io/imageicon1024.png",
+        "image": "https://impostiq.github.io/displayimage512.png",
         "alternateName": ["Impostic", "Impostick", "Find the Spy", "Impostiq Online", "Imposter Online", "Imposter", "Agent vs Imposter"],
         "applicationCategory": "Game",
         "operatingSystem": "Web",
@@ -43,15 +43,15 @@
     <meta property="og:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
     
     <meta property="og:url" content="https://impostiq.github.io" />
-    <meta name="thumbnail" content="https://impostiq.github.io/imageicon1024.png" />
-    
-    <!-- FORTIFIED IMAGE TAGS -->
-    <link rel="image_src" href="https://impostiq.github.io/imageicon1024.png" />
+    <meta name="thumbnail" content="https://impostiq.github.io/displayimage512.png" />
+
+	<!-- FORTIFIED IMAGE TAGS -->
+	<link rel="image_src" href="https://impostiq.github.io/displayimage512.png" />
     <meta property="og:image" id="og-image" content="https://impostiq.github.io/ogimage.png" />
     <meta property="og:image:secure_url" content="https://impostiq.github.io/ogimage.png" />
     <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1024" />
-    <meta property="og:image:height" content="1024" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Impostiq Game Logo" />
     
     <meta property="og:type" content="website" />
@@ -1767,13 +1767,6 @@
                 }
             );
 
-            let iconUrl = "https://impostiq.github.io/imageicon1024.png";
-            if (season === 'christmas') {
-                iconUrl = "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Snowman-3d-icon.png";
-            } else if (season === 'halloween') {
-                iconUrl = "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Jack-O-Lantern-3d-icon.png";
-            }
-
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
                     <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
@@ -1788,7 +1781,7 @@
 
                         {/* Minimal Preview Box */}
                         <div className="bg-white/5 border border-white/10 rounded-xl p-3 mb-5 flex gap-3 items-center">
-                            <img src={iconUrl} alt="Icon" className="w-10 h-10 rounded-lg flex-shrink-0 bg-black/20" />
+                            <img src={"https://impostiq.github.io/displayimage512.png"} alt="Icon" className="w-10 h-10 rounded-lg flex-shrink-0 bg-black/20" />
                             <div className="flex flex-col min-w-0">
                                 <h3 className="text-white font-bold text-sm truncate">{shareData.title}</h3>
                                 <p className="text-white/40 text-[10px] truncate">{shareData.text}</p>
