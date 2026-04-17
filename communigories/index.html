@@ -68,7 +68,7 @@
                 halloween: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Jack-O-Lantern-3d-icon.png"
             };
             if (images[season]) {
-                const favicon = document.querySelector('link[rel="icon"]');
+                const favicon = document.getElementById('browser-favicon');
                 if (favicon) {
                     favicon.href = images[season];
                     document.head.removeChild(favicon);
