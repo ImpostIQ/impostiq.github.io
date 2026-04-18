@@ -418,6 +418,19 @@
             50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; }
             100% { stroke-dasharray: 90, 200; stroke-dashoffset: -124px; }
         }
+
+        @keyframes typing-dot {
+            0%, 100% { opacity: 0.3; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .typing-dot-1, .typing-dot-2, .typing-dot-3 {
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+        .typing-dot-1 { animation: typing-dot 1.4s infinite ease-in-out both; }
+        .typing-dot-2 { animation: typing-dot 1.4s infinite ease-in-out 0.2s both; }
+        .typing-dot-3 { animation: typing-dot 1.4s infinite ease-in-out 0.4s both; }
+    </style>
     </style>
     
     <script>
@@ -2144,9 +2157,15 @@
             const pollIsActive = lobbyData.gameState === 'reveal' && lobbyPlayers.some(p => p.status === 'confused');
             
             const readyPlayersCount = lobbyData.gameState === 'reveal' ? lobbyPlayers.filter(p => {
-                const isImposter = lobbyData.imposterIds?.includes(p.id);
-                const needsToVote = lobbyData.isFakeWordMode ? true : !isImposter;
-                return p.hasSeenCard && (!pollIsActive || !needsToVote || p.status);
+                if (!p.hasSeenCard) return false;
+                if (!pollIsActive) return true;
+                
+                const isImposter = !lobbyData.isFakeWordMode && lobbyData.imposterIds?.includes(p.id);
+                const getsNotification = isImposter && lobbyData.notifyImposterOnVote;
+                const needsToRespond = !isImposter || getsNotification;
+                
+                if (needsToRespond) return !!p.status;
+                return true;
             }).length : 0;
 
             const allPlayersReady = lobbyData.gameState === 'reveal' && lobbyPlayers.length > 0 && readyPlayersCount === lobbyPlayers.length;
@@ -2155,6 +2174,14 @@
             const isMyRoleImposter = !lobbyData.isFakeWordMode && lobbyData.imposterIds?.includes(user.uid);
             
             const showConfusionPoll = lobbyData.gameState === 'reveal' && pollIsActive && !isMyRoleImposter && !me?.status;
+            const showImposterVoteNotification = lobbyData.gameState === 'reveal' && pollIsActive && isMyRoleImposter && lobbyData.notifyImposterOnVote && !me?.status;
+
+            const handleImposterDismiss = () => {
+                if (navigator.vibrate) navigator.vibrate(20);
+                audioManager.playSound('uiClick');
+                const targetDb = window.db || db;
+                targetDb.collection('lobbies').doc(lobbyId).collection('players').doc(user.uid).update({ status: 'dismissed' });
+            };
 
             useEffect(() => {
                 if (me?.categoryVote && me.categoryVote !== 'Mystery Mode' && !displayCategories.includes(me.categoryVote)) {
@@ -2310,6 +2337,7 @@
                         />
                     )}
                     {showConfusionPoll && <ConfusionPollModal onVote={onConfusionVote} />}
+                    {showImposterVoteNotification && <ImposterVoteNotificationModal onClose={handleImposterDismiss} />}
                     
                     <div className="absolute top-6 left-6 z-20">
                         {lobbyData.gameState === 'waiting' && (
@@ -2389,7 +2417,17 @@
                                         (lobbyData.gameState === 'reveal' && lobbyData.turnOrder ? lobbyData.turnOrder : lobbyPlayers).map((playerOrTurn, index) => {
                                             const p = lobbyPlayers.find(lp => lp.id === (playerOrTurn.id || playerOrTurn));
                                             if (!p) return null;
-                                            const hasAcknowledgedCard = !!p.hasSeenCard;
+                                            
+                                            let hasAcknowledgedCard = !!p.hasSeenCard;
+                                            if (lobbyData.gameState === 'reveal' && pollIsActive) {
+                                                const isThisPlayerImposter = !lobbyData.isFakeWordMode && lobbyData.imposterIds?.includes(p.id);
+                                                const getsNotification = isThisPlayerImposter && lobbyData.notifyImposterOnVote;
+                                                const needsToRespond = !isThisPlayerImposter || getsNotification;
+                                                if (needsToRespond) {
+                                                    hasAcknowledgedCard = !!p.status;
+                                                }
+                                            }
+                                            
                                             const isTurnOrder = lobbyData.gameState === 'reveal';
 
                                             return (
@@ -3044,10 +3082,12 @@
                 </svg>
             ), 
             "icon-ellipsis": (props) => (
-                <svg viewBox="0 0 512 512" width="1em" {...props}>
-                    <path fill="currentColor" d="M0 256a56 56 0 1 1 112 0 56 56 0 1 1-112 0zm168 0a56 56 0 1 1 112 0 56 56 0 1 1-112 0zm224-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
+                <svg viewBox="0 0 24 24" width="1.2em" {...props}>
+                    <circle cx="4" cy="12" r="3" fill="currentColor" className="typing-dot-1" />
+                    <circle cx="12" cy="12" r="3" fill="currentColor" className="typing-dot-2" />
+                    <circle cx="20" cy="12" r="3" fill="currentColor" className="typing-dot-3" />
                 </svg>
-            ), 
+            ),
             "icon-trash-can": (props) => (
                 <svg viewBox="0 0 512 512" width="0.8em" {...props}>
                     <path fill="currentColor" d="M490.667,96c0-17.673-14.327-32-32-32h-80.555C364.632,25.757,328.549,0.13,288,0h-64c-40.549,0.13-76.632,25.757-90.112,64H53.333c-17.673,0-32,14.327-32,32l0,0c0,17.673,14.327,32,32,32H64v266.667C64,459.468,116.532,512,181.333,512h149.333C395.468,512,448,459.468,448,394.667V128h10.667C476.34,128,490.667,113.673,490.667,96zM384,394.667C384,424.122,360.122,448,330.667,448H181.333C151.878,448,128,424.122,128,394.667V128h256V394.667zM202.667,384c17.673,0,32-14.327,32-32V224c0-17.673-14.327-32-32-32s-32,14.327-32,32v128C170.667,369.673,184.994,384,202.667,384zM309.333,384c17.673,0,32-14.327,32-32V224c0-17.673-14.327-32-32-32s-32,14.327-32,32v128C277.333,369.673,291.66,384,309.333,384z" />
@@ -5400,7 +5440,6 @@
             const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
             
             const [restartNotification, setRestartNotification] = useState(null);
-            const [showImposterVoteNotification, setShowImposterVoteNotification] = useState(false);
             const lastSeenRestartTimestampRef = useRef(0);
 
             const audioManagerRef = useRef(null);
@@ -5815,7 +5854,9 @@
                         }
                         
                         if (data.lastRestartReason && data.lastRestartReason.timestamp > lastSeenRestartTimestampRef.current) {
-                            setRestartNotification(data.lastRestartReason.word);
+                            if (previousData) {
+                                setRestartNotification(data.lastRestartReason.word);
+                            }
                             lastSeenRestartTimestampRef.current = data.lastRestartReason.timestamp;
                         }
                         
@@ -5852,14 +5893,6 @@
                         }
                     }
 
-                    if (currentLobbyDoc?.notifyImposterOnVote && !currentLobbyDoc?.isFakeWordMode && currentLobbyDoc.imposterIds?.includes(user.uid)) {
-                        const previouslyConfused = previousPlayersRef.current.some(p => p.status === 'confused');
-                        const nowConfused = newPlayers.some(p => p.status === 'confused');
-                        if (!previouslyConfused && nowConfused) {
-                            setShowImposterVoteNotification(true);
-                        }
-                    }
-                    
                     setLobbyPlayers(newPlayers);
                     previousPlayersRef.current = newPlayers;
                     
@@ -6520,7 +6553,6 @@
                         setLobbyClosedInfo(null);
                     }} />}
                     {restartNotification && <RestartNotificationModal word={restartNotification} onClose={() => setRestartNotification(null)} />}
-                    {showImposterVoteNotification && <ImposterVoteNotificationModal onClose={() => setShowImposterVoteNotification(false)} />}
                     {showExitConfirmModal && <ExitLobbyConfirmModal onConfirm={() => { setShowExitConfirmModal(false); handleBackToHome(); }} onCancel={() => setShowExitConfirmModal(false)} />}
                     
                     {showCommunigories && (
