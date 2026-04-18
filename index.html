@@ -4592,14 +4592,17 @@
             
             const isOnline = !!lobbyId;
             const endVotes = isOnline ? (lobbyPlayers || []).filter(p => p.votedToEnd).length : 0;
-            const requiredVotes = isOnline ? Math.ceil((lobbyPlayers || []).length / 2) : 1;
-            const hasVotedToEnd = isOnline ? !!(lobbyPlayers || []).find(p => p.id === user?.uid)?.votedToEnd : false;
+			const requiredVotes = isOnline ? Math.ceil((lobbyPlayers || []).length / 2) : 1;
+			const hasVotedToEnd = isOnline ? !!(lobbyPlayers || []).find(p => p.id === user?.uid)?.votedToEnd : false;
 
-            useEffect(() => {
-                if (isOnline && isHost && endVotes >= requiredVotes) {
-                    onEndGame();
-                }
-            }, [endVotes, requiredVotes, isHost, isOnline, onEndGame]);
+			useEffect(() => {
+				// If the timer is at 0, only 1 vote is needed. Otherwise, require a majority.
+				const activeRequiredVotes = (duration && timeLeft <= 0) ? 1 : requiredVotes;
+
+				if (isOnline && isHost && endVotes >= activeRequiredVotes) {
+					onEndGame();
+				}
+			}, [endVotes, requiredVotes, duration, timeLeft, isHost, isOnline, onEndGame]);
 
             useEffect(() => {
                 if (audioManager) {
@@ -4608,54 +4611,47 @@
             }, [audioManager]);
 
             useEffect(() => {
-                if (!duration || !missionStartTime) {
-                    return;
-                }
+				if (!duration || !missionStartTime) {
+					return;
+				}
 
-                let timerExpired = false;
-                const updateTimer = () => {
-                    const getStartTime = () => {
-                        if (missionStartTime.toDate) return missionStartTime.toDate().getTime();
-                        if (missionStartTime instanceof Date) return missionStartTime.getTime();
-                        return Date.now();
-                    };
+				let timerExpired = false;
+				const updateTimer = () => {
+					const getStartTime = () => {
+						if (missionStartTime.toDate) return missionStartTime.toDate().getTime();
+						if (missionStartTime instanceof Date) return missionStartTime.getTime();
+						return Date.now();
+					};
 
-                    const startTime = getStartTime();
-                    const elapsed = (Date.now() - startTime) / 1000;
-                    const newTimeLeft = Math.round(Math.max(0, duration - elapsed));
-                    
-                    setTimeLeft(newTimeLeft);
+					const startTime = getStartTime();
+					const elapsed = (Date.now() - startTime) / 1000;
+					const newTimeLeft = Math.round(Math.max(0, duration - elapsed));
+					
+					setTimeLeft(newTimeLeft);
 
-                    if (newTimeLeft <= 0 && !timerExpired) {
-                        if (!isOnline || endVotes >= 1) {
-                            timerExpired = true;
-                            clearInterval(timerRef.current);
-                            
-                            if (audioManager) {
-                                audioManager.stopMusic(); 
-                                audioManager.playSound('alarm');
-                            }
-                            
-                            if (navigator.vibrate) navigator.vibrate(500);
-                            
-                            // Only auto-switch for Online Mode (to keep players synced)
-                            // In Local Mode, the players must manually tap "REVEAL IMPOSTER"
-                            if (isOnline && isHost) {
-                                onEndGame();
-                            }
-                        }
-                    }
-                };
+					if (newTimeLeft <= 0 && !timerExpired) {
+						timerExpired = true;
+						clearInterval(timerRef.current);
+						
+						if (audioManager) {
+							audioManager.stopMusic(); 
+							audioManager.playSound('alarm');
+						}
+						
+						if (navigator.vibrate) navigator.vibrate(500);
+					}
+				};
 
-                if(timerRef.current) clearInterval(timerRef.current);
-                updateTimer(); 
-                timerRef.current = setInterval(updateTimer, 1000);
+				if(timerRef.current) clearInterval(timerRef.current);
+				updateTimer(); 
+				timerRef.current = setInterval(updateTimer, 1000);
 
-                return () => {
-                    clearInterval(timerRef.current);
-                    audioManager.stopSound('alarm');
-                };
-            }, [duration, missionStartTime, isHost, onEndGame, audioManager, lobbyId]);
+				return () => {
+					clearInterval(timerRef.current);
+					// Clean up the alarm when someone finally clicks the button and transitions the screen
+					if (audioManager) audioManager.stopSound('alarm'); 
+				};
+			}, [duration, missionStartTime, audioManager]); 
 
             const handleIdentifyImposter = () => {
                 if (navigator.vibrate) navigator.vibrate(50);
