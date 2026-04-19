@@ -3577,7 +3577,7 @@
             );
         };
 
-        const SetupScreen = ({ onStartGame, audioManager, onBack, displayCategories, wordBank, activeWordBank, customCategoryNames = {} }) => {
+        const SetupScreen = ({ onStartGame, audioManager, onBack, displayCategories, wordBank, customCategoryNames = {} }) => {
             const DEFAULT_PLAYERS = [{ name: 'Player 1', audioData: null }, { name: 'Player 2', audioData: null }, { name: 'Player 3', audioData: null }];
             const MIN_PLAYERS = 3;
             const [playerError, setPlayerError] = useState('');
@@ -4581,7 +4581,7 @@
             );
         };
 
-        const GameTimerScreen = ({ lobbyData, lobbyPlayers, user, onEndGame, firstPlayer, audioManager, isHost, lobbyId }) => {
+        const GameTimerScreen = ({ lobbyData, lobbyPlayers, user, onEndGame, audioManager, isHost, lobbyId }) => {
             const [showTurnOrder, setShowTurnOrder] = useState(false);
             const { duration, missionStartTime, turnOrder } = lobbyData || {};
             const [timeLeft, setTimeLeft] = useState(duration || 0);
@@ -6455,14 +6455,14 @@
 
                 if (gameMode === 'local') {
                     switch (localGameState) {
-                        case 'setup': return <SetupScreen onStartGame={startLocalGame} audioManager={audioManagerRef.current} onBack={handleBackToHome} displayCategories={displayCategories} wordBank={wordBank} activeWordBank={activeWordBank} customCategoryNames={customCategoryNames} />;
+                        case 'setup': return <SetupScreen onStartGame={startLocalGame} audioManager={audioManagerRef.current} onBack={handleBackToHome} displayCategories={displayCategories} wordBank={wordBank} customCategoryNames={customCategoryNames} />;
                         case 'pass':
                             const isFakeWordPlayer = localGameData.isFakeWordMode && localGameData.fakeWordPlayerIndices.includes(localCurrentPlayerIndex);
                             const isImposter = !localGameData.isFakeWordMode && localGameData.imposterIndices.includes(localCurrentPlayerIndex);
                             const wordToShow = isImposter ? "IMPOSTER" : (isFakeWordPlayer ? localGameData.fakeWord : localGameData.secretWord);
                             return <CardRevealScreen key={localCurrentPlayerIndex} player={localGameData.players[localCurrentPlayerIndex]} word={wordToShow} onNext={handleLocalNextPlayer} isLastPlayer={localCurrentPlayerIndex === localGameData.players.length - 1} audioManager={audioManagerRef.current} />;
                         case 'turnOrder': return <TurnOrderScreen players={localGameData.turnOrder} onStartMission={handleStartLocalActiveGame} audioManager={audioManagerRef.current} isHost={true}/>;
-                        case 'active': return <GameTimerScreen lobbyData={localGameData} onEndGame={handleLocalEndGame} firstPlayer={localGameData.firstPlayer} audioManager={audioManagerRef.current} isHost={true} lobbyId={null}/>;
+                        case 'active': return <GameTimerScreen lobbyData={localGameData} onEndGame={handleLocalEndGame} audioManager={audioManagerRef.current} isHost={true} lobbyId={null}/>;
                         case 'result': 
                             return <ResultScreen 
                                 isLocal={true} lobbyData={localGameData} lobbyPlayers={localGameData.players} 
@@ -6502,7 +6502,7 @@
                     if (onlineState === 'active') {
                          return <GameTimerScreen 
                             lobbyData={lobbyData} lobbyPlayers={lobbyPlayers} user={user} onEndGame={handleEndGameOnline} 
-                            firstPlayer={lobbyData.turnOrder ? lobbyData.turnOrder[0].name : ''} audioManager={audioManagerRef.current} isHost={isHost} lobbyId={lobbyId}
+                            audioManager={audioManagerRef.current} isHost={isHost} lobbyId={lobbyId}
                         />;
                     }
                     if (onlineState === 'voting') {
