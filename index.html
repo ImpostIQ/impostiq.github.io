@@ -902,8 +902,8 @@
             const cleanName = name.trim().toLowerCase();
             
             const spyMapping = {
-                'james bond': { url: "https://em-content.zobj.net/source/microsoft-teams/364/man-in-tuxedo-light-skin-tone_1f935-1f3fb-200d-2642-fe0f.png", size: "scale-[1.1] translate-y-[10%]" },
-                '007': { url: "https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png", size: "scale-[1.1] translate-y-[10%]" },
+                'james bond': { url: "https://impostiq.github.io/images/easteregg_images/james_bond.png" },
+                '007': { url: "https://impostiq.github.io/images/easteregg_images/007.png" },
             };
 
             const isSpy = !!spyMapping[cleanName];
@@ -4336,9 +4336,9 @@
                 const cleanName = player.name.trim().toLowerCase();
                 
                 const spyMapping = {
-                    'james bond': { url: "https://em-content.zobj.net/source/microsoft-teams/364/man-in-tuxedo-light-skin-tone_1f935-1f3fb-200d-2642-fe0f.png", size: "scale-[1.1] translate-y-[10%]" },
-                    '007': { url: "https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png", size: "scale-[1.1] translate-y-[10%]" },
-                };
+					'james bond': { url: "https://impostiq.github.io/images/easteregg_images/james_bond.png" },
+					'007': { url: "https://impostiq.github.io/images/easteregg_images/007.png" },
+				};
 
                 const isSpy = !!spyMapping[cleanName];
                 let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=transparent`;
