@@ -1964,7 +1964,7 @@
             );
         };
 
-        const CategorySelectionModal = ({ isOpen, onClose, isOnline, displayCategories, onSelect, currentSelection, voteCounts, onInspect, audioManager, season }) => {
+        const CategorySelectionModal = ({ isOpen, onClose, isOnline, displayCategories, onSelect, currentSelection, voteCounts, onInspect, audioManager, season, customCategoryNames = {} }) => {
             if (!isOpen) return null;
 
             const allOptions = ['Mystery Mode', ...displayCategories];
@@ -2126,7 +2126,7 @@
                                                     className={`transition-colors duration-300 ${isSupercell || isSeasonal ? "brightness-125" : (isSelected ? "text-brand-400" : "text-slate-500 group-hover:text-slate-300")}`} 
                                                 />
                                             )}
-                                            <span className={`text-xs font-bold tracking-wide ${isSupercell || isSeasonal || isMystery ? 'text-white' : ''}`}>{cat}</span>
+                                            <span className={`text-xs font-bold tracking-wide ${isSupercell || isSeasonal || isMystery ? 'text-white' : ''}`}>{customCategoryNames[cat] || cat}</span>
                                         </div>
                                     </button>
                                 )
@@ -2145,7 +2145,7 @@
             );
         };
 
-        const WaitingRoom = ({ lobbyData, lobbyPlayers, user, lobbyId, onStartGame, onStartMission, onLeaveLobby, audioManager, onConfusionVote, season, displayCategories, wordBank }) => {
+        const WaitingRoom = ({ lobbyData, lobbyPlayers, user, lobbyId, onStartGame, onStartMission, onLeaveLobby, audioManager, onConfusionVote, season, displayCategories, wordBank, customCategoryNames = {} }) => {
             const isHost = user.uid === lobbyData.hostId;
             const MIN_PLAYERS = 3;
             const [inspectedCategory, setInspectedCategory] = useState(null);
@@ -2157,7 +2157,7 @@
             const pollIsActive = lobbyData.gameState === 'reveal' && lobbyPlayers.some(p => p.status === 'confused');
             
             const readyPlayersCount = lobbyData.gameState === 'reveal' ? lobbyPlayers.filter(p => {
-                if (!p.hasSeenCard) return false;
+                if (!p.hasSeenCard && !p.status) return false;
                 if (!pollIsActive) return true;
                 
                 const isImposter = !lobbyData.isFakeWordMode && lobbyData.imposterIds?.includes(p.id);
@@ -2208,14 +2208,13 @@
                 if (isHost) {
                     const newValue = !currentValue;
                     
-                    if(settingName === 'isFakeWordMode' && newValue) { // Switching TO Fake Word Mode
+                    if(settingName === 'isFakeWordMode' && newValue) { 
                         db.collection('lobbies').doc(lobbyId).update({
                             isFakeWordMode: true,
                             notifyImposterOnVote: false,
-                            enableTwoImposters: false, // ADDED: Reset two imposters when going to fake word mode
                             lastSoundEvent: { name: 'switchOn', timestamp: Date.now() }
                         });
-                    } else { // Generic toggle
+                    } else { 
                         db.collection('lobbies').doc(lobbyId).update({ 
                             [settingName]: newValue,
                             lastSoundEvent: { name: newValue ? 'switchOn' : 'switchOff', timestamp: Date.now() }
@@ -2284,6 +2283,7 @@
             let displayTitle = "Mystery Mode";
             let displayIcon = "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png";
             let isFaIcon = false;
+            let leadingCategoryId = "Mystery Mode";
 
             if (maxVotes === 0) {
                 displayTitle = "Mystery Mode (Default)";
@@ -2292,18 +2292,26 @@
                 displayTitle = "Tie! (Random resolving)";
                 displayIcon = "icon-solid icon-scale-balanced";
                 isFaIcon = true;
+                leadingCategoryId = "Tie";
             } else {
-                displayTitle = leaders[0];
-                if (displayTitle === 'Mystery Mode') {
+                leadingCategoryId = leaders[0];
+                displayTitle = customCategoryNames[leadingCategoryId] || leadingCategoryId;
+                if (leadingCategoryId === 'Mystery Mode') {
                     displayIcon = "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png";
                 } else {
-                    displayIcon = CATEGORY_ICONS[displayTitle];
+                    displayIcon = CATEGORY_ICONS[leadingCategoryId];
                 }
             }
 
-            const isCustomCategoryLeading = displayTitle !== 'Mystery Mode' && displayTitle !== 'Mystery Mode (Default)' && displayTitle !== 'Tie! (Random resolving)' && !AUDIO_URLS.categories[displayTitle];
-            const tieIncludesCustomCategory = leaders.length > 1 && leaders.some(cat => cat !== 'Mystery Mode' && !AUDIO_URLS.categories[cat]);
+            const isTie = maxVotes > 0 && leaders.length > 1;
+            const hasCustomCategories = displayCategories.some(cat => cat !== 'Mystery Mode' && !AUDIO_URLS.categories[cat]);
+            const isExplicitlyMysteryMode = maxVotes === 0 || (!isTie && leadingCategoryId === 'Mystery Mode');
+            const tieIsStrictlyCustom = isTie && leaders.every(cat => cat !== 'Mystery Mode' && !AUDIO_URLS.categories[cat]);
+            const isCustomCategoryLeading = (!isTie && leadingCategoryId !== 'Mystery Mode' && !AUDIO_URLS.categories[leadingCategoryId]) || tieIsStrictlyCustom;
+            const tieIncludesCustomCategory = isTie && leaders.some(cat => cat !== 'Mystery Mode' && !AUDIO_URLS.categories[cat]);
+            const tieIncludesMysteryMode = isTie && leaders.includes('Mystery Mode');
             const customCategoryWarning = "Voice lines are unavailable for custom categories";
+            const showCustomWarningInSettings = (tieIncludesCustomCategory && !tieIsStrictlyCustom) || (isExplicitlyMysteryMode && hasCustomCategories) || (tieIncludesMysteryMode && hasCustomCategories);
 
             useEffect(() => {
                 if (isHost && lobbyData?.speakCategory && isCustomCategoryLeading) {
@@ -2313,7 +2321,7 @@
 
             return (
                  <div className="flex flex-col h-[100dvh] relative z-10">
-                    <CategoryInfoModal category={inspectedCategory} onClose={() => setInspectedCategory(null)} wordBank={wordBank} />
+                    <CategoryInfoModal category={inspectedCategory} onClose={() => setInspectedCategory(null)} wordBank={wordBank} customCategoryNames={customCategoryNames} />
                     
                     <CategorySelectionModal 
                         isOpen={isCategoryModalOpen}
@@ -2326,6 +2334,7 @@
                         onInspect={setInspectedCategory}
                         audioManager={audioManager}
                         season={season}
+                        customCategoryNames={customCategoryNames}
                     />
 
                     {showQRCode && <QRCodeModal lobbyId={lobbyId} password={lobbyData.password} onClose={() => setShowQRCode(false)} audioManager={audioManager} season={season} />}
@@ -2404,17 +2413,17 @@
                                         {lobbyData.gameState === 'reveal' ? 'Mission Turn Order' : 'Agents'}
                                     </h2>
                                 </div>
-                                <div className="p-4 flex flex-col gap-3">
-                                    {lobbyPlayers.length === 0 ? (
-                                        [...Array(lobbyData.turnOrder ? lobbyData.turnOrder.length : 3)].map((_, i) => (
-                                            <div key={`ghost-${i}`} className="flex items-center gap-3 px-4 h-[58px] rounded-xl bg-white/5 animate-pulse">
+                                <div className="p-4 flex flex-col gap-3 max-h-[320px] overflow-y-auto no-scrollbar overscroll-y-contain">
+                                    {lobbyPlayers.length === 0 ? ([...Array(lobbyData.turnOrder ? lobbyData.turnOrder.length : 3)].map((_, i) => (
+                                            <div key={`ghost-${i}`} className="flex items-center gap-3 px-4 h-[58px] rounded-xl bg-white/5 animate-pulse flex-shrink-0">
                                                 <div className="w-5 h-5 rounded-full bg-white/10 flex-shrink-0"></div>
                                                 <div className="w-7 h-7 rounded-full bg-white/10 flex-shrink-0"></div>
                                                 <div className="h-4 bg-white/10 rounded w-1/3"></div>
                                             </div>
                                         ))
                                     ) : (
-                                        (lobbyData.gameState === 'reveal' && lobbyData.turnOrder ? lobbyData.turnOrder : lobbyPlayers).map((playerOrTurn, index) => {
+                                        (lobbyData.gameState === 'reveal' && lobbyData.turnOrder ? lobbyData.turnOrder : lobbyPlayers)
+                                        .map((playerOrTurn, index) => {
                                             const p = lobbyPlayers.find(lp => lp.id === (playerOrTurn.id || playerOrTurn));
                                             if (!p) return null;
                                             
@@ -2431,7 +2440,7 @@
                                             const isTurnOrder = lobbyData.gameState === 'reveal';
 
                                             return (
-                                                <div key={p.id} className={`flex items-center gap-3 px-4 h-[58px] rounded-xl transition-colors ${p.id === user.uid ? 'bg-white/10 shadow-sm' : 'bg-white/5 hover:bg-white/10'}`}>
+                                                <div key={p.id} className={`flex items-center gap-3 px-4 h-[58px] rounded-xl transition-colors flex-shrink-0 ${p.id === user.uid ? 'bg-white/10 shadow-sm' : 'bg-white/5 hover:bg-white/10'}`}>
                                                     {isTurnOrder ? (
                                                         <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-brand-500/20 text-brand-400 font-mono font-bold text-sm rounded-lg border border-brand-500/20">
                                                             {index + 1}
@@ -2464,8 +2473,9 @@
                                                 </div>
                                             );
                                         })
-                                    )}
+                                   )}
                                 </div>
+
                                 {lobbyData.gameState === 'reveal' && lobbyData.turnOrder && (
                                     <div className="text-center py-3 bg-black/50 border-t border-white/5 animate-fadeIn">
                                         <p className="text-xs text-white/60 font-semibold px-4">
@@ -2500,7 +2510,7 @@
                                             </div>
                                             <div className="text-left flex-1 min-w-0">
                                                 <h3 className="text-white font-display font-bold text-lg truncate">{displayTitle}</h3>
-                                                <p className="text-white/40 text-xs mt-1">{me?.categoryVote ? `You voted for: ${me.categoryVote}` : 'Tap to cast your vote'}</p>
+                                                <p className="text-white/40 text-xs mt-1">{me?.categoryVote ? `You voted for: ${customCategoryNames[me.categoryVote] || me.categoryVote}` : 'Tap to cast your vote'}</p>
                                             </div>
                                             <FaIcon name="icon-chevron-right" className=" text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
                                         </button>
@@ -2604,19 +2614,19 @@
                                     </div>
                                     <div 
                                         className={`grid transition-all duration-400 ease-out bg-black/50 border-t ${
-                                            tieIncludesCustomCategory && lobbyData.speakCategory 
+                                            showCustomWarningInSettings && lobbyData.speakCategory 
                                                 ? 'grid-rows-[1fr] border-white/5 opacity-100' 
                                                 : 'grid-rows-[0fr] border-transparent opacity-0'
                                         }`}
                                     >
                                         <div className="overflow-hidden">
                                             <div className={`text-center py-3 transform transition-all duration-400 ease-out ${
-                                                tieIncludesCustomCategory && lobbyData.speakCategory 
+                                                showCustomWarningInSettings && lobbyData.speakCategory 
                                                     ? 'translate-y-0' 
                                                     : '-translate-y-4'
                                             }`}>
                                                 <p className="text-xs text-white/60 font-semibold px-4">
-                                                    If the tie resolves to a custom category, <strong className="text-white/90">Speak Category</strong> will be skipped.
+                                                    If a custom category is selected, <strong className="text-white/90">Speak Category</strong> will be skipped.
                                                 </p>
                                             </div>
                                         </div>
@@ -3422,7 +3432,7 @@
             );
         };
         
-        const CategoryInfoModal = ({ category, onClose, wordBank }) => {
+        const CategoryInfoModal = ({ category, onClose, wordBank, customCategoryNames = {} }) => {
             if (!category || !wordBank) return null;
             
             const categoryWords = wordBank[category];
@@ -3431,6 +3441,7 @@
             const examples = categoryWords.slice(0, 8).join(", ");
             const remainingCount = categoryWords.length - 8;
             const icon = CATEGORY_ICONS[category];
+            const catName = customCategoryNames[category] || category;
 
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
@@ -3444,7 +3455,7 @@
                             <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${category === 'Supercell' ? 'bg-blue-500/20' : 'bg-brand-500/20'} ring-1 ring-white/10`}>
                                 <FaIcon name={icon} sizeClass="text-3xl" className={`${category === 'Supercell' ? '' : 'text-brand-400'} w-11 h-11`} />
                             </div>
-                            <h2 className="text-2xl font-display font-bold text-white">{category}</h2>
+                            <h2 className="text-2xl font-display font-bold text-white">{catName}</h2>
                             <p className="text-white/40 text-xs font-bold tracking-widest uppercase mt-1">Category Info</p>
                         </div>
                         
@@ -3566,7 +3577,7 @@
             );
         };
 
-        const SetupScreen = ({ onStartGame, audioManager, onBack, displayCategories, wordBank, activeWordBank }) => {
+        const SetupScreen = ({ onStartGame, audioManager, onBack, displayCategories, wordBank, activeWordBank, customCategoryNames = {} }) => {
             const DEFAULT_PLAYERS = [{ name: 'Player 1', audioData: null }, { name: 'Player 2', audioData: null }, { name: 'Player 3', audioData: null }];
             const MIN_PLAYERS = 3;
             const [playerError, setPlayerError] = useState('');
@@ -3701,16 +3712,6 @@
                 } catch { return false; }
             });
             
-            const [playersExpanded, setPlayersExpanded] = useState(false);
-            const isMobile = useMediaQuery('(max-width: 639px)');
-            const playerDisplayLimit = isMobile ? 3 : 6;
-            
-            useEffect(() => {
-                if (players.length <= playerDisplayLimit) {
-                    setPlayersExpanded(false);
-                }
-            }, [players.length, playerDisplayLimit]);
-            
             const [isRecording, setIsRecording] = useState(false);
             const [recordedAudioData, setRecordedAudioData] = useState(null);
             const [showMicTooltip, setShowMicTooltip] = useState(false);
@@ -3839,6 +3840,7 @@
                 }
             };
 
+            const catName = customCategoryNames[selectedCategory] || selectedCategory;
             const displayIcon = selectedCategory === 'Mystery Mode' ? "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png" : CATEGORY_ICONS[selectedCategory];
             const isCustomCategory = selectedCategory !== 'Mystery Mode' && !AUDIO_URLS.categories[selectedCategory];
 
@@ -3856,7 +3858,7 @@
                         </button>
                     </div>
                     
-                    <CategoryInfoModal category={inspectedCategory} onClose={() => setInspectedCategory(null)} wordBank={wordBank} />
+                    <CategoryInfoModal category={inspectedCategory} onClose={() => setInspectedCategory(null)} wordBank={wordBank} customCategoryNames={customCategoryNames} />
                     
                     <CategorySelectionModal 
                         isOpen={isCategoryModalOpen}
@@ -3868,6 +3870,7 @@
                         onInspect={setInspectedCategory}
                         audioManager={audioManager}
                         season={currentSeason}
+                        customCategoryNames={customCategoryNames}
                     />
 
                     <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
@@ -3885,8 +3888,9 @@
                                         <FaIcon name="icon-user-plus" className=" text-brand-400 mr-1" /> Add Players
                                     </h2>
                                 </div>
-                                <div className="p-4">
-                                    <div className="flex flex-col gap-3 mb-4">
+                                <div>
+                                    <div className="p-4 bg-black/20 border-b border-white/5">
+                                        <div className="flex flex-col gap-3">
                                         <div>
                                             <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors pr-4 relative z-10">
                                                 <input
@@ -3938,12 +3942,14 @@
                                             <FaIcon name="icon-plus-button" className=" text-white text-lg" />
                                         </button>
                                     </div>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {(playersExpanded ? players : players.slice(0, playerDisplayLimit)).map((p, i) => (
+                                        </div>
+                                    </div>
+                                <div className="p-4 max-h-[320px] overflow-y-auto no-scrollbar overscroll-y-contain">
+                                    <div className="grid grid-cols-1 gap-3">
+                                    {players.map((p, i) => (
                                         <div
                                             key={i}
-                                            className={`flex items-center min-w-0 gap-2 px-3 py-2 rounded-xl animate-fadeIn transition-all cursor-pointer border ${
+                                            className={`flex items-center min-w-0 gap-3 px-4 h-[58px] rounded-xl animate-fadeIn transition-all cursor-pointer border ${
                                                 p.audioData 
                                                     ? 'bg-white/5 border-brand-500/50 hover:bg-brand-500/10' 
                                                     : 'bg-white/5 border-transparent hover:bg-white/10'
@@ -3954,12 +3960,10 @@
                                             onTouchStart={() => handlePlayerPress(p)}
                                             onTouchEnd={handlePlayerRelease}
                                         >
-                                            <PlayerAvatar name={p.name} className="w-6 h-6 rounded-full flex-shrink-0" />
-                                            <div className="flex-1 min-w-0 flex items-center">
-                                                <span className={`truncate block text-sm font-semibold ${p.audioData ? 'text-brand-200' : 'text-slate-300'}`}>
-                                                    {p.name}
-                                                </span>
-                                            </div>
+                                            <PlayerAvatar name={p.name} className="w-7 h-7 rounded-full flex-shrink-0" />
+                                            <span className={`flex-1 min-w-0 truncate font-bold ${p.audioData ? 'text-brand-200' : 'text-white/80'}`}>
+                                                {p.name}
+                                            </span>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); removePlayer(i); }}
                                                 disabled={players.length <= MIN_PLAYERS}
@@ -3973,16 +3977,9 @@
                                             </button>
                                         </div>
                                     ))}
+                                    </div>
                                 </div>
-                                {players.length > playerDisplayLimit && (
-                                    <button
-                                        onClick={() => setPlayersExpanded(!playersExpanded)}
-                                        className="mt-3 w-full text-center bg-white/10 hover:bg-brand-500/20 text-brand-400 text-sm font-bold py-3 rounded-xl transition-all active:scale-95"
-                                    >
-                                        {playersExpanded ? 'Show Less' : `Show ${players.length - playerDisplayLimit} More...`}
-                                    </button>
-                                )}
-                                </div>
+                              </div>
                             </section>
 
                             <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
@@ -4000,7 +3997,7 @@
                                             <FaIcon name={displayIcon} sizeClass="text-3xl" className="text-brand-400 drop-shadow-md" />
                                         </div>
                                         <div className="text-left flex-1 min-w-0">
-                                            <h3 className="text-white font-display font-bold text-lg truncate">{selectedCategory}</h3>
+                                            <h3 className="text-white font-display font-bold text-lg truncate">{catName}</h3>
                                             <p className="text-white/40 text-xs mt-1">Tap to change</p>
                                         </div>
                                         <FaIcon name="icon-chevron-right" className=" text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
@@ -4544,9 +4541,9 @@
                                         <FaIcon name="icon-list-ol" className=" text-brand-400 mr-1" /> Mission Sequence
                                     </h2>
                                 </div>
-                                <div className="p-4 flex flex-col gap-3">
+                                <div className="p-4 flex flex-col gap-3 max-h-[320px] overflow-y-auto no-scrollbar overscroll-y-contain">
                                     {players.map((player, index) => (
-                                        <div key={index} className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl border border-transparent hover:bg-white/10 transition-colors">
+                                        <div key={index} className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl border border-transparent hover:bg-white/10 transition-colors flex-shrink-0">
                                             <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-brand-500/20 text-brand-400 font-mono font-bold text-sm rounded-lg border border-brand-500/20">
                                                 {index + 1}
                                             </div>
@@ -4868,9 +4865,9 @@
                                                 <FaIcon name="icon-users" className=" text-brand-400 mr-1" /> Voting Status
                                             </h2>
                                         </div>
-                                        <div className="p-4 flex flex-col gap-3">
+                                        <div className="p-4 flex flex-col gap-3 max-h-[320px] overflow-y-auto no-scrollbar overscroll-y-contain">
                                             {lobbyPlayers.map(player => (
-                                                <div key={player.id} className="flex items-center justify-between bg-white/5 px-4 py-3 rounded-xl border border-transparent">
+                                                <div key={player.id} className="flex items-center justify-between bg-white/5 px-4 py-3 rounded-xl border border-transparent flex-shrink-0">
                                                     <div className="flex items-center gap-3 truncate">
                                                         <PlayerAvatar name={player.name} className="w-7 h-7 rounded-full flex-shrink-0"/>
                                                         <span className="font-bold text-white/80 truncate">{player.name}</span>
@@ -4890,12 +4887,12 @@
                                             <FaIcon name="icon-crosshairs" className=" text-brand-400 mr-1" /> Select Suspects
                                         </h2>
                                     </div>
-                                    <div className="p-4 flex flex-col gap-3">
+                                    <div className="p-4 flex flex-col gap-3 max-h-[320px] overflow-y-auto no-scrollbar overscroll-y-contain">
                                         {lobbyPlayers.filter(p => p.id !== user.uid).map(player => (
                                             <button 
                                                 key={player.id} 
                                                 onClick={() => handleSelectPlayer(player.id)}
-                                                className={`w-full text-left p-4 rounded-xl transition-all flex items-center gap-4 active:scale-95 border ${selectedVotes.includes(player.id) ? 'bg-brand-500/20 border-brand-500 shadow-[inset_0_0_0_1px_rgba(139,92,246,1)]' : 'bg-white/5 hover:bg-white/10 border-transparent'}`}
+                                                className={`w-full text-left p-4 rounded-xl transition-all flex flex-shrink-0 items-center gap-4 active:scale-95 border ${selectedVotes.includes(player.id) ? 'bg-brand-500/20 border-brand-500 shadow-[inset_0_0_0_1px_rgba(139,92,246,1)]' : 'bg-white/5 hover:bg-white/10 border-transparent'}`}
                                             >
                                                 <div className={`w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center border-2 transition-colors ${selectedVotes.includes(player.id) ? 'bg-brand-500 border-brand-500' : 'border-white/20'}`}>
                                                     {selectedVotes.includes(player.id) && <FaIcon name="icon-check" className=" text-xs text-white" />}
@@ -5053,9 +5050,9 @@
                                                     <FaIcon name="icon-check-to-slot" className=" text-brand-400 mr-1" /> Voting Record
                                                 </h2>
                                             </div>
-                                            <div className="p-4 flex flex-col gap-3">
+                                            <div className="p-4 flex flex-col gap-3 max-h-[320px] overflow-y-auto no-scrollbar overscroll-y-contain">
                                                 {lobbyData.votingRecord.map((record, index) => (
-                                                    <div key={index} className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 bg-white/5 px-4 py-3 rounded-xl border border-transparent">
+                                                    <div key={index} className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 bg-white/5 px-4 py-3 rounded-xl border border-transparent flex-shrink-0">
                                                         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                                                             <PlayerAvatar name={record.voterName} className="w-7 h-7 rounded-full flex-shrink-0" />
                                                             <span className="font-bold text-white/80 truncate text-sm">{record.voterName}</span>
@@ -5157,22 +5154,6 @@
             }
             return { lobbyId: str.slice(0, 6), password: str.slice(6, 10) };
         };
-
-        const useMediaQuery = (query) => {
-            const [matches, setMatches] = React.useState(false);
-
-            React.useEffect(() => {
-                const media = window.matchMedia(query);
-                if (media.matches !== matches) {
-                    setMatches(media.matches);
-                }
-                const listener = () => setMatches(media.matches);
-                window.addEventListener("resize", listener);
-                return () => window.removeEventListener("resize", listener);
-            }, [matches, query]);
-
-            return matches;
-        };
         
         const preloadAssets = (onProgress) => {
             const imageUrls = new Set();
@@ -5247,7 +5228,7 @@
             };
         };
 
-       const App = () => {
+        const App = () => {
             useEffect(() => {
                 // Determine which critical images are needed on the initial loading screen
                 const imagesToLoad = [
@@ -5290,27 +5271,30 @@
             const [isOnlineStatus, setIsOnlineStatus] = useState(navigator.onLine);
             const [wordBank, setWordBank] = useState(null);
             const [customCategories, setCustomCategories] = useState({});
+            const [customCategoryNames, setCustomCategoryNames] = useState({});
 
             const baseWordBankRef = useRef(null);
 
             const loadLocalCategories = (baseBank) => {
                 let updatedBank = { ...baseBank };
                 let updatedCustomCats = {};
+                let updatedNames = {};
                 
                 const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
                 Object.keys(savedComms).forEach(id => {
                     const cat = savedComms[id];
-                    if (updatedBank[cat.name]) {
-                        // Merge words if multiple categories share the same name
-                        updatedBank[cat.name] = [...new Set([...updatedBank[cat.name], ...cat.words])];
+                    if (updatedBank[cat.id]) {
+                        updatedBank[cat.id] = [...new Set([...updatedBank[cat.id], ...cat.words])];
                     } else {
-                        updatedBank[cat.name] = cat.words;
+                        updatedBank[cat.id] = cat.words;
                     }
-                    updatedCustomCats[cat.name] = cat.icon;
-                    CATEGORY_ICONS[cat.name] = cat.icon;
+                    updatedCustomCats[cat.id] = cat.icon;
+                    updatedNames[cat.id] = cat.name;
+                    CATEGORY_ICONS[cat.id] = cat.icon;
                 });
                 setWordBank(updatedBank);
                 setCustomCategories(updatedCustomCats);
+                setCustomCategoryNames(updatedNames);
             };
 
             useEffect(() => {
@@ -5474,21 +5458,20 @@
                 const activeWordBank = getActiveWordBank(wordBank);
                 
                 const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
-                const customCatNamesLocal = Object.keys(customCategories).filter(name => {
-                    const cat = Object.values(savedComms).find(c => c.name === name);
+                const customCatIdsLocal = Object.keys(customCategories).filter(id => {
+                    const cat = Object.values(savedComms).find(c => c.id === id);
                     return cat ? cat.useLocal !== false : true;
                 });
 
                 const regularCategories = Object.keys(wordBank).filter(c => c !== 'Supercell' && c !== 'Halloween' && c !== 'Christmas' && !Object.keys(customCategories).includes(c));
                 
-                const displayCategories = ['Supercell', ...seasonalCategories, ...customCatNamesLocal, ...regularCategories];
+                const displayCategories =['Supercell', ...seasonalCategories, ...customCatIdsLocal, ...regularCategories];
 
                 let onlineDisplayCategories = displayCategories;
-                if (lobbyData && lobbyData.lobbyCustomCategories) {
-                    // Do not strictly filter by activeWordBank here to prevent visual flashing while memory loads
-                    const lobbyCustomCatNames = lobbyData.lobbyCustomCategories.map(c => c.name);
-                    onlineDisplayCategories = ['Supercell', ...seasonalCategories, ...lobbyCustomCatNames, ...regularCategories];
-                }
+				if (lobbyData && Array.isArray(lobbyData.lobbyCustomCategories)) {
+					const lobbyCustomCatIds = lobbyData.lobbyCustomCategories.map(c => c.id);
+					onlineDisplayCategories = ['Supercell', ...seasonalCategories, ...lobbyCustomCatIds, ...regularCategories];
+				}
 
                 const totalWords = Object.values(wordBank).reduce((sum, category) => sum + category.length, 0);
                 const roundedWordCount = Math.floor(totalWords / 250) * 250;
@@ -5809,18 +5792,22 @@
                         // Load custom categories for guests if the lobby is using them
                         if (data.lobbyCustomCategories && Array.isArray(data.lobbyCustomCategories)) {
                             data.lobbyCustomCategories.forEach(customCat => {
-                                if (!customCategories[customCat.name]) {
+                                if (!customCategories[customCat.id]) {
                                     commDb.collection('communigories').doc(customCat.id).get().then(docSnap => {
                                         if (docSnap.exists) {
                                             const catData = docSnap.data();
                                             setWordBank(prev => {
-                                                if(prev[catData.name]) return prev;
-                                                return {...prev, [catData.name]: catData.words};
+                                                if(prev[customCat.id]) return prev;
+                                                return {...prev, [customCat.id]: catData.words};
                                             });
                                             setCustomCategories(prev => {
-                                                if(prev[catData.name]) return prev;
-                                                CATEGORY_ICONS[catData.name] = catData.icon;
-                                                return {...prev, [customCat.id]: true, [catData.name]: catData.icon};
+                                                if(prev[customCat.id]) return prev;
+                                                CATEGORY_ICONS[customCat.id] = catData.icon;
+                                                return {...prev,[customCat.id]: catData.icon};
+                                            });
+                                            setCustomCategoryNames(prev => {
+                                                if(prev[customCat.id]) return prev;
+                                                return {...prev,[customCat.id]: catData.name};
                                             });
                                         }
                                     });
@@ -5833,9 +5820,10 @@
                             commDb.collection('communigories').doc(data.customCategoryId).get().then(docSnap => {
                                 if (docSnap.exists) {
                                     const catData = docSnap.data();
-                                    setWordBank(prev => ({...prev, [catData.name]: catData.words}));
-                                    setCustomCategories(prev => ({...prev, [data.customCategoryId]: true, [catData.name]: catData.icon}));
-                                    CATEGORY_ICONS[catData.name] = catData.icon;
+                                    setWordBank(prev => ({...prev,[data.customCategoryId]: catData.words}));
+                                    setCustomCategories(prev => ({...prev,[data.customCategoryId]: catData.icon}));
+                                    setCustomCategoryNames(prev => ({...prev,[data.customCategoryId]: catData.name}));
+                                    CATEGORY_ICONS[data.customCategoryId] = catData.icon;
                                 }
                             });
                         }
@@ -6467,7 +6455,7 @@
 
                 if (gameMode === 'local') {
                     switch (localGameState) {
-                        case 'setup': return <SetupScreen onStartGame={startLocalGame} audioManager={audioManagerRef.current} onBack={handleBackToHome} displayCategories={displayCategories} wordBank={wordBank} activeWordBank={activeWordBank} />;
+                        case 'setup': return <SetupScreen onStartGame={startLocalGame} audioManager={audioManagerRef.current} onBack={handleBackToHome} displayCategories={displayCategories} wordBank={wordBank} activeWordBank={activeWordBank} customCategoryNames={customCategoryNames} />;
                         case 'pass':
                             const isFakeWordPlayer = localGameData.isFakeWordMode && localGameData.fakeWordPlayerIndices.includes(localCurrentPlayerIndex);
                             const isImposter = !localGameData.isFakeWordMode && localGameData.imposterIndices.includes(localCurrentPlayerIndex);
@@ -6480,7 +6468,7 @@
                                 isLocal={true} lobbyData={localGameData} lobbyPlayers={localGameData.players} 
                                 onRestart={handleLocalRestart} onBackToHome={handleBackToHome} audioManager={audioManagerRef.current} isHost={true} 
                             />;
-                        default: return <SetupScreen onStartGame={startLocalGame} audioManager={audioManagerRef.current} onBack={handleBackToHome} displayCategories={displayCategories} wordBank={wordBank} activeWordBank={activeWordBank} />;
+                        default: return <SetupScreen onStartGame={startLocalGame} audioManager={audioManagerRef.current} onBack={handleBackToHome} displayCategories={displayCategories} wordBank={wordBank} activeWordBank={activeWordBank} customCategoryNames={customCategoryNames} />;
                     }
                 }
                 
@@ -6494,7 +6482,7 @@
                     const onlineState = lobbyData.gameState;
                     
                     if (onlineState === 'waiting' || (onlineState === 'reveal' && meAsPlayer?.hasSeenCard)) {
-                         return <WaitingRoom lobbyData={lobbyData} lobbyPlayers={lobbyPlayers} user={user} lobbyId={lobbyId} onStartGame={handleStartGameOnline} onStartMission={handleStartMissionOnline} onLeaveLobby={() => isHost ? handleBackToHome() : setShowExitConfirmModal(true)} audioManager={audioManagerRef.current} onConfusionVote={handleConfusionVote} season={currentSeason} displayCategories={onlineDisplayCategories} wordBank={wordBank} />;
+                         return <WaitingRoom lobbyData={lobbyData} lobbyPlayers={lobbyPlayers} user={user} lobbyId={lobbyId} onStartGame={handleStartGameOnline} onStartMission={handleStartMissionOnline} onLeaveLobby={() => isHost ? handleBackToHome() : setShowExitConfirmModal(true)} audioManager={audioManagerRef.current} onConfusionVote={handleConfusionVote} season={currentSeason} displayCategories={onlineDisplayCategories} wordBank={wordBank} customCategoryNames={customCategoryNames} />;
                     }
                     if (onlineState === 'reveal' && !meAsPlayer?.hasSeenCard) {
                         const isFakeWordPlayerOnline = lobbyData.isFakeWordMode && lobbyData.fakeWordPlayerIds?.includes(user.uid);
