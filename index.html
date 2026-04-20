@@ -403,13 +403,18 @@
         }
         
         .sleek-spinner circle {
-            stroke: currentColor;
-            stroke-width: 6; 
-            stroke-dasharray: 80, 200;
-            stroke-dashoffset: 0;
-            stroke-linecap: round;
-            fill: none;
-        }
+			stroke: currentColor;
+			stroke-width: 6; 
+			stroke-linecap: round;
+			fill: none;
+			animation: sleek-dash 1.5s ease-in-out infinite;
+		}
+
+		@keyframes sleek-dash {
+			0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+			50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; }
+			100% { stroke-dasharray: 90, 200; stroke-dashoffset: -124px; }
+		}
         
         @keyframes sleek-rotate {
             0% { transform: rotate(0deg); }
@@ -944,12 +949,12 @@
             return (
                 <div className={`flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/5 overflow-hidden w-4 h-4 rounded-[0.5rem] relative ${className}`}>
                     {/* Loading Spinner */}
-                    <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out ${(!isLoaded && !isAlreadyCached) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                        <svg className="sleek-spinner w-1/2 h-1/2 text-white/30" viewBox="25 25 50 50">
-                            <circle cx="50" cy="50" r="20"></circle>
-                        </svg>
-                    </div>
-                    
+					<div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out ${(!isLoaded && !isAlreadyCached) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+						<svg className="sleek-spinner w-4 h-4 text-white/70 transform-gpu" style={{ willChange: 'transform' }} viewBox="25 25 50 50">
+							<circle cx="50" cy="50" r="20"></circle>
+						</svg>
+					</div>
+										
                     {/* Avatar Image */}
                     <img
                         ref={imgRef}
