@@ -398,27 +398,22 @@
         }
 
         .sleek-spinner {
-            animation: sleek-rotate 2s linear infinite;
+            animation: sleek-rotate 1.2s linear infinite;
+            transform-origin: center;
         }
         
         .sleek-spinner circle {
             stroke: currentColor;
             stroke-width: 6; 
-            stroke-dasharray: 1, 200;
+            stroke-dasharray: 80, 200;
             stroke-dashoffset: 0;
-            animation: sleek-dash 1.5s ease-in-out infinite;
             stroke-linecap: round;
             fill: none;
         }
         
         @keyframes sleek-rotate {
+            0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes sleek-dash {
-            0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
-            50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; }
-            100% { stroke-dasharray: 90, 200; stroke-dashoffset: -124px; }
         }
 
         @keyframes typing-dot {
@@ -504,7 +499,7 @@
             <li><strong>Theme:</strong> Dark mode (Deep Slate background #020617) heavily utilizing glassmorphism (translucent panels with blur). Primary brand color is Violet/Purple (#8b5cf6).</li>
             <li><strong>Icons:</strong> The game utilizes custom SVG Flaticon Rounded Interface Solid/Bold icons instead of standard icon fonts to ensure high-performance rendering and a modern aesthetic.</li>
             <li><strong>Role Color Coding:</strong> <strong>Teal</strong> for Agents, <strong>Red</strong> for Imposters, and <strong>Yellow</strong> for Fake Word players or system alerts.</li>
-            <li><strong>Avatars:</strong> Auto-generated using the Dicebear API based on the player's typed name. <em>Easter Egg:</em> Typing "James Bond" or "007" bypasses the generator and assigns a special secret detective/spy avatar with similar styling to the auto-generated avatars!</li>
+            <li><strong>Avatars:</strong> Auto-generated using the Dicebear API based on the player's typed name. <em>Easter Egg:</em> Typing "James Bond" or "007" bypasses the generator and assigns a special secret different coloured avatar with similar styling to the auto-generated avatars!</li>
             <li><strong>Main Menu Icons:</strong> 
                 <ul>
                     <li>Top-Right: Volume/Mute toggle SVG icon (state saves permanently to localStorage).</li>
@@ -905,10 +900,9 @@
             const cleanName = name.trim().toLowerCase();
             
             const spyMapping = {
-                'james bond': { url: "https://impostiq.github.io/images/easteregg_images/james_bond.png" },
-                '007': { url: "https://impostiq.github.io/images/easteregg_images/007.png" },
+                'james bond': { url: "https://api.dicebear.com/9.x/thumbs/svg?seed=JamesBond&backgroundColor=99b0bf&shapeColor=020617" },
+                '007': { url: "https://api.dicebear.com/9.x/thumbs/svg?seed=Agent007&backgroundColor=99b0bf&shapeColor=0f172a" },
             };
-
             const isSpy = !!spyMapping[cleanName];
             
             let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(name)}&backgroundColor=transparent`;
@@ -950,13 +944,11 @@
             return (
                 <div className={`flex-shrink-0 flex items-center justify-center bg-white/5 border border-white/5 overflow-hidden w-4 h-4 rounded-[0.5rem] relative ${className}`}>
                     {/* Loading Spinner */}
-                    {(!isLoaded && !isAlreadyCached) && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <svg className="sleek-spinner w-1/2 h-1/2 text-white/30" viewBox="25 25 50 50">
-                                <circle cx="50" cy="50" r="20"></circle>
-                            </svg>
-                        </div>
-                    )}
+                    <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out ${(!isLoaded && !isAlreadyCached) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                        <svg className="sleek-spinner w-1/2 h-1/2 text-white/30" viewBox="25 25 50 50">
+                            <circle cx="50" cy="50" r="20"></circle>
+                        </svg>
+                    </div>
                     
                     {/* Avatar Image */}
                     <img
@@ -4339,8 +4331,8 @@
                 const cleanName = player.name.trim().toLowerCase();
                 
                 const spyMapping = {
-					'james bond': { url: "https://impostiq.github.io/images/easteregg_images/james_bond.png" },
-					'007': { url: "https://impostiq.github.io/images/easteregg_images/007.png" },
+					'james bond': { url: "https://api.dicebear.com/9.x/thumbs/svg?seed=JamesBond&backgroundColor=99b0bf&shapeColor=020617" },
+					'007': { url: "https://api.dicebear.com/9.x/thumbs/svg?seed=Agent007&backgroundColor=99b0bf&shapeColor=0f172a" },
 				};
 
                 const isSpy = !!spyMapping[cleanName];
