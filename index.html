@@ -2487,14 +2487,14 @@
                             
                             {lobbyData.gameState === 'waiting' && (
                                 <section className="mb-6 glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
-                                    <div className="text-center py-3 bg-black/50 border-b border-white/5">
-                                        <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
-                                            <FaIcon name="icon-gear" className=" text-brand-400 mr-1" /> Game Settings
-                                        </h2>
-                                    </div>
-                                    <div className="p-4 flex flex-col gap-3">
-                                        <button
-                                            onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
+                                <div className="text-center py-3 bg-black/50 border-b border-white/5">
+                                    <h2 className="text-xs font-bold tracking-widest text-white/80 uppercase">
+                                        <FaIcon name="icon-gear" className=" text-brand-400 mr-1" /> Game Settings
+                                    </h2>
+                                </div>
+                                <div className="p-4 flex flex-col gap-3 max-h-[400px] overflow-y-auto no-scrollbar">
+                                    <button
+                                        onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
                                             className="w-full bg-black/20 hover:bg-white/5 border border-white/5 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
                                         >
                                             <div className="w-14 h-14 rounded-2xl bg-brand-500/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
@@ -3988,7 +3988,7 @@
                                         <FaIcon name="icon-gear" className=" text-brand-400 mr-1" /> Game Settings
                                     </h2>
                                 </div>
-                                <div className="p-4 flex flex-col gap-3">
+                                <div className="p-4 flex flex-col gap-3 max-h-[400px] overflow-y-auto no-scrollbar">
                                     <button
                                         onClick={() => { setIsCategoryModalOpen(true); audioManager.playSound('uiClick'); }}
                                         className="w-full bg-black/20 hover:bg-white/5 border border-white/5 rounded-[1.5rem] p-4 flex items-center gap-4 transition-all active:scale-95 group"
