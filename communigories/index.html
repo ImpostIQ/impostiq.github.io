@@ -117,8 +117,8 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;700;800&display=block" rel="stylesheet">
+	
     <script>
         document.addEventListener('touchstart', function() { document.documentElement.classList.add('is-touch'); }, { passive: true, once: true });
         tailwind.config = {
@@ -397,7 +397,7 @@
                         </div>
                         <h2 className="text-2xl font-display font-bold text-white mb-2">{title}</h2>
                         <p className="text-white/60 mb-8">{message}</p>
-                        <button onClick={() => { if(playSound) playSound(); onClose(); }} className="w-full bg-white hover:bg-slate-200 text-slate-950 py-4 rounded-xl font-display font-bold shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95 transition-all">
+                        <button onClick={() => { if(playSound) playSound(); onClose(); }} className="w-full bg-white hover:bg-slate-200 text-slate-950 py-4 rounded-xl font-display font-bold active:scale-95 transition-all">
                             GOT IT
                         </button>
                     </div>
@@ -485,7 +485,7 @@
 
                         <div className="flex items-center gap-2 bg-black/40 rounded-xl p-1.5 border border-white/5">
                             <div className="flex-1 overflow-hidden px-3">
-                                <p className="text-white/40 text-[10px] truncate font-mono select-all">{shareData.url}</p>
+                                <p className="text-white/40 text-[10px] truncate font-display select-all">{shareData.url}</p>
                             </div>
                             <button onClick={() => { if(playSound) playSound(); handleCopy(); }} className={`flex-shrink-0 px-4 py-2 rounded-lg font-bold text-[10px] tracking-wider transition-all active:scale-95 ${copied ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>
                                 {copied ? 'COPIED' : 'COPY'}
@@ -1399,7 +1399,7 @@
                             <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#020617] via-[#020617] to-transparent z-50">
                                 <div className="max-w-lg mx-auto pb-[env(safe-area-inset-bottom)]">
                                     <button onClick={() => { playSound(); handleUpload(); }} disabled={isLoading}
-                                        className="w-full h-[68px] flex items-center justify-center bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-transform duration-200"
+                                        className="w-full h-[68px] flex items-center justify-center bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-transform duration-200"
                                     >
                                         {isLoading ? (
                                             <div className="flex items-center justify-center gap-3">
