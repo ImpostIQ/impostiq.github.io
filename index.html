@@ -5998,6 +5998,18 @@
                         
                         // Load custom categories for guests if the lobby is using them
                         if (data.lobbyCustomCategories && Array.isArray(data.lobbyCustomCategories)) {
+                            setCustomCategoryNames(prev => {
+                                const newNames = { ...prev };
+                                let changed = false;
+                                data.lobbyCustomCategories.forEach(c => {
+                                    if (c.name && newNames[c.id] !== c.name) {
+                                        newNames[c.id] = c.name;
+                                        changed = true;
+                                    }
+                                });
+                                return changed ? newNames : prev;
+                            });
+
                             data.lobbyCustomCategories.forEach(customCat => {
                                 if (!customCategories[customCat.id]) {
                                     commDb.collection('communigories').doc(customCat.id).get().then(docSnap => {
