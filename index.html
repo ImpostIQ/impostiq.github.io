@@ -3876,6 +3876,8 @@
             const catName = customCategoryNames[selectedCategory] || selectedCategory;
             const displayIcon = selectedCategory === 'Mystery Mode' ? "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png" : CATEGORY_ICONS[selectedCategory];
             const isCustomCategory = selectedCategory !== 'Mystery Mode' && !AUDIO_URLS.categories[selectedCategory];
+            const hasCustomCategoriesLocal = displayCategories.some(cat => cat !== 'Mystery Mode' && !AUDIO_URLS.categories[cat]);
+            const showCustomWarningLocal = selectedCategory === 'Mystery Mode' && hasCustomCategoriesLocal;
 
             useEffect(() => {
                 if (isCustomCategory && speakCategory) {
@@ -4174,6 +4176,25 @@
                                             <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${speakCategory ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
                                         </button>
                                     </Tooltip>
+                                </div>
+                                <div 
+                                    className={`grid transition-all duration-400 ease-out bg-black/50 border-t ${
+                                        showCustomWarningLocal && speakCategory 
+                                            ? 'grid-rows-[1fr] border-white/5 opacity-100' 
+                                            : 'grid-rows-[0fr] border-transparent opacity-0'
+                                    }`}
+                                >
+                                    <div className="overflow-hidden">
+                                        <div className={`text-center py-3 transform transition-all duration-400 ease-out ${
+                                            showCustomWarningLocal && speakCategory 
+                                                ? 'translate-y-0' 
+                                                : '-translate-y-4'
+                                        }`}>
+                                            <p className="text-xs text-white/60 font-semibold px-4">
+                                                If a custom category is selected, <strong className="text-white/90">Speak Category</strong> will be skipped.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
                         </div>
