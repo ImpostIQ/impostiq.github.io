@@ -530,7 +530,7 @@
 
         <h2>4. Game Modes: Deep Technical Logic</h2>
 
-        <h3>A. Play Online</h3>
+        <h3>A. Play with Friends</h3>
         <ul>
             <li><strong>Lobby Creation:</strong> Requires a username (max 25 chars). Automatically generates a 6-character uppercase Base34 Lobby ID and a 4-character uppercase Base34 Password.</li>
             <li><strong>Share Invite Deep Links & QR Codes:</strong> Clicking "SHARE INVITE" opens a custom native-feeling share modal routing directly to apps like WhatsApp, iMessage, Messenger, or Telegram using deep links. The URL uses a complex `encodeInviteCode` function combining the ID and password into a single 10-character Base36 string. Users can also scan a dynamically generated QR Code in the lobby to instantly join.</li>
@@ -552,8 +552,9 @@
         <h2>5. Host Settings Logic & Requirements</h2>
         <p><em>Note: In online lobbies, guests see these settings but they are faded. Tooltip: "Only the host can change settings."</em></p>
         <ul>
-            <li><strong>Fake Word Mode (Yellow SVG masks icon):</strong> Replaces the Imposter. One Agent receives a different word from the same category but thinks it's the real word. <em>System Override: Enabling this automatically forces "Notify Imposter on Vote" to FALSE.</em></li>
-            <li><strong>Second Imposter / Second Fake Card (Orange SVG user-secret icon):</strong> Adds a second rogue player. <em>System Lock: Strictly disabled and greyed out unless there are 10 or more players currently in the lobby.</em></li>
+            <li><strong>Fake Word Mode (Yellow SVG masks icon):</strong> Replaces the Imposter. One Agent receives a different word from the same category but thinks it's the real word. <em>System Override: Enabling this automatically forces "Notify Imposter on Vote" and "Imposter Word Guess" to FALSE.</em></li>
+            <li><strong>Imposter Word Guess (Teal SVG brain and lightbulb icon):</strong> If the Agents vote correctly and catch the Imposter, the Imposter is given one final chance to type a guess for the secret word. If correct, they steal the win. (Disabled in Fake Word mode).</li>
+            <li><strong>Second Imposter / Second Fake Word (Orange SVG user-secret icon):</strong> Adds a second rogue player. <em>System Lock: Strictly disabled and greyed out unless there are 10 or more players currently in the lobby.</em></li>
             <li><strong>Notify Imposter on Vote (Red SVG bell icon):</strong> If an Agent triggers a 'Word Check' poll, the Imposter receives a secret red popup warning so they don't look surprised. (Disabled in Fake Word mode).</li>
             <li><strong>Speak Category (Purple SVG person speaking icon):</strong> Text-to-speech announces the category aloud when the active timer starts. <em>System Lock: Automatically disabled and greyed out if a custom Communigory is selected, as voice lines only exist for official base categories.</em></li>
         </ul>
@@ -650,9 +651,13 @@
             <li>In 'Fake Word' mode, one player has a different word from the same category. They think their word is the real one!</li>
             <li>Tip for Fake Word mode: If someone gives a clue that is confidently wrong, they might have the fake word. Don't dismiss them as just a bad player!</li>
             <li>The player with the Fake Word is included in 'Word Check' polls online. This makes it much harder to identify them by process of elimination.</li>
-            <li>In Fake Card Mode, you think you’re an agent... but the imposter never knows. One wrong move could expose you, so play smart and question everything, even yourself.</li>
+            <li>In Fake Word Mode, you think you’re an agent... but the imposter never knows. One wrong move could expose you, so play smart and question everything, even yourself.</li>
+            <li>If 'Imposter Word Guess' is enabled, pay close attention to the category! Even if caught, you can steal the win by typing the correct secret word.</li>
             <li>Be wary of players who only say 'I agree' or repeat previous clues in different words. They might be stalling.</li>
             <li>Press and hold any category card during setup to sneak a peek at some example words!</li>
+			<li>If you're confident you've found the spy, you don't have to wait for the timer. Use the 'Vote to End Round' button to force an early vote!</li>
+            <li>The 'Speak Category' feature only works for official categories. It will be automatically disabled if a custom Communigory is chosen for the round.</li>
+            <li>Playing online? Any custom 'Communigories' that a player has saved and enabled for online play will automatically merge into the lobby for everyone to vote on, even if you haven't downloaded them yourself!</li>
         </ul>
     </noscript>
 
@@ -851,7 +856,7 @@
 
                     <button 
                         onClick={() => window.location.reload()} 
-                        className="w-full bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-2xl shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3"
+                        className="w-full bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
                     >
                         <FaIcon name="icon-rotate-right" className=" text-lg" /> TRY AGAIN
                     </button>
@@ -1300,7 +1305,7 @@
                                     <img src="https://em-content.zobj.net/source/microsoft-teams/337/face-with-monocle_1f9d0.png" alt="Confusion Icon" className="w-7 h-7" />
                                     What if I Don't Know the Word?
                                 </h3>
-                                <p>It happens! If you're an Agent and receive a secret word you don't recognize, you'll see a special button during the card reveal (online mode only).</p>
+                                <p>It happens! If you're an Agent and receive a secret word you don't recognize, you'll see a special button during the card reveal (Play with Friends mode only).</p>
                                 <div className="mt-3 bg-white/5 p-3 rounded-lg border border-white/10 text-sm space-y-2">
                                     <p><strong>1. Declare Confusion:</strong> Press the "I don't recognize this word" button.</p>
                                     <p><strong>2. Agents Vote:</strong> This triggers a secret poll for all other Agents, asking if they know the word.</p>
@@ -1445,9 +1450,9 @@
                             <div className="p-4 pt-4 pb-3 flex flex-col gap-4">
                                 <button
                                     onClick={() => { onSelectMode('online'); audioManager.playSound('uiClick'); }}
-                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                                 >
-                                    <FaIcon name="icon-earth-americas" className=" text-brand-500" /> PLAY ONLINE
+                                    <FaIcon name="icon-earth-americas" className=" text-brand-500" /> PLAY WITH FRIENDS
                                 </button>
                                  <button
                                     onClick={() => { onSelectMode('local'); audioManager.playSound('uiClick'); }}
@@ -1619,7 +1624,7 @@
                              <button
                                 onClick={handleAction}
                                 disabled={isLoading}
-                                className="w-full h-[68px] flex items-center justify-center bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all"
+                                className="w-full h-[68px] flex items-center justify-center bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all"
                             >
                                {isLoading ? (
                                     <div className="flex items-center justify-center gap-3">
@@ -2134,7 +2139,7 @@
                     </div>
                     {isOnline && (
                         <div className="flex-shrink-0 p-4 pt-4 bg-slate-900/80 border-t border-white/5 backdrop-blur-xl">
-                            <button onClick={onClose} className="w-full max-w-md mx-auto flex items-center justify-center bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-[1.25rem] shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all">
+                            <button onClick={onClose} className="w-full max-w-md mx-auto flex items-center justify-center bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-[1.25rem] active:scale-[0.98] transition-all">
                                 Done
                             </button>
                         </div>
@@ -2211,6 +2216,7 @@
                         db.collection('lobbies').doc(lobbyId).update({
                             isFakeWordMode: true,
                             notifyImposterOnVote: false,
+                            imposterCanGuess: false,
                             lastSoundEvent: { name: 'switchOn', timestamp: Date.now() }
                         });
                     } else { 
@@ -2552,7 +2558,7 @@
                                                     <FaIcon name="icon-user-secret" className=" text-lg" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-bold text-white/90 text-sm">{lobbyData.isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
+                                                    <h3 className="font-bold text-white/90 text-sm">{lobbyData.isFakeWordMode ? 'Second Fake Word' : 'Second Imposter'}</h3>
                                                     <p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10+ agents are in the lobby.</p>
                                                 </div>
                                             </div>
@@ -2576,7 +2582,11 @@
                                                 </div>
                                                 <div>
                                                     <h3 className="font-bold text-red-400/90 text-sm">Notify Imposter on Vote</h3>
-                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">Shows a pop-up to the Imposter if an agent initiates a word-check.</p>
+                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">
+                                                        {lobbyData.enableTwoImposters 
+                                                            ? "Shows a pop-up to the Imposters if an agent initiates a word-check." 
+                                                            : "Shows a pop-up to the Imposter if an agent initiates a word-check."}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <button 
@@ -2585,6 +2595,33 @@
                                                 className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.notifyImposterOnVote ? 'bg-red-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
                                             >
                                                 <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.notifyImposterOnVote ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
+                                            </button>
+                                        </Tooltip>
+
+                                        <Tooltip 
+                                            className={`flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all duration-300 ${(!isHost || lobbyData.isFakeWordMode) ? 'opacity-50' : ''}`} 
+                                            text={lobbyData.isFakeWordMode ? "Disabled in Fake Word Mode" : (!isHost ? "Only the host can change settings" : "")}
+                                            isDisabled={!isHost || lobbyData.isFakeWordMode}
+                                        >
+                                            <div className="flex items-center gap-4 pr-4">
+                                                <div className="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 flex-shrink-0">
+                                                    <FaIcon name="icon-guess" className=" text-lg" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-bold text-teal-400/90 text-sm">Imposter Word Guess</h3>
+                                                    <p className="text-white/40 text-xs mt-1 leading-relaxed">
+                                                        {lobbyData.enableTwoImposters 
+                                                            ? "If caught, the Imposters get a final chance to guess the word and steal the win." 
+                                                            : "If caught, the Imposter gets a final chance to guess the word and steal the win."}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => handleSettingChange('imposterCanGuess', lobbyData.imposterCanGuess)}
+                                                disabled={!isHost || lobbyData.isFakeWordMode}
+                                                className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${lobbyData.imposterCanGuess ? 'bg-teal-500/80' : 'bg-white/10'} ${(!isHost || lobbyData.isFakeWordMode) && 'cursor-not-allowed'}`}
+                                            >
+                                                <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${lobbyData.imposterCanGuess ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
                                             </button>
                                         </Tooltip>
 
@@ -2642,7 +2679,7 @@
                                 allPlayersReady && !pollIsActive ? (
                                     <button
                                         onClick={onStartMission}
-                                        className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                                        className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-200/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                                         <span className="relative z-10 flex items-center gap-3">
@@ -2652,7 +2689,7 @@
                                 ) : (
                                     <button
                                         disabled={true}
-                                        className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] opacity-50 shadow-none flex items-center justify-center gap-3"
+                                        className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] opacity-50 shadow-none flex items-center justify-center gap-3"
                                     >
                                         <FaIcon name="icon-hourglass-half" className=" text-sm" /> WAITING FOR AGENTS ({readyPlayersCount}/{lobbyPlayers.length})
                                     </button>
@@ -2661,7 +2698,7 @@
                                 <button
                                     onClick={onStartGame}
                                     disabled={lobbyPlayers.length < MIN_PLAYERS || lobbyData.gameState !== 'waiting'}
-                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                 >
                                     <FaIcon name="icon-play" className=" text-sm" /> {lobbyPlayers.length < MIN_PLAYERS ? `WAITING FOR PLAYERS (${lobbyPlayers.length}/${MIN_PLAYERS})` : `ALL READY (${lobbyPlayers.length}/${MIN_PLAYERS}+)`}
                                 </button>
@@ -2695,7 +2732,7 @@
             "Listen to how others answer. Is someone being overly generic or changing their story?",
             "If you are the Imposter, try to get others to talk first so you can copy their vibe.",
             "Don't be too obvious! If the word is 'Pizza', don't ask 'Do you like pepperoni?'",
-            "In Online Mode, check the 'Voting Record' at the end to see who betrayed whom.",
+            "When playing with friends, check the 'Voting Record' at the end to see who betrayed whom.",
             "The 'Speak Category' toggle allows the game to announce the category name aloud.",
             "Watch out for players who simply repeat the previous answer in different words.",
             "Silence is suspicious! Make sure you have an answer ready before it's your turn.",
@@ -2705,7 +2742,7 @@
             "Did someone smile when they saw their card? That might be a clue.",
             "If you are the Imposter and figure out the word, try to blend in by adding a unique detail.",
             "Keep your card hidden! Reflections in glasses or windows can give you away.",
-            "Got a word you don't recognize? As an Agent, you can press a button on the reveal screen to start a 'Word Check' poll.",
+            "Got a word you don't recognize? As an Agent, you can press a button on the reveal screen to start a 'Word Check' poll (Play with Friends mode only).",
             "If a 'Word Check' poll appears, vote honestly. Rerolling a confusing word gives the Agents a better chance to win.",
             "If a round suddenly restarts before it begins, it means a majority of Agents were confused by the secret word and voted to re-deal.",
             "Imposter Tip: A long pause before the round starts? That's a secret 'Word Check' for Agents. Stay cool, they don't know you're excluded.",
@@ -2713,14 +2750,18 @@
             "With 10 or more players, the host can enable a second Imposter, raising the stakes and the suspicion!",
             "When two Imposters are in play, they don't know each other's identity. Be careful not to accidentally vote for your fellow spy!",
             "If the 'Notify Imposter' setting is on, the spy gets a heads-up when an Agent starts a 'Word Check' poll. Use this intel to stay one step ahead!",
-            "If the game seems to pause after cards are dealt in online mode, a secret 'Word Check' poll is likely in progress. Imposters, use this time to prepare your cover story!",
-            "Pay attention to the voting record at the end of an online match. It can reveal alliances and voting patterns you missed during the discussion.",
+            "If the game seems to pause after cards are dealt when playing with friends, a secret 'Word Check' poll is likely in progress. Imposters, use this time to prepare your cover story!",
+            "Pay attention to the voting record at the end of a match with friends. It can reveal alliances and voting patterns you missed during the discussion.",
             "In 'Fake Word' mode, one player has a different word from the same category. They think their word is the real one!",
             "Tip for Fake Word mode: If someone gives a clue that is confidently wrong, they might have the fake word. Don't dismiss them as just a bad player!",
             "The player with the Fake Word is included in 'Word Check' polls online. This makes it much harder to identify them by process of elimination.",
-            "In Fake Card Mode, you think you’re an agent... but the imposter never knows. One wrong move could expose you, so play smart and question everything, even yourself.",
+            "In Fake Word Mode, you think you’re an agent... but you never know. One wrong move could expose you, so question everything, even yourself.",
+            "If 'Imposter Word Guess' is enabled, pay close attention to the category! Even if caught, you can steal the win by typing the correct secret word.",
             "Be wary of players who only say 'I agree' or repeat previous clues in different words. They might be stalling.",
             "Press and hold any category card during setup to sneak a peek at some example words!",
+            "If you're confident you've found the spy, you don't have to wait for the timer. Use the 'Vote to End Round' button to force an early vote!",
+            "The 'Speak Category' feature only works for official categories. It will be automatically disabled if a custom Communigory is chosen for the round.",
+            "Playing with friends? Any saved 'Communigories' automatically merge into the lobby for everyone to vote on, even if you haven't downloaded them!",
         ];
 
         const LoadingScreen = ({ onStart, onFinishedLoading, isDataLoading }) => {
@@ -2736,7 +2777,7 @@
                         do { newIndex = Math.floor(Math.random() * TIPS.length); } while (newIndex === prev && TIPS.length > 1);
                         return newIndex;
                     });
-                }, 5000);
+                }, 9000);
                 return () => clearInterval(tipInterval);
             }, []);
 
@@ -2837,7 +2878,7 @@
                                 disabled={!isFullyReady && !showRestartBtn}
                                 className={`w-full max-w-xs relative overflow-hidden transition-all duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)] block border
                                     ${(isFullyReady || showRestartBtn)
-                                        ? 'h-[68px] bg-white rounded-[24px] shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25)] active:scale-[0.98] border-transparent cursor-pointer' 
+                                        ? 'h-[68px] bg-white rounded-[24px] active:scale-[0.98] border-transparent cursor-pointer' 
                                         : 'h-4 bg-slate-800/50 rounded-[16px] border-white/5 cursor-default shadow-none'
                                     }`}
                             >
@@ -2918,6 +2959,11 @@
             "icon-lightbulb": (props) => (
                 <svg viewBox="0 0 26 26" width="0.8em" {...props}>
                     <path fill="currentColor" d="M17.937 2.27a8.839 8.839 0 0 0-6.983-2.21 9.173 9.173 0 0 0-5.1 15.75c.955.901 1.146 2.19 1.146 3.969v.153a4.049 4.049 0 0 0 4.021 4.068h1.958a4.049 4.049 0 0 0 4.021-4.068v-.523c0-1.67.15-2.709.942-3.415a9.223 9.223 0 0 0 0-13.724zm-3.937 17.662a1.046 1.046 0 0 1-1.021 1.068h-1.958a1.046 1.046 0 0 1-1.021-1.068v-.153c0-.259 0-.519-.014-.779h4.02c0 .137-.006.274-.006.409zm1.945-6.177a5.292 5.292 0 0 0-1.488 2.245h-.957v-4.917a2.993 2.993 0 0 0 1.5-2.583 1.5 1.5 0 0 0-3 0 1.5 1.5 0 0 0-3 0 2.993 2.993 0 0 0 1.5 2.583v4.917h-1.038a6.061 6.061 0 0 0-1.54-2.368 6.18 6.18 0 0 1-1.871-5.313 6.087 6.087 0 0 1 5.249-5.278 5.989 5.989 0 0 1 .7-.041 5.861 5.861 0 0 1 3.94 1.509 6.222 6.222 0 0 1 .005 9.246z" />
+                </svg>
+            ), 
+			"icon-guess": (props) => (
+                <svg viewBox="0 0 24 24" width="1em" {...props}>
+                    <path fill="currentColor" d="m23.994 10.005c0 2.37-1.049 4.602-2.877 6.124-.709.591-1.117 1.524-1.117 2.562 0 1.825-1.484 3.31-3.309 3.31h-1.191c-.829 0-1.5-.672-1.5-1.5v-10.001c0-.829.671-1.5 1.5-1.5h2.074c.627 0 1.103.633.863 1.212-.281.679-.795 1.234-1.437 1.58v4.208h.563c.375-.842.927-1.588 1.634-2.176 1.142-.951 1.797-2.343 1.797-3.819 0-1.406-.568-2.708-1.599-3.667-1.03-.958-2.378-1.429-3.786-1.324-.827.051-1.545-.561-1.605-1.387s.561-1.545 1.387-1.605c2.249-.165 4.4.588 6.047 2.119 1.625 1.51 2.556 3.647 2.556 5.864zm-11.994-6.005v14.75c0 2.895-2.355 5.25-5.25 5.25-2.629 0-4.789-1.9-5.178-4.435-.959-.933-1.516-2.22-1.516-3.565 0-.85.215-1.672.618-2.401-.438-.784-.667-1.652-.667-2.554 0-1.119.369-2.634 2-3.857v-.188c0-1.425.76-2.658 2.009-3.364.184-2.036 1.9-3.636 3.983-3.636 2.206 0 4 1.794 4 4zm-3 0c0-.551-.449-1-1-1s-1 .449-1 1v.639c0 .677-.454 1.271-1.107 1.448-.404.109-.885.357-.885.913v1c0 .542-.292 1.042-.765 1.308-1.095.615-1.235 1.252-1.235 1.738.002.601.239 1.065.469 1.368.303.271.512.681.527 1.087.015.407-.106.828-.388 1.122-.361.376-.56.865-.56 1.378 0 .64.305 1.226.837 1.607.426.306.656.807.623 1.317.089 1.172 1.05 2.075 2.234 2.075 1.241 0 2.25-1.01 2.25-2.25z" />
                 </svg>
             ), 
             "icon-chevron-left": (props) => (
@@ -3484,7 +3530,7 @@
                         
                         <button 
                             onClick={onClose}
-                            className="w-full bg-white hover:bg-slate-200 text-slate-950 py-3 rounded-xl font-display font-bold text-base shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95 transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-white hover:bg-slate-200 text-slate-950 py-3 rounded-xl font-display font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-3"
                         >
                             RETURN TO HOME
                         </button>
@@ -3506,7 +3552,7 @@
                         
                         <button 
                             onClick={onClose}
-                            className="w-full bg-white hover:bg-slate-200 text-slate-950 py-3 rounded-xl font-display font-bold text-base shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95 transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-white hover:bg-slate-200 text-slate-950 py-3 rounded-xl font-display font-bold text-base active:scale-95 transition-all flex items-center justify-center gap-3"
                         >
                             RETURN TO HOME
                         </button>
@@ -3627,31 +3673,21 @@
             }, [displayCategories, selectedCategory, wordBank]);
             
             const [speakCategory, setSpeakCategory] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('imposter_speak_category');
-                    return saved ? JSON.parse(saved) : false;
-                } catch { return false; }
+                const saved = localStorage.getItem('imposter_speak_category');
+                return saved !== null ? JSON.parse(saved) : false;
             });
-
             const [isFakeWordMode, setIsFakeWordMode] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('imposter_fake_word_mode');
-                    return saved ? JSON.parse(saved) : false;
-                } catch { return false; }
+                const saved = localStorage.getItem('imposter_fake_word_mode');
+                return saved !== null ? JSON.parse(saved) : false;
             });
-
             const [newPlayerName, setNewPlayerName] = useState('');
             const [timerMinutes, setTimerMinutes] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('imposter_timerMinutes');
-                    return saved ? JSON.parse(saved) : 3;
-                } catch { return 3; }
+                const saved = localStorage.getItem('imposter_timerMinutes');
+                return saved !== null ? JSON.parse(saved) : 3;
             });
             const [timerEnabled, setTimerEnabled] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('imposter_timerEnabled');
-                    return saved !== null ? JSON.parse(saved) : true;
-                } catch { return true; }
+                const saved = localStorage.getItem('imposter_timerEnabled');
+                return saved !== null ? JSON.parse(saved) : true;
             });
 
             const holdTimerRef = useRef(null);
@@ -3705,10 +3741,8 @@
             const [inspectedCategory, setInspectedCategory] = useState(null);
             const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
             const [enableTwoImposters, setEnableTwoImposters] = useState(() => {
-                try {
-                    const saved = localStorage.getItem('imposter_enableTwoImposters');
-                    return saved ? JSON.parse(saved) : false;
-                } catch { return false; }
+                const saved = localStorage.getItem('imposter_enableTwoImposters');
+                return saved !== null ? JSON.parse(saved) : false;
             });
             
             const [isRecording, setIsRecording] = useState(false);
@@ -4034,7 +4068,7 @@
                                                 <FaIcon name="icon-user-secret" className=" text-lg" />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-white/90 text-sm">{isFakeWordMode ? 'Second Fake Card' : 'Second Imposter'}</h3>
+                                                <h3 className="font-bold text-white/90 text-sm">{isFakeWordMode ? 'Second Fake Word' : 'Second Imposter'}</h3>
                                                 <p className="text-white/40 text-xs mt-1 leading-relaxed">Adds a second rogue agent when 10+ players are in the lobby.</p>
                                             </div>
                                         </div>
@@ -4150,7 +4184,7 @@
                             <button
                                 onClick={handleStartClick}
                                 disabled={players.length < MIN_PLAYERS}
-                                className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+                                className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-200/50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                                 <span className="relative z-10 flex items-center gap-3">
@@ -4475,7 +4509,7 @@
                                 e.stopPropagation();
                                 handleAckAndNext();
                             }}
-                            className="w-full bg-white hover:bg-slate-200 text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg shadow-[0_0_30px_rgba(255,255,255,0.1)] active:scale-95 transition-all flex items-center justify-center gap-3"
+                            className="w-full bg-white hover:bg-slate-200 text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg active:scale-95 transition-all flex items-center justify-center gap-3"
                         >
                             <FaIcon name="icon-check-circle" className=" text-lg" />
                             {isOnline ? "CONTINUE" : (isLastPlayer ? "REVEAL TURN ORDER" : "NEXT PLAYER")}
@@ -4565,7 +4599,7 @@
                             {isHost ? (
                                 <button 
                                     onClick={onStartMission}
-                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                 >
                                     <FaIcon name="icon-play" className=" text-sm" /> START ROUND
                                 </button>
@@ -4754,7 +4788,7 @@
                                 ) : (
                                     <button
                                         onClick={handleIdentifyImposter}
-                                        className="w-full h-[68px] bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                        className="w-full h-[68px] bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                     >
                                         <FaIcon name="icon-check-to-slot-button" className=" text-lg" />
                                         VOTE TO END ROUND ({endVotes}/{duration && timeLeft === 0 ? 1 : requiredVotes})
@@ -4763,7 +4797,7 @@
                             ) : (
                                 <button
                                     onClick={handleIdentifyImposter}
-                                    className="w-full h-[68px] bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                    className="w-full h-[68px] bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                 >
                                     <FaIcon name="icon-user-secret" className=" text-lg" />
                                     {duration && timeLeft === 0 ? 'REVEAL IMPOSTER' : 'IDENTIFY IMPOSTER'}
@@ -4775,6 +4809,149 @@
             );
         };
         
+        const ImposterGuessScreen = ({ lobbyData, lobbyId, user, audioManager }) => {
+            const isImposter = lobbyData.imposterIds?.includes(user.uid);
+            const isMultiple = lobbyData.imposterIds?.length > 1;
+            const hasAlreadyGuessed = lobbyData.failedGuessers?.includes(user.uid);
+            const [guessInput, setGuessInput] = useState('');
+            const [isSubmitting, setIsSubmitting] = useState(false);
+
+            const handleGuess = async () => {
+                if (!guessInput.trim() || isSubmitting) return;
+                setIsSubmitting(true);
+                audioManager.playSound('uiClick');
+                
+                const guessedWord = guessInput.trim();
+                // Normalize both strings by removing spaces, hyphens, and punctuation
+                const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const isCorrect = normalize(guessedWord) === normalize(lobbyData.secretWord);
+                
+                const targetDb = window.db || db;
+
+                if (isCorrect) {
+                    // If ANY imposter guesses correctly, instant win!
+                    const finalResult = { winner: 'imposter', reason: 'guessed_word', guessedWord: lobbyData.secretWord };
+                    await targetDb.collection('lobbies').doc(lobbyId).update({
+                        gameState: 'result',
+                        gameResult: finalResult,
+                        pendingResult: firebase.firestore.FieldValue.delete(),
+                        failedGuessers: firebase.firestore.FieldValue.delete()
+                    }).catch(() => setIsSubmitting(false));
+                } else {
+                    // Incorrect guess
+                    if (isMultiple) {
+                        const currentFailed = lobbyData.failedGuessers || [];
+                        if (currentFailed.length + 1 >= lobbyData.imposterIds.length) {
+                            // This is the LAST imposter to guess, and they failed. Agents win.
+                            const finalResult = { ...(lobbyData.pendingResult || {}), guessedWord: guessedWord, imposterFailedGuess: true };
+                            await targetDb.collection('lobbies').doc(lobbyId).update({
+                                gameState: 'result',
+                                gameResult: finalResult,
+                                pendingResult: firebase.firestore.FieldValue.delete(),
+                                failedGuessers: firebase.firestore.FieldValue.delete()
+                            }).catch(() => setIsSubmitting(false));
+                        } else {
+                            // They failed, but we must wait for the other imposter to guess
+                            await targetDb.collection('lobbies').doc(lobbyId).update({
+                                failedGuessers: firebase.firestore.FieldValue.arrayUnion(user.uid)
+                            }).catch(() => setIsSubmitting(false));
+                        }
+                    } else {
+                        // Only one imposter, and they failed. Agents win.
+                        const finalResult = { ...(lobbyData.pendingResult || {}), guessedWord: guessedWord, imposterFailedGuess: true };
+                        await targetDb.collection('lobbies').doc(lobbyId).update({
+                            gameState: 'result',
+                            gameResult: finalResult,
+                            pendingResult: firebase.firestore.FieldValue.delete()
+                        }).catch(() => setIsSubmitting(false));
+                    }
+                }
+            };
+
+            return (
+                <div className="flex flex-col h-[100dvh] relative z-10 animate-fadeIn">
+                    <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+                        <div className="max-w-lg mx-auto p-6 pt-24">
+                            <div className="mb-8 text-center">
+                                <h1 className="text-4xl font-display font-black text-white mb-2 drop-shadow-lg tracking-tight">
+                                    {isImposter ? 'Final Guess' : 'Imposter Caught!'}
+                                </h1>
+                                <p className="text-white/40 font-display font-medium text-lg tracking-wide">
+                                    {isImposter ? "You were caught! Guess the word to steal the win." : (isMultiple ? "The Imposters are making their final guess..." : "The Imposter is making their final guess...")}
+                                </p>
+                            </div>
+
+                            {isImposter ? (
+                                hasAlreadyGuessed ? (
+                                    <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg animate-fadeIn">
+                                        <div className="text-center py-10 bg-black/40 flex flex-col items-center justify-center px-4">
+                                            <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mb-6 ring-1 ring-red-500/30 overflow-hidden">
+                                                <FaIcon name="icon-xmark" className="text-4xl text-red-400" />
+                                            </div>
+                                            <h2 className="text-2xl sm:text-3xl font-display font-black text-red-400 mb-3 uppercase tracking-wide">
+                                                Incorrect Guess
+                                            </h2>
+                                            <p className="text-white/60 text-sm max-w-[280px]">
+                                                Waiting for the other Imposter to make their attempt...
+                                            </p>
+                                        </div>
+                                    </section>
+                                ) : (
+                                    <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                        <div className="text-center py-8 bg-black/40 border-b border-white/5 flex flex-col items-center justify-center px-4">
+                                            <div className="w-20 h-20 bg-teal-500/10 rounded-full flex items-center justify-center mb-4 ring-1 ring-white/5 overflow-hidden">
+                                                <FaIcon name="icon-guess" className="text-4xl text-teal-400" />
+                                            </div>
+                                            <h2 className="text-xl font-display font-black text-teal-400 mb-2 uppercase tracking-wide">Steal the Victory</h2>
+                                            <p className="text-white/60 text-sm max-w-[280px]">Type the secret word. If you are correct, the spies win.</p>
+                                        </div>
+                                        <div className="p-6 bg-black/20">
+                                            <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-teal-500/80 focus-within:bg-slate-950/80 transition-colors">
+                                                <input
+                                                    type="text"
+                                                    value={guessInput}
+                                                    onChange={(e) => setGuessInput(e.target.value.slice(0, 30))}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && guessInput.trim()) {
+                                                            e.preventDefault();
+                                                            handleGuess();
+                                                        }
+                                                    }}
+                                                    placeholder="Type your guess..."
+                                                    className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0 text-center caret-teal-400 selection:bg-teal-500/30"
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={handleGuess}
+                                                disabled={!guessInput.trim() || isSubmitting}
+                                                className="w-full mt-4 bg-teal-600 hover:bg-teal-500 text-white font-display font-bold py-4 rounded-xl active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {isSubmitting ? 'SUBMITTING...' : 'SUBMIT GUESS'}
+                                            </button>
+                                        </div>
+                                    </section>
+                                )
+                            ) : (
+                                <section className="glass-panel rounded-[2rem] overflow-hidden border border-white/10 shadow-lg">
+                                    <div className="text-center py-10 bg-black/40 flex flex-col items-center justify-center px-4">
+                                        <div className="w-24 h-24 bg-teal-500/10 rounded-full flex items-center justify-center mb-6 ring-1 ring-teal-500/30 overflow-hidden">
+                                            <FaIcon name="icon-guess" className="text-4xl text-teal-400" />
+                                        </div>
+                                        <h2 className="text-2xl sm:text-3xl font-display font-black text-teal-400 mb-3 uppercase tracking-wide">
+                                            {isMultiple ? 'Waiting for Guesses' : 'Waiting for Guess'}
+                                        </h2>
+                                        <p className="text-white/60 text-sm max-w-[280px]">
+                                            {isMultiple ? 'The Imposters are making their final attempt to steal the win.' : 'The Imposter is making their final attempt to steal the win.'}
+                                        </p>
+                                    </div>
+                                </section>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const VotingScreen = ({ lobbyData, lobbyPlayers, user, lobbyId, audioManager }) => {
             const me = lobbyPlayers.find(p => p.id === user.uid);
             const [selectedVotes, setSelectedVotes] = useState([]);
@@ -4912,7 +5089,7 @@
                                 <button
                                     onClick={handleConfirmVote}
                                     disabled={selectedVotes.length !== numImposters}
-                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_50px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                    className="w-full bg-white text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] disabled:opacity-50 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                                 >
                                     <FaIcon name="icon-check-double" className=" text-sm" /> CONFIRM VOTE ({selectedVotes.length}/{numImposters})
                                 </button>
@@ -4986,11 +5163,21 @@
                  ambientBgClass = "bg-brand-500/5";
             } else if (isAgentWin) {
                  titleText = "AGENTS WIN";
-                 subtitleText = "The rogue element was successfully identified!";
+                 if (gameResult?.imposterFailedGuess) {
+                     subtitleText = roguePlayers.length > 1 
+                        ? `An Imposter incorrectly guessed: ${gameResult.guessedWord}` 
+                        : `The Imposter incorrectly guessed: ${gameResult.guessedWord}`;
+                 } else {
+                     subtitleText = "The rogue element was successfully identified!";
+                 }
                  titleColor = "text-teal-400";
                  titleBg = "bg-teal-500/10";
                  titleImg = "https://em-content.zobj.net/source/microsoft-teams/363/detective_light-skin-tone_1f575-1f3fb_1f3fb.png";
                  ambientBgClass = "bg-teal-500/5";
+            } else if (gameResult?.reason === 'guessed_word') {
+                 subtitleText = roguePlayers.length > 1 
+                    ? `An Imposter correctly guessed the word: ${gameResult.guessedWord}!` 
+                    : `The Imposter correctly guessed the word: ${gameResult.guessedWord}!`;
             }
 
             return (
@@ -5082,7 +5269,7 @@
                                         onRestart();
                                     }}
                                     disabled={notAllPlayersPresent}
-                                    className="w-full bg-white text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg shadow-[0_0_30px_rgba(255,255,255,0.1)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                                    className="w-full bg-white text-slate-950 py-5 rounded-[1.5rem] font-display font-bold text-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                                 >
                                     <FaIcon name="icon-rotate-right" className=" text-lg" />
                                     {notAllPlayersPresent ? 'WAITING FOR PLAYERS' : 'PLAY AGAIN'}
@@ -5893,7 +6080,15 @@
                     
                     if (currentLobbyDoc.gameState === 'voting') {
                         const allVoted = newPlayers.length > 0 && newPlayers.every(p => p.votedFor);
-                        if (allVoted) setTimeout(() => calculateResults(currentLobbyDoc, newPlayers), 1000);
+                        if (allVoted && !window.votingTimeout) {
+                            window.votingTimeout = setTimeout(() => {
+                                calculateResults(currentLobbyDoc, newPlayers);
+                                window.votingTimeout = null;
+                            }, 1000);
+                        } else if (!allVoted && window.votingTimeout) {
+                            clearTimeout(window.votingTimeout);
+                            window.votingTimeout = null;
+                        }
                     }
                     
                     if (currentLobbyDoc.gameState === 'reveal') {
@@ -5927,7 +6122,7 @@
                 if (lobbyData && lobbyData.gameState !== previousGameStateRef.current) {
                     if (
                         user && lobbyId &&
-                        (previousGameStateRef.current === 'result' || previousGameStateRef.current === 'reveal') &&
+                        (previousGameStateRef.current === 'result' || previousGameStateRef.current === 'reveal' || previousGameStateRef.current === 'imposterGuess') &&
                         lobbyData.gameState === 'waiting'
                     ) {
                         db.collection('lobbies').doc(lobbyId).collection('players').doc(user.uid).update({
@@ -6100,16 +6295,25 @@
                     .map(c => ({ id: c.id, name: c.name }));
 
                 await lobbyRef.set({
-                    hostId: user.uid, password: newPassword, category: 'Mystery Mode',
+                    hostId: user.uid, 
+                    password: newPassword, 
+                    category: 'Mystery Mode',
                     customCategoryId: (commId && commId !== 'open') ? commId : null,
                     lobbyCustomCategories: onlineCustomCats,
-                    isRandomMode: true, speakCategory: false, gameState: 'waiting',
-                    isFakeWordMode: false,
-                    enableTwoImposters: false, notifyImposterOnVote: false,
+                    isRandomMode: true, 
+                    gameState: 'waiting',
                     usedWords: [],
+                    
+                    speakCategory: false, 
+                    isFakeWordMode: false, 
+                    imposterCanGuess: false,
+                    enableTwoImposters: false, 
+                    notifyImposterOnVote: false,
+                    
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expireAt: firebase.firestore.Timestamp.fromDate(expiryDate)
                 });
+                
                 await lobbyRef.collection('players').doc(user.uid).set({
                     name: username, isHost: true,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -6343,7 +6547,7 @@
             };
             
             const calculateResults = async (currentLobbyData, currentLobbyPlayers) => {
-                if (currentLobbyData.gameState !== 'voting') return;
+                if (latestLobbyData.current?.gameState !== 'voting') return;
 
                 const isFakeWordMode = currentLobbyData.isFakeWordMode;
                 const roguePlayerIds = isFakeWordMode ? currentLobbyData.fakeWordPlayerIds : currentLobbyData.imposterIds;
@@ -6405,9 +6609,15 @@
                     }));
                 });
 
-                await db.collection('lobbies').doc(lobbyId).update({ 
-                    gameState: 'result', gameResult: result, votingRecord
-                });
+                if (result.winner === 'agents' && currentLobbyData.imposterCanGuess && !currentLobbyData.isFakeWordMode) {
+                    await db.collection('lobbies').doc(lobbyId).update({ 
+                        gameState: 'imposterGuess', pendingResult: result, votingRecord
+                    });
+                } else {
+                    await db.collection('lobbies').doc(lobbyId).update({ 
+                        gameState: 'result', gameResult: result, votingRecord
+                    });
+                }
             };
             
             const handleRestartOnline = async () => {
@@ -6425,6 +6635,8 @@
                     duration: firebase.firestore.FieldValue.delete(),
                     votingRecord: firebase.firestore.FieldValue.delete(),
                     lastRestartReason: firebase.firestore.FieldValue.delete(),
+                    pendingResult: firebase.firestore.FieldValue.delete(),
+                    failedGuessers: firebase.firestore.FieldValue.delete(),
                 };
 
                 await db.collection('lobbies').doc(lobbyId).update(updatePayload);
@@ -6506,6 +6718,9 @@
                     }
                     if (onlineState === 'voting') {
                         return <VotingScreen lobbyData={lobbyData} lobbyPlayers={lobbyPlayers} user={user} lobbyId={lobbyId} audioManager={audioManagerRef.current} />;
+                    }
+                    if (onlineState === 'imposterGuess') {
+                        return <ImposterGuessScreen lobbyData={lobbyData} lobbyId={lobbyId} user={user} audioManager={audioManagerRef.current} />;
                     }
                     if (onlineState === 'result') {
                         return <ResultScreen 
