@@ -6015,18 +6015,15 @@
                                     commDb.collection('communigories').doc(customCat.id).get().then(docSnap => {
                                         if (docSnap.exists) {
                                             const catData = docSnap.data();
-                                            setWordBank(prev => {
-                                                if(prev[customCat.id]) return prev;
-                                                return {...prev, [customCat.id]: catData.words};
-                                            });
+                                            setWordBank(prev => prev[customCat.id] ? prev : {...prev, [customCat.id]: catData.words});
                                             setCustomCategories(prev => {
                                                 if(prev[customCat.id]) return prev;
                                                 CATEGORY_ICONS[customCat.id] = catData.icon;
-                                                return {...prev,[customCat.id]: catData.icon};
+                                                return {...prev, [customCat.id]: catData.icon};
                                             });
                                             setCustomCategoryNames(prev => {
-                                                if(prev[customCat.id]) return prev;
-                                                return {...prev,[customCat.id]: catData.name};
+                                                if(prev[customCat.id] && prev[customCat.id] !== customCat.id) return prev;
+                                                return {...prev, [customCat.id]: catData.name || catData.title || customCat.name || customCat.id};
                                             });
                                         }
                                     });
@@ -6039,10 +6036,16 @@
                             commDb.collection('communigories').doc(data.customCategoryId).get().then(docSnap => {
                                 if (docSnap.exists) {
                                     const catData = docSnap.data();
-                                    setWordBank(prev => ({...prev,[data.customCategoryId]: catData.words}));
-                                    setCustomCategories(prev => ({...prev,[data.customCategoryId]: catData.icon}));
-                                    setCustomCategoryNames(prev => ({...prev,[data.customCategoryId]: catData.name}));
-                                    CATEGORY_ICONS[data.customCategoryId] = catData.icon;
+                                    setWordBank(prev => prev[data.customCategoryId] ? prev : {...prev, [data.customCategoryId]: catData.words});
+                                    setCustomCategories(prev => {
+                                        if(prev[data.customCategoryId]) return prev;
+                                        CATEGORY_ICONS[data.customCategoryId] = catData.icon;
+                                        return {...prev, [data.customCategoryId]: catData.icon};
+                                    });
+                                    setCustomCategoryNames(prev => {
+                                        if(prev[data.customCategoryId] && prev[data.customCategoryId] !== data.customCategoryId) return prev;
+                                        return {...prev, [data.customCategoryId]: catData.name || catData.title || data.customCategoryId};
+                                    });
                                 }
                             });
                         }
