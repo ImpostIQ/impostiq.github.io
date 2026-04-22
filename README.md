@@ -18,7 +18,7 @@
   </p>
 
   <p>
-    <a href="https://impostiq.github.io"><img draggable="false" src="https://i.ibb.co/SpmN53G/impostiq-button-1775747942201-4x.png" alt="Play Online Now" height="50"></a>&nbsp;
+    <a href="https://impostiq.github.io"><img draggable="false" src="https://i.ibb.co/SpmN53G/impostiq-button-1775747942201-4x.png" alt="Play Now" height="50"></a>&nbsp;
     <a href="https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1"><img draggable="false" src="https://i.ibb.co/ym97RvG0/impostiq-button-1775748439177-4x.png" alt="Download Android APK" height="50"></a>&nbsp;
     <a href="https://discord.gg/m9WrJxGKtr"><img draggable="false" src="https://i.ibb.co/XZ5NRYp6/impostiq-button-1775748563963-4x.png" alt="Join the Discord" height="50"></a>
   </p>
@@ -41,7 +41,7 @@
 
 <p>Players must take turns asking each other questions or stating facts to figure out who the spy is. The Agents want to be specific enough to prove they know the word, but vague enough so the Imposter doesn't figure it out and blend in!</p> 
 
-<p>With over <strong>8,500+ words</strong> across <strong>28 categories</strong>, no two games are ever the same.</p>
+<p>With over <strong>8,500+ words</strong> across <strong>28 categories</strong>, plus an endless community vault of custom user-generated categories, no two games are ever the same.</p>
 
 <br>
 
@@ -58,23 +58,24 @@
 
 <h4>
   <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/globe-showing-americas_1f30e.png" width="24" align="absmiddle"></picture>&nbsp;
-  <picture><img draggable="false" src="https://i.ibb.co/xtGxNWnL/b1a7ae62e30bc26be31da66414f2de2f.png" alt="1. Play Online (Real-Time Multiplayer)" height="16" align="absmiddle" style="margin-top: 3px;"></picture>
+  <strong>Play with Friends</strong>
 </h4>
 <p>Play on separate devices over the internet with friends across the globe.</p>
 <ul>
   <li><strong>Easy Invites:</strong> Share a dynamic 10-character deep-link or a custom QR code. Joining is instant.</li>
-  <li><strong>Category Voting:</strong> The host doesn't dictate the theme; all players vote for the category they want. Ties are resolved randomly!</li>
-  <li><strong>Interactive Voting:</strong> When the 3-minute timer ends (or a majority votes to end early), players use a secret interactive UI to lock in their suspects.</li>
-  <li><strong>Voting Records:</strong> At the end of the match, an intricate voting record shows exactly who betrayed whom.</li>
+  <li><strong>Category Voting:</strong> The host doesn't dictate the theme; all players vote for the category they want. Ties are resolved randomly.</li>
+  <li><strong>Mission Sequence:</strong> To prevent chaotic talking, the game generates a randomized Turn Order list so everyone is forced to interrogate and be interrogated.</li>
+  <li><strong>Interactive Voting & Records:</strong> When the 3-minute hardcoded timer ends (or a majority votes to end early), players use a secret interactive UI to lock in their suspects. At the end of the match, an intricate voting record shows exactly who betrayed whom.</li>
 </ul>
 
 <h4>
   <picture><img draggable="false" src="http://em-content.zobj.net/source/microsoft-teams/337/mobile-phone_1f4f1.png" width="24" align="absmiddle"></picture>&nbsp;
-  <picture><img draggable="false" src="https://i.ibb.co/7x6Y4Hxj/5f42f73fa3cf01f638d3912914349912.png" alt="2. Play on This Device (Local Pass-and-Play)" height="16" align="absmiddle" style="margin-top: 3px;"></picture>
+  <strong>Play on This Device</strong>
 </h4>
 <p>Hanging out in person? You only need <strong>one phone</strong> to play.</p>
 <ul>
   <li><strong>Pass and Play:</strong> The screen will tell you who to pass the phone to. They tap "Verify Identity" to secretly check their role.</li>
+  <li><strong>Adjustable Timers:</strong> Set the timer anywhere from 1 to 15 minutes, or turn it off entirely for "Untimed Mode".</li>
   <li><strong>Custom Voice Notes:</strong> When setting up players, the host can tap the <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/studio-microphone_1f399-fe0f.png" width="20" align="absmiddle"></picture> microphone icon to record custom <em>"Hey, it's your turn!"</em> voice notes that play automatically when the phone is passed.</li>
 </ul>
 
@@ -97,8 +98,8 @@
   <li><strong>Create Your Own:</strong> Build custom word banks (minimum 10 words), assign a 3D visual icon, and upload them to the community feed.</li>
   <li><strong>Trending &amp; Newest:</strong> Browse hundreds of unique packs created by players around the world, sorted by popularity (downloads) and release date.</li>
   <li><strong>Private Categories:</strong> Hosting an inside-joke game? Toggle "Private" to hide your category from the public feed, making it accessible only via a direct share link.</li>
-  <li><strong>Instant Deep Linking:</strong> Found a category you love? Instantly launch a Local or Online lobby utilizing that specific custom word bank with a single click. The game engine will seamlessly pull it directly into your active word bank.</li>
-  <li><strong>Personal Library:</strong> Save your favorite Communigories to your local device to easily access and manage them for future game nights.</li>
+  <li><strong>Library Management:</strong> Save your favorite Communigories to your local device. You can easily toggle them on/off for <em>Play on This Device</em> or <em>Play with Friends</em> games without having to delete them.</li>
+  <li><strong>Instant Deep Linking:</strong> Found a category you love? Instantly launch a lobby utilizing that specific custom word bank with a single click. In <em>Play with Friends</em> mode, any custom categories you have enabled automatically sync to the lobby for everyone to vote on!</li>
 </ul>
 
 <br>
@@ -118,11 +119,12 @@
 
 | Setting | Icon | Availability | Description |
 | :--- | :---: | :---: | :--- |
-| **Fake Word Mode** | <picture><img draggable="false" src="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/3d/1f3ad_3d.png" width="24"></picture> | **Both** | Replaces the Imposter. Instead, one Agent receives a *different* word from the same category. They have no idea their word is the fake one! |
-| **Second Imposter** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" width="24"></picture> | **Both** | Have a massive group? Lobbies with **10 or more players** unlock the ability to add a second Imposter (or a second Fake Card) to the mission. |
-| **Speak Category** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/megaphone_1f4e3.png" width="24"></picture> | **Both** | When the round begins, text-to-speech automatically announces the chosen category aloud so everyone is on the same page. |
-| **Countdown Timer** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/three-oclock_1f552.png" width="24"></picture> | **Local Only** | Adjust the discussion timer from 1 to 15 minutes, or turn it off entirely for a relaxed, **Untimed Mode**. *(Online missions are hardcoded to a fast-paced 3 minutes).* |
-| **Notify Imposter** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/bell_1f514.png" width="24"></picture> | **Online Only** | If an Agent is confused by a word, they can trigger a secret poll. This setting gives the Imposter a secret red popup warning so they don't look surprised. |
+| **Fake Word Mode** | <picture><img draggable="false" src="https://images.emojiterra.com/microsoft/fluent-emoji/15.1/3d/1f3ad_3d.png" width="24"></picture> | **Both Modes** | Replaces the Imposter. Instead, one Agent receives a *different* word from the same category. They have no idea their word is the fake one! |
+| **Imposter Word Guess** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/brain_1f9e0.png" width="24"></picture> | **Play with Friends** | If the Agents correctly catch the Imposter, the Imposter is given one final chance to type a guess for the secret word. If correct, they steal the win! |
+| **Second Imposter** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png" width="24"></picture> | **Both Modes** | Have a massive group? Lobbies with **10 or more players** unlock the ability to add a second Imposter (or a second Fake Card) to the mission. |
+| **Speak Category** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/megaphone_1f4e3.png" width="24"></picture> | **Both Modes** | When the round begins, text-to-speech automatically announces the chosen category aloud so everyone is on the same page. *(Auto-disabled for Custom Categories)*. |
+| **Countdown Timer** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/three-oclock_1f552.png" width="24"></picture> | **Play on This Device** | Adjust the discussion timer from 1 to 15 minutes, or turn it off entirely for a relaxed, **Untimed Mode**. *(Play with Friends missions are hardcoded to a fast-paced 3 minutes).* |
+| **Notify Imposter** | <picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/bell_1f514.png" width="24"></picture> | **Play with Friends** | If an Agent is confused by a word, they can trigger a secret poll. This setting gives the Imposter a secret red popup warning so they aren't caught off-guard. |
 
 <br>
 
@@ -139,10 +141,10 @@
 
 <p>Because Impostiq features an enormous <strong>8,500+ word bank</strong>, sometimes an Agent might receive a secret word they don't recognize.</p> 
 
-<p>To keep the game 100% fair, online mode features the <strong>Word Check</strong> system:</p>
+<p>To keep the game 100% fair, <em>Play with Friends</em> features the <strong>Word Check</strong> system:</p>
 <ol>
   <li>During the card reveal, an Agent can click <em>"I don't recognize this word"</em>.</li>
-  <li>The game pauses and pushes a secret Yes/No poll to all other Agents.</li>
+  <li>The game pauses and pushes a secret Yes/No poll to all other Agents (bypassing the Imposter).</li>
   <li>If the majority of Agents admit they don't know the word either, the game intercepts the round, forces an automatic restart, and deals a brand new word and Imposter.</li>
 </ol>
 
@@ -214,12 +216,13 @@
 </p>
 
 <ul>
-  <li><strong>Frontend:</strong> React 18, Tailwind CSS, Framer Motion (for dynamic 3D card tilt physics).</li>
+  <li><strong>Frontend:</strong> React 18, Tailwind CSS, Framer Motion (for dynamic 3D card tilt physics and spring animations).</li>
   <li><strong>Backend:</strong> Firebase Firestore (Real-time NoSQL state management) &amp; Firebase Auth.</li>
-  <li><strong>Infrastructure &amp; Load Balancing:</strong> Time-based Database Load Balancing (Swaps between primary Firebase instances at 12:00 PT to prevent active game rate limits).</li>
+  <li><strong>Infrastructure &amp; Load Balancing:</strong> Time-based Database Load Balancing (Dynamically checks the Pacific Time Zone and swaps between primary Firebase instances 'APP1' and 'APP2' at 12:00 PT to prevent rate limit throttling).</li>
   <li><strong>Communigories Architecture:</strong> User-generated categories are pushed to a completely separate, dedicated Firebase instance to safely handle public uploads, votes, and queries without congesting live game servers.</li> 
-  <li><strong>Offline Persistence:</strong> The Communigories vault enables Firestore offline persistence heavily speeding up subsequent loads and enabling category caching.</li>
-  <li><strong>Audio Engine:</strong> Custom-built <code>audioManager</code> for parallel SFX and looping music states.</li>
+  <li><strong>WebView/APK Fallbacks:</strong> The game detects if it's running inside an iOS UIWebView or an Android APK wrapper (like Median.co) and dynamically disables the 3D depth layering on cards to prevent native graphical glitching.</li>
+  <li><strong>Avatars:</strong> Auto-generated on the fly via the Dicebear API based on the user's typed name.</li>
+  <li><strong>Audio Engine:</strong> Custom-built <code>audioManager</code> for parallel SFX, automatic iOS Web Audio unlocking, and looping music states.</li>
 </ul>
 
 <br>
