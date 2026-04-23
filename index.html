@@ -5499,9 +5499,16 @@
                     updatedNames[cat.id] = cat.name;
                     CATEGORY_ICONS[cat.id] = cat.icon;
                 });
-                setWordBank(updatedBank);
-                setCustomCategories(updatedCustomCats);
-                setCustomCategoryNames(updatedNames);
+                
+                setWordBank(prev => prev ? { ...prev, ...updatedBank } : updatedBank);
+                
+                setCustomCategories(prev => {
+                    const merged = prev ? { ...prev, ...updatedCustomCats } : updatedCustomCats;
+                    Object.keys(merged).forEach(k => { CATEGORY_ICONS[k] = merged[k]; });
+                    return merged;
+                });
+                
+                setCustomCategoryNames(prev => prev ? { ...prev, ...updatedNames } : updatedNames);
             };
 
             useEffect(() => {
@@ -6011,7 +6018,21 @@
                             });
 
                             data.lobbyCustomCategories.forEach(customCat => {
-                                if (!customCategories[customCat.id]) {
+                                // If the lobby document contains the full data (words & icon), use it instantly!
+                                if (customCat.words && customCat.icon) {
+                                    CATEGORY_ICONS[customCat.id] = customCat.icon;
+                                    
+                                    setCustomCategories(prev => {
+                                        if (prev[customCat.id]) return prev;
+                                        return {...prev, [customCat.id]: customCat.icon};
+                                    });
+                                    
+                                    setWordBank(prev => {
+                                        if (prev[customCat.id]) return prev;
+                                        return {...prev, [customCat.id]: customCat.words};
+                                    });
+                                } else if (!customCategories[customCat.id]) {
+                                    // Fallback for older lobbies created before this update
                                     commDb.collection('communigories').doc(customCat.id).get().then(docSnap => {
                                         if (docSnap.exists) {
                                             const catData = docSnap.data();
@@ -6026,25 +6047,6 @@
                                                 return {...prev, [customCat.id]: catData.name || catData.title || customCat.name || customCat.id};
                                             });
                                         }
-                                    });
-                                }
-                            });
-                        }
-
-                        // Legacy support for single custom category
-                        if (data.customCategoryId && !customCategories[data.customCategoryId]) {
-                            commDb.collection('communigories').doc(data.customCategoryId).get().then(docSnap => {
-                                if (docSnap.exists) {
-                                    const catData = docSnap.data();
-                                    setWordBank(prev => prev[data.customCategoryId] ? prev : {...prev, [data.customCategoryId]: catData.words});
-                                    setCustomCategories(prev => {
-                                        if(prev[data.customCategoryId]) return prev;
-                                        CATEGORY_ICONS[data.customCategoryId] = catData.icon;
-                                        return {...prev, [data.customCategoryId]: catData.icon};
-                                    });
-                                    setCustomCategoryNames(prev => {
-                                        if(prev[data.customCategoryId] && prev[data.customCategoryId] !== data.customCategoryId) return prev;
-                                        return {...prev, [data.customCategoryId]: catData.name || catData.title || data.customCategoryId};
                                     });
                                 }
                             });
@@ -6328,7 +6330,7 @@
                 const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
                 const onlineCustomCats = Object.values(savedComms)
                     .filter(c => c.useOnline !== false)
-                    .map(c => ({ id: c.id, name: c.name }));
+                    .map(c => ({ id: c.id, name: c.name, icon: c.icon, words: c.words }));
 
                 await lobbyRef.set({
                     hostId: user.uid, 
@@ -6407,7 +6409,7 @@
                 const savedComms = JSON.parse(localStorage.getItem('saved_communigories') || '{}');
                 const myOnlineCustomCats = Object.values(savedComms)
                     .filter(c => c.useOnline !== false)
-                    .map(c => ({ id: c.id, name: c.name }));
+                    .map(c => ({ id: c.id, name: c.name, icon: c.icon, words: c.words }));
 
                 if (myOnlineCustomCats.length > 0) {
                     const existingCats = data.lobbyCustomCategories || [];
