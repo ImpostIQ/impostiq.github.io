@@ -454,7 +454,7 @@
 
             return (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
-                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
                     <div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl flex flex-col animate-slide-up">
                         
                         <div className="flex justify-between items-center mb-4">
@@ -500,7 +500,7 @@
             if (!isOpen) return null;
 
             return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center sm:p-6 bg-slate-950/95 sm:bg-black/70 backdrop-blur-xl sm:backdrop-blur-md animate-fadeIn">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center sm:p-6 bg-slate-950/95 sm:bg-black/60 backdrop-blur-md animate-fadeIn">
                     <div className="absolute inset-0 hidden sm:block" onClick={() => { if(playSound) playSound('uiClick'); onClose(); }}></div>
                     <div className="relative flex flex-col w-full h-full sm:h-auto sm:max-w-4xl sm:max-h-[90vh] bg-slate-950/95 sm:rounded-3xl sm:border sm:border-white/10 sm:shadow-2xl sm:animate-slide-up overflow-hidden z-10">
                         
