@@ -246,6 +246,6 @@
 
 <div align="center">
   <picture>
-    <img draggable="false" src="https://i.ibb.co/KSsMm0W/ogimage.png" style="border-radius: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-width: 100%;">
+    <img draggable="false" src="https://i.ibb.co/20wvZ5J0/image-4.png" style="border-radius: 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-width: 100%;">
   </picture>
 </div>
