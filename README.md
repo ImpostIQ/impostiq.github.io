@@ -13,7 +13,7 @@
   
   <p align="center">
     <picture>
-      <img draggable="false" src="https://i.ibb.co/Y7MG336C/desc.png" alt="A thrilling social deduction party game of deception, secrets, and strategy." style="display: block; width: 70%; max-width: 700px; margin: 0 auto;">
+      <img draggable="false" src="https://i.ibb.co/Y7MG336C/desc.png" alt="A thrilling social deduction party game of deception, secrets, and strategy." style="display: block; width: 90%; max-width: 700px; margin: 0 auto;">
     </picture>
   </p>
 
