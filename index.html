@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="google-site-verification" content="f_vovPG5F0fSlBF405RthRa9nx-2krtUjjF9oyWBFp0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Impostiq • Find the Spy</title>
     <meta property="og:site_name" content="Impostiq">
     <meta name="apple-mobile-web-app-title" content="Impostiq">
     <meta name="description" content="A social deduction game similar to Spyfall. Players receive a secret word, but the Imposter receives nothing. Players must question each other to find the spy without revealing the word.">
+    <title>Impostiq • Find the Spy</title>
     
     <script type="application/ld+json">
     [
@@ -36,75 +36,64 @@
     ]
     </script>
     
-	<link rel="icon" href="https://impostiq.github.io/images/imagerounded576.png" sizes="576x576" type="image/png">
-
-	<link rel="icon" id="browser-favicon" href="https://impostiq.github.io/images/favicon192.png" sizes="16x16 32x32 192x192" type="image/png">
-
+	<link rel="icon" id="dynamic-favicon" href="https://impostiq.github.io/images/iconroundedsquare192.png" sizes="192x192" type="image/png">
 	<link rel="apple-touch-icon" href="https://impostiq.github.io/images/imagerounded576.png">
 	
-    <meta property="og:title" content="Impostiq • Find the Spy" />
-    <meta property="og:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
-    
-    <meta property="og:url" content="https://impostiq.github.io" />
     <meta name="thumbnail" content="https://impostiq.github.io/images/displayimage512.png" />
-
 	<link rel="image_src" href="https://impostiq.github.io/images/displayimage512.png" />
+	<meta itemprop="image" content="https://impostiq.github.io/images/displayimage512.png">
+	
+    <meta property="og:title" content="Impostiq • Find the Spy" />
+    <meta property="og:url" content="https://impostiq.github.io" />
     <meta property="og:image" id="og-image" content="https://impostiq.github.io/images/ogimage.png" />
     <meta property="og:image:secure_url" content="https://impostiq.github.io/images/ogimage.png" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Impostiq Game Logo" />
-    
     <meta property="og:type" content="website" />
+    <meta property="og:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
+    
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Impostiq • Find the Spy" />
+    <meta name="twitter:image" id="twitter-image" content="https://impostiq.github.io/images/ogimage.png" />
     <meta name="twitter:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
     
-    <meta name="twitter:image" id="twitter-image" content="https://impostiq.github.io/images/ogimage.png" />
-
     <script>
-        (function() {
-            const getSeasonalInfo = () => {
-                const now = new Date();
-                const month = now.getMonth() + 1;
-                const day = now.getDate();
-                
-                if ((month === 10 && day >= 24) || (month === 11 && day <= 7)) {
-                    return 'halloween';
-                }
+		(function() {
+			const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
+			if (isBot) return;
+			
+			const getSeasonalInfo = () => {
+				const now = new Date();
+				const month = now.getMonth() + 1;
+				const day = now.getDate();
+				
+				if ((month === 10 && day >= 24) || (month === 11 && day <= 7)) {
+					return 'halloween';
+				}
+				if ((month === 12 && day >= 18) || (month === 1 && day <= 1)) {
+					return 'christmas';
+				}
+				return 'default';
+			};
 
-                if ((month === 12 && day >= 18) || (month === 1 && day <= 1)) {
-                    return 'christmas';
-                }
-                
-                return 'default';
-            };
+			const season = getSeasonalInfo();
+			
+			if (season === 'default') return;
 
-            const season = getSeasonalInfo();
-            
-            const cacheBuster = "?v=" + season + "-" + new Date().getFullYear(); 
+			const cacheBuster = "?v=" + season + "-" + new Date().getFullYear(); 
+			const images = {
+				christmas: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Snowman-3d-icon.png",
+				halloween: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Jack-O-Lantern-3d-icon.png"
+			};
 
-            const images = {
-                christmas: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Snowman-3d-icon.png",
-                halloween: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Jack-O-Lantern-3d-icon.png"
-            };
-
-            if (images[season]) {
-                const imageUrl = images[season] + cacheBuster;
-                
-                const favicon = document.getElementById('browser-favicon');
-                const ogImage = document.getElementById('og-image');
-                const twitterImage = document.getElementById('twitter-image');
-
-                if (favicon) {
-                    favicon.href = imageUrl;
-                    document.head.removeChild(favicon);
-                    document.head.appendChild(favicon);
-                }
-            }
-        })();
-    </script>
+			const favicon = document.getElementById('dynamic-favicon');
+			if (favicon && images[season]) {
+				favicon.href = images[season] + cacheBuster;
+			}
+		})();
+	</script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
