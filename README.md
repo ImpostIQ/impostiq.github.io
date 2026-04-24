@@ -164,8 +164,8 @@
 <p>The game engine automatically transforms based on the time of year, changing the UI, metadata, and background music!</p>
 
 <ul>
-  <li><picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/337/jack-o-lantern_1f383.png" width="20" align="absmiddle"></picture> <strong>Halloween Event (Oct 24 - Nov 7):</strong> Unlocks a spooky UI, eerie music, and a special Halloween category (Vampires, Zombies, Jack-O-Lanterns).</li>
-  <li><picture><img draggable="false" src="https://em-content.zobj.net/source/microsoft-teams/364/christmas-tree_1f384.png" width="20" align="absmiddle"></picture> <strong>Christmas Event (Dec 18 - Jan 1):</strong> The UI freezes over with festive jingles and a dedicated Christmas category (Reindeer, Eggnog, Santa Claus).</li>
+  <li><strong>Halloween Event (Oct 24 - Nov 7):</strong> Unlocks a spooky UI, eerie music, and a special Halloween category (Vampires, Zombies, Jack-O-Lanterns).</li>
+  <li><strong>Christmas Event (Dec 18 - Jan 1):</strong> The UI freezes over with festive jingles and a dedicated Christmas category (Reindeer, Eggnog, Santa Claus).</li>
 </ul>
 
 <br>
@@ -199,8 +199,6 @@
   <li><strong>Detect the Dissonance:</strong> If everyone's clues seem to point to a different word, <em>you</em> might be the one with the fake word. If you suspect this, pivot to more general clues.</li>
   <li><em>Example:</em> Real Word: <em>Apple</em>. Your Fake Word: <em>Banana</em>. An agent says "It can be red or green." If you proudly say "It's long and you peel it," you will immediately expose yourself as the fake!</li>
 </ul>
-
-<picture><img draggable="false" src="https://i.ibb.co/svJ1wYZZ/24c642e20f5eebfb49eb41065789f42d.png" alt="Pro-Tip: During setup, press and hold (long-press) any category card to sneak a peek at some example words before the game begins!" height="17" align="absmiddle" style="margin-top: 3px;"></picture>
 
 <br>
 
