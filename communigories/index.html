@@ -139,6 +139,12 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    cursor: {
+                        default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
+                        pointer: "url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer",
+                        text: "url('https://impostiq.github.io/images/cursors/text.cur'), text",
+                        'not-allowed': "url('https://impostiq.github.io/images/cursors/not-allowed.cur'), not-allowed",
+                    },
                     colors: { slate: { 850: '#151e2e', 950: '#020617' }, brand: { 400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed' } },
                     animation: {
                         'fade-in': 'fadeIn 0.3s ease-out forwards',
@@ -170,6 +176,22 @@
         html, body { position: fixed; inset: 0; overflow: hidden; background-color: #020617; color: #f8fafc; touch-action: none; user-select: none; -webkit-user-select: none; }
         img { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; pointer-events: none; }
         
+		body, button:disabled, .cursor-default, .cursor-wait { 
+            cursor: url('https://impostiq.github.io/images/cursors/default.cur'), default !important; 
+        }
+        
+        button:not(:disabled), a, [role="button"], .cursor-pointer { 
+            cursor: url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer !important; 
+        }
+        
+        input, textarea, .cursor-text { 
+            cursor: url('https://impostiq.github.io/images/cursors/text.cur'), text !important; 
+        }
+        
+        button:disabled:not(.w-full), .cursor-not-allowed, .disabled\:cursor-not-allowed:disabled { 
+            cursor: url('https://impostiq.github.io/images/cursors/not-allowed.cur'), not-allowed !important; 
+        }
+		
         .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
