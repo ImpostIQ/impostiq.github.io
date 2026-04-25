@@ -27,7 +27,7 @@
 	]
 	</script>
 	
-	<link rel="icon" id="dynamic-favicon" href="https://impostiq.github.io/images/iconroundedsquare192.png" sizes="192x192" type="image/png">
+	<link rel="icon" id="dynamic-favicon" href="https://impostiq.github.io/images/squarefavicon192.png" sizes="192x192" type="image/png">
 	<link rel="apple-touch-icon" href="https://impostiq.github.io/images/imagerounded576.png">
     
     <meta name="thumbnail" content="https://impostiq.github.io/images/displayimage512_communigories.png" />
@@ -57,39 +57,41 @@
 		}
 	</script>
 
+    
     <script>
 		(function() {
 			const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
-			if (isBot) return;
+			if (isBot) return; 
+			
+			const favicon = document.getElementById('dynamic-favicon');
+			if (!favicon) return;
+
+			let iconToLoad = "https://impostiq.github.io/images/favicon192.png";
 			
 			const getSeasonalInfo = () => {
 				const now = new Date();
 				const month = now.getMonth() + 1;
 				const day = now.getDate();
 				
-				if ((month === 10 && day >= 24) || (month === 11 && day <= 7)) {
-					return 'halloween';
-				}
-				if ((month === 12 && day >= 18) || (month === 1 && day <= 1)) {
-					return 'christmas';
-				}
+				if ((month === 10 && day >= 24) || (month === 11 && day <= 7)) return 'halloween';
+				if ((month === 12 && day >= 18) || (month === 1 && day <= 1)) return 'christmas';
 				return 'default';
 			};
 
 			const season = getSeasonalInfo();
 			
-			if (season === 'default') return;
-
-			const cacheBuster = "?v=" + season + "-" + new Date().getFullYear(); 
-			const images = {
-				christmas: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Snowman-3d-icon.png",
-				halloween: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Jack-O-Lantern-3d-icon.png"
-			};
-
-			const favicon = document.getElementById('dynamic-favicon');
-			if (favicon && images[season]) {
-				favicon.href = images[season] + cacheBuster;
+			if (season !== 'default') {
+				const cacheBuster = "?v=" + season + "-" + new Date().getFullYear(); 
+				const images = {
+					christmas: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Snowman-3d-icon.png",
+					halloween: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/1024/Jack-O-Lantern-3d-icon.png"
+				};
+				if (images[season]) {
+					iconToLoad = images[season] + cacheBuster;
+				}
 			}
+
+			favicon.href = iconToLoad;
 		})();
 	</script>
 	
