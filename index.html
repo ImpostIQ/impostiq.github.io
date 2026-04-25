@@ -146,6 +146,12 @@
                         display: ['Outfit', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     },
+                    cursor: {
+                        default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
+                        pointer: "url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer",
+                        text: "url('https://impostiq.github.io/images/cursors/text.cur'), text",
+                        'not-allowed': "url('https://impostiq.github.io/images/cursors/not-allowed.cur'), not-allowed",
+                    },
                     colors: {
                         slate: {
                             850: '#151e2e',
@@ -252,6 +258,22 @@
             user-drag: none;
             -webkit-touch-callout: none;
             pointer-events: none;
+        }
+
+        body, button:disabled, .cursor-default, .cursor-wait { 
+            cursor: url('https://impostiq.github.io/images/cursors/default.cur'), default !important; 
+        }
+        
+        button:not(:disabled), a, [role="button"], .cursor-pointer { 
+            cursor: url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer !important; 
+        }
+        
+        input, textarea, .cursor-text { 
+            cursor: url('https://impostiq.github.io/images/cursors/text.cur'), text !important; 
+        }
+        
+        button:disabled:not(.w-full), .cursor-not-allowed, .disabled\:cursor-not-allowed:disabled { 
+            cursor: url('https://impostiq.github.io/images/cursors/not-allowed.cur'), not-allowed !important; 
         }
 
         .glass-panel {
