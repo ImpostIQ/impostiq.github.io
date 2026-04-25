@@ -17,6 +17,12 @@
                         sans: ['Inter', 'sans-serif'],
                         display: ['Outfit', 'sans-serif'],
                     },
+                    cursor: {
+                        default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
+                        pointer: "url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer",
+                        text: "url('https://impostiq.github.io/images/cursors/text.cur'), text",
+                        'not-allowed': "url('https://impostiq.github.io/images/cursors/not-allowed.cur'), not-allowed",
+                    },
                     colors: {
                         slate: {
                             850: '#151e2e',
@@ -50,7 +56,22 @@
             -webkit-user-select: none;
         }
 
-        /* Modern Glassmorphism to match game perfectly */
+		body, button:disabled, .cursor-default, .cursor-wait { 
+            cursor: url('https://impostiq.github.io/images/cursors/default.cur'), default !important; 
+        }
+        
+        button:not(:disabled), a, [role="button"], .cursor-pointer { 
+            cursor: url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer !important; 
+        }
+        
+        input, textarea, .cursor-text { 
+            cursor: url('https://impostiq.github.io/images/cursors/text.cur'), text !important; 
+        }
+        
+        button:disabled:not(.w-full), .cursor-not-allowed, .disabled\:cursor-not-allowed:disabled { 
+            cursor: url('https://impostiq.github.io/images/cursors/not-allowed.cur'), not-allowed !important; 
+        }
+
         .glass-panel {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(20px);
