@@ -108,6 +108,9 @@
             transform-origin: center;
             opacity: 0.4; 
             animation: fluid-spin 30s linear infinite;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         
         .fluid-layer-1 {
@@ -128,6 +131,8 @@
 			backdrop-filter: blur(50px) saturate(130%);
 			-webkit-backdrop-filter: blur(50px) saturate(130%);
 			background-color: rgba(2, 6, 23, 0.25);
+			will-change: transform;
+			transform: translateZ(0);
 			
 			background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 			background-size: 130px;
@@ -135,10 +140,10 @@
 		}
 
 		@keyframes fluid-spin {
-			0% { transform: rotate(0deg) scale(1) translate(0, 0); }
-			33% { transform: rotate(120deg) scale(1.05) translate(2%, -2%); }
-			66% { transform: rotate(240deg) scale(0.95) translate(-2%, 2%); }
-			100% { transform: rotate(360deg) scale(1) translate(0, 0); }
+			0% { transform: rotate(0deg) scale(1) translate3d(0, 0, 0); }
+			33% { transform: rotate(120deg) scale(1.05) translate3d(2%, -2%, 0); }
+			66% { transform: rotate(240deg) scale(0.95) translate3d(-2%, 2%, 0); }
+			100% { transform: rotate(360deg) scale(1) translate3d(0, 0, 0); }
 		}
     </style>
 	
