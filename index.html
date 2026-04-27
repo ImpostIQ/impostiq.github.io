@@ -341,103 +341,44 @@
             100% { opacity: 0; }
         }
 		
-		.liquid-blob {
-			position: absolute;
-			border-radius: 50%;
-			filter: blur(25px);
-			transform-origin: center;
-			animation-timing-function: ease-in-out;
-			animation-iteration-count: infinite;
-			animation-direction: alternate;
-		}
-
-		@keyframes liquid-flow-1 {
-			0% { transform: scale(1) translate(0, 0) rotate(0deg); }
-			100% { transform: scale(1.3) translate(10%, -15%) rotate(90deg); }
-		}
-		@keyframes liquid-flow-2 {
-			0% { transform: scale(1) translate(0, 0) rotate(0deg); }
-			100% { transform: scale(1.4) translate(-15%, 10%) rotate(-90deg); }
-		}
-		@keyframes liquid-flow-3 {
-			0% { transform: scale(1) translate(0, 0) rotate(0deg); }
-			100% { transform: scale(1.2) translate(5%, 5%) rotate(45deg); }
-		}
-		
 		.blob {
-			position: absolute;
-			border-radius: 50%;
-			filter: blur(100px);
-			-webkit-filter: blur(100px);
-			opacity: 0.5;
-			animation: float 8s ease-in-out infinite;
-		}
-
-        .fluid-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -10;
-            background: #020617;
-            overflow: hidden;
-            pointer-events: none;
-            user-select: none;
-        }
-        
-        .fluid-bg::after {
-            content: '';
             position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, #020617 120%);
-            z-index: 1;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+            animation: blob-bounce 10s infinite ease-in-out;
         }
-
-        .fluid-layer {
+        @keyframes blob-bounce {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        .liquid-blob {
             position: absolute;
-            top: -50vh;
-            left: -50vw;
-            width: 200vw;
-            height: 200vh;
-            filter: blur(100px);
-            transform-origin: center;
-            opacity: 0.4; 
-            animation: fluid-spin 30s linear infinite;
-            will-change: transform;
-            transform: translateZ(0);
-            backface-visibility: hidden;
+            filter: blur(40px);
+            mix-blend-mode: screen;
+            animation-iteration-count: infinite;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        .fluid-layer-1 {
-            background: conic-gradient(from 90deg at 50% 50%, #020617 0deg, transparent 120deg, #190b38 180deg, transparent 300deg, #3e2085 360deg);
+        @keyframes liquid-flow-1 {
+            0% { transform: translate(0%, 0%) scale(1) rotate(0deg); border-radius: 43% 57% 65% 35% / 46% 54% 46% 54%; }
+            33% { transform: translate(15%, -15%) scale(1.1) rotate(120deg); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            66% { transform: translate(-10%, 15%) scale(0.95) rotate(240deg); border-radius: 30% 70% 70% 30% / 30% 60% 40% 70%; }
+            100% { transform: translate(0%, 0%) scale(1) rotate(360deg); border-radius: 43% 57% 65% 35% / 46% 54% 46% 54%; }
         }
-        
-        .fluid-layer-2 {
-            background: conic-gradient(from 270deg at 50% 50%, transparent 0deg, #295f8c 90deg, transparent 180deg, #3e2085 270deg, transparent 360deg);
-            animation-duration: 45s;
-            animation-direction: reverse;
-            opacity: 0.4; 
+        @keyframes liquid-flow-2 {
+            0% { transform: translate(0%, 0%) scale(0.95) rotate(0deg); border-radius: 54% 46% 35% 65% / 40% 65% 35% 60%; }
+            33% { transform: translate(-15%, 15%) scale(1.05) rotate(-120deg); border-radius: 40% 60% 70% 30% / 50% 40% 60% 50%; }
+            66% { transform: translate(15%, -5%) scale(1) rotate(-240deg); border-radius: 70% 30% 40% 60% / 30% 70% 30% 70%; }
+            100% { transform: translate(0%, 0%) scale(0.95) rotate(-360deg); border-radius: 54% 46% 35% 65% / 40% 65% 35% 60%; }
         }
-
-        .fluid-glass {
-			position: absolute;
-			inset: 0;
-			z-index: 2; 
-			backdrop-filter: blur(50px) saturate(130%);
-			-webkit-backdrop-filter: blur(50px) saturate(130%);
-			background-color: rgba(2, 6, 23, 0.25);
-			will-change: transform;
-			transform: translateZ(0);
-            
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-            background-size: 250px;
-            background-repeat: repeat; 
+        @keyframes liquid-flow-3 {
+            0% { transform: translate(0%, 0%) scale(1.05) rotate(0deg); border-radius: 30% 70% 40% 60% / 60% 30% 70% 40%; }
+            33% { transform: translate(10%, 15%) scale(0.95) rotate(90deg); border-radius: 60% 40% 70% 30% / 40% 70% 30% 60%; }
+            66% { transform: translate(-15%, -10%) scale(1) rotate(180deg); border-radius: 40% 60% 30% 70% / 70% 40% 60% 30%; }
+            100% { transform: translate(0%, 0%) scale(1.05) rotate(360deg); border-radius: 30% 70% 40% 60% / 60% 30% 70% 40%; }
         }
-
-        @keyframes fluid-spin {
-			0% { transform: rotate(0deg) scale(1) translate3d(0, 0, 0); }
-			33% { transform: rotate(120deg) scale(1.05) translate3d(2%, -2%, 0); }
-			66% { transform: rotate(240deg) scale(0.95) translate3d(-2%, 2%, 0); }
-			100% { transform: rotate(360deg) scale(1) translate3d(0, 0, 0); }
-		}
         
         .subtle-shine-container {
             position: relative;
@@ -6935,10 +6876,10 @@
                 <div className="w-full h-full text-slate-200 font-sans selection:bg-brand-500/30">
                     {!isOnlineStatus && <OfflineScreen />} 
                     
-                    <div className="fluid-bg">
-                        <div className="fluid-layer fluid-layer-1"></div>
-                        <div className="fluid-layer fluid-layer-2"></div>
-                        <div className="fluid-glass"></div>
+                    <div className="fixed inset-0 bg-[#020617] -z-10"></div>
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="blob bg-brand-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]"></div>
+                        <div className="blob bg-cyan-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
                     </div>
                     {showHowToPlay && <HowToPlayModal onClose={() => setShowHowToPlay(false)} />}
                     {showRemovedModal && <RemovedModal onClose={() => {
