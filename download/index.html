@@ -2,23 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    
     <title>Download the Impostiq APK game</title>
-    <meta name="description" content="Download the official Impostiq APK for Android devices. Install the ultimate social deduction party game directly to your phone.">
+    <meta name="description" content="Download the official Impostiq APK for Android devices.">
+    <link rel="canonical" href="https://impostiq.github.io/download" />
+    <link rel="icon" id="dynamic-favicon" href="https://impostiq.github.io/images/iconroundedsquare192.png">
 
-    <script>
-        window.location.href = "https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1";
-
-        setTimeout(function() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.close();
-            }
-        }, 300);
-    </script>
+    <style>
+        body { 
+            background-color: #020617; 
+            color: white; 
+            font-family: sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0;
+        }
+        .message { text-align: center; }
+    </style>
 </head>
-<body style="background-color: #020617; color: white; text-align: center; font-family: sans-serif; padding-top: 50px;">
-    Downloading...
+<body>
+    <script>
+        (function() {
+            const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
+            if (isBot) return; 
+
+            const favicon = document.getElementById('dynamic-favicon');
+            if (favicon) favicon.href = "https://impostiq.github.io/images/favicon192.png";
+
+            const downloadUrl = "https://www.dropbox.com/scl/fi/kh8yf9gnvo3zjynipd5h8/Impostiq.apk?rlkey=8e9wwz2kaifa38o8xq98oqjhe&st=7xg4dsyn&dl=1";
+            
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+			
+            setTimeout(() => {
+                window.close();
+            }, 3500);
+        })();
+    </script>
 </body>
 </html>
