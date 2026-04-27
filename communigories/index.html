@@ -908,6 +908,15 @@
 
             const handleFilterChange = (newFilter) => {
                 if (newFilter === activeFilter) return;
+                
+                if (categoriesCache[newFilter]) {
+                    setCategories(categoriesCache[newFilter]);
+                    setIsLoading(false);
+                } else {
+                    setCategories([]);
+                    setIsLoading(true);
+                }
+                
                 setActiveFilter(newFilter);
             };
 
