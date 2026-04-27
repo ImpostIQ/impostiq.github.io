@@ -215,27 +215,27 @@
 		}
 
 		.fluid-layer {
-			position: absolute;
-			top: -50vh;
-			left: -50vw;
-			width: 200vw;
-			height: 200vh;
-			filter: blur(150px);
-			transform-origin: center;
-			opacity: 0.4; /* Lowered opacity for subtlety */
-			animation: fluid-spin 30s linear infinite;
-		}
-
-		.fluid-layer-1 {
-			background: conic-gradient(from 90deg at 50% 50%, #07101f 0deg, transparent 120deg, #0e7490 180deg, transparent 300deg, #4c1d95 360deg);
-		}
-
-		.fluid-layer-2 {
-			background: conic-gradient(from 270deg at 50% 50%, transparent 0deg, #061736 90deg, transparent 180deg, #07101f 270deg, transparent 360deg);
-			animation-duration: 45s;
-			animation-direction: reverse;
-			opacity: 0.5; 
-		}
+            position: absolute;
+            top: -50vh;
+            left: -50vw;
+            width: 200vw;
+            height: 200vh;
+            filter: blur(150px);
+            transform-origin: center;
+            opacity: 0.1; 
+            animation: fluid-spin 30s linear infinite;
+        }
+        
+        .fluid-layer-1 {
+            background: conic-gradient(from 90deg at 50% 50%, #020617 0deg, transparent 120deg, #0e4690 180deg, transparent 300deg, #020617 360deg);
+        }
+        
+        .fluid-layer-2 {
+            background: conic-gradient(from 270deg at 50% 50%, transparent 0deg, #195f85 90deg, transparent 180deg, #09334a 270deg, transparent 360deg);
+            animation-duration: 45s;
+            animation-direction: reverse;
+            opacity: 0.5; 
+        }
 
 		.fluid-glass {
 			position: absolute;
@@ -1213,7 +1213,7 @@
                                         }
                                     }
                                 }} 
-                                className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all shadow-md"
+                                className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all"
                             >
                                 <FaIcon name="icon-chevron-left" className="text-xl" />
                             </button>
@@ -1225,12 +1225,12 @@
                                     setActiveView(activeView === 'upload' ? 'browse' : 'upload'); 
                                     setEditId(null); setNewCatName(''); setNewCatWords(''); setIsPrivate(false); setError(''); 
                                 }}
-                                className={`w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90 shadow-md ${activeView === 'upload' ? 'bg-brand-500 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'}`}
+                                className={`w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90  ${activeView === 'upload' ? 'bg-brand-500 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'}`}
                             >
                                 <FaIcon name="icon-cloud-up" className="text-xl" />
                             </button>
                             {!isEmbedded && (
-                                <button onClick={() => { handleMuteToggle(); }} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all shadow-md">
+                                <button onClick={() => { handleMuteToggle(); }} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
                                     {isMuted ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" className="w-5 h-5 fill-current">
                                             <path d="m23.707,22.293c.391.391.391,1.023,0,1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293L.293,1.707C-.098,1.316-.098.684.293.293S1.316-.098,1.707.293l4.628,4.628C8.142,2.461,10.839.757,13.828.207c.288-.056.593.025.82.215.229.19.36.472.36.769v12.404l1.688,1.688c1.806-1.817,1.803-4.763-.01-6.576-.391-.391-.391-1.023,0-1.414.391-.391,1.023-.391,1.414,0,2.592,2.592,2.596,6.808.01,9.404l1.44,1.44c3.316-3.481,3.266-9.011-.152-12.43-.391-.391-.391-1.023,0-1.414s1.023-.391,1.414,0c4.198,4.198,4.249,10.997.152,15.258l2.742,2.742ZM.009,10v4c0,2.757,2.243,5,5,5h1.269c1.807,2.502,4.53,4.237,7.551,4.793.06.011.12.017.181.017.232,0,.459-.081.64-.231.229-.19.36-.472.36-.769v-3.579L1.881,6.103C.74,7.02.009,8.426.009,10Z"/>
@@ -1466,7 +1466,7 @@
                         {/* Scroll to Top Button */}
 						<button 
 							onClick={scrollToTop}
-							className={`fixed right-6 bottom-6 z-40 w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all duration-300 shadow-md ${(showScrollTop && activeView === 'browse') ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+							className={`fixed right-6 bottom-6 z-40 w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all duration-300 ${(showScrollTop && activeView === 'browse') ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-10 pointer-events-none'}`}
 						>
 							<FaIcon name="icon-chevron-up" className="text-xl" />
 						</button>
