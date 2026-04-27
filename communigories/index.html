@@ -224,6 +224,9 @@
             transform-origin: center;
             opacity: 0.4; 
             animation: fluid-spin 30s linear infinite;
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         
         .fluid-layer-1 {
@@ -244,6 +247,8 @@
 			backdrop-filter: blur(50px) saturate(130%);
 			-webkit-backdrop-filter: blur(50px) saturate(130%);
 			background-color: rgba(2, 6, 23, 0.25);
+			will-change: transform;
+			transform: translateZ(0);
 			
 			background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 			background-size: 130px;
@@ -251,10 +256,10 @@
 		}
 
 		@keyframes fluid-spin {
-			0% { transform: rotate(0deg) scale(1) translate(0, 0); }
-			33% { transform: rotate(120deg) scale(1.05) translate(2%, -2%); }
-			66% { transform: rotate(240deg) scale(0.95) translate(-2%, 2%); }
-			100% { transform: rotate(360deg) scale(1) translate(0, 0); }
+			0% { transform: rotate(0deg) scale(1) translate3d(0, 0, 0); }
+			33% { transform: rotate(120deg) scale(1.05) translate3d(2%, -2%, 0); }
+			66% { transform: rotate(240deg) scale(0.95) translate3d(-2%, 2%, 0); }
+			100% { transform: rotate(360deg) scale(1) translate3d(0, 0, 0); }
 		}
         
         .sleek-spinner circle {
@@ -599,7 +604,7 @@
                                         <button
                                             key={iconObj.url}
                                             onClick={() => { if(playSound) playSound('selectCategory'); onSelect(iconObj.url); onClose(); }}
-                                            className={`relative overflow-hidden flex flex-col items-center rounded-[1.25rem] sm:rounded-[1.5rem] transition-all duration-300 group aspect-square ${isSelected ? 'bg-brand-500/10' : 'bg-slate-800/40 backdrop-blur-md'}`}
+                                            className={`relative overflow-hidden flex flex-col items-center rounded-[1.25rem] sm:rounded-[1.5rem] transition-all duration-300 group aspect-square ${isSelected ? 'bg-brand-500/10' : 'bg-slate-800/40'}`}
                                         >
                                             <div className="flex-1 flex items-center justify-center w-full relative z-0 mt-1">
                                                 <img 
@@ -757,13 +762,19 @@
             const [shareData, setShareData] = useState(null);
 
             const [showScrollTop, setShowScrollTop] = useState(false);
+            const[visibleCount, setVisibleCount] = useState(50);
             const scrollContainerRef = useRef(null);
 
             const handleScroll = (e) => {
-                if (e.target.scrollTop > 300) {
+                const { scrollTop, scrollHeight, clientHeight } = e.target;
+                if (scrollTop > 300) {
                     setShowScrollTop(true);
                 } else {
                     setShowScrollTop(false);
+                }
+                
+                if (scrollHeight - scrollTop <= clientHeight + 300) {
+                    setVisibleCount(prev => prev + 50);
                 }
             };
 
@@ -956,12 +967,20 @@
             const handleFilterChange = (newFilter) => {
                 if (newFilter === activeFilter) return;
                 setActiveFilter(newFilter);
+                setVisibleCount(50); 
             };
 
             const displayedCategories = React.useMemo(() => {
-                if (!searchQuery) return categories;
-                return categories.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
-            }, [categories, searchQuery]);
+                let filtered = categories;
+                if (searchQuery) {
+                    filtered = categories.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+                }
+                return filtered.slice(0, visibleCount);
+            },[categories, searchQuery, visibleCount]);
+
+            useEffect(() => {
+                setVisibleCount(50);
+            }, [searchQuery]);
 
             const handleUpload = async () => {
                 if (!newCatName.trim()) { setError('Category name is required.'); return; }
@@ -1379,7 +1398,7 @@
                                         {isLoading ? (
                                             <div className="grid grid-cols-2 gap-4 animate-pulse">
                                                 {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                                                    <div key={i} className="relative overflow-hidden flex flex-col items-center rounded-[1.5rem] min-h-[133px] border bg-slate-800/40 border-white/5 backdrop-blur-md">
+                                                    <div key={i} className="relative overflow-hidden flex flex-col items-center rounded-[1.5rem] min-h-[133px] border bg-slate-800/40 border-white/5">
                                                         <div className="w-full py-2 bg-black/50 border-b border-white/5 h-8 flex justify-center items-center gap-4">
                                                             <div className="w-6 h-3 bg-white/10 rounded"></div>
                                                             <div className="w-6 h-3 bg-white/10 rounded"></div>
@@ -1424,7 +1443,7 @@
                                                         <button 
                                                             key={cat.id} 
                                                             onClick={() => { playSound('openInfo'); setSelectedCategory(cat); }}
-                                                            className="relative overflow-hidden flex flex-col items-center rounded-[1.5rem] transition-transform duration-200 group min-h-[130px] border bg-slate-800/40 border-white/5 hover:bg-white/5 hover:border-white/10 backdrop-blur-md active:scale-95"
+                                                            className="relative overflow-hidden flex flex-col items-center rounded-[1.5rem] transition-transform duration-200 group min-h-[130px] border bg-slate-800/40 border-white/5 hover:bg-white/5 hover:border-white/10 active:scale-95"
                                                         >
                                                             {!cat.isPrivate && (
                                                                 <div className="w-full text-center py-2 bg-black/50 border-b border-white/5">
@@ -1447,11 +1466,11 @@
                                                         </button>
                                                     ))}
                                                 </div>
-                                                {displayedCategories.length >= 500 && (
+                                                {categories.length >= 500 && displayedCategories.length >= categories.length && (
 													<div className="mt-8 mb-4 text-center animate-fadeIn">
 														<div className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 shadow-sm">
 															<span className="text-white/50 text-[11px] font-bold tracking-wide">
-																Showing the top 500 results. Use search to find specific categories.
+																End of top 500 results. Use search to find specific categories.
 															</span>
 														</div>
 													</div>
