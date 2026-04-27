@@ -341,6 +341,29 @@
             100% { opacity: 0; }
         }
 		
+		.liquid-blob {
+			position: absolute;
+			border-radius: 50%;
+			filter: blur(25px);
+			transform-origin: center;
+			animation-timing-function: ease-in-out;
+			animation-iteration-count: infinite;
+			animation-direction: alternate;
+		}
+
+		@keyframes liquid-flow-1 {
+			0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+			100% { transform: scale(1.3) translate(10%, -15%) rotate(90deg); }
+		}
+		@keyframes liquid-flow-2 {
+			0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+			100% { transform: scale(1.4) translate(-15%, 10%) rotate(-90deg); }
+		}
+		@keyframes liquid-flow-3 {
+			0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+			100% { transform: scale(1.2) translate(5%, 5%) rotate(45deg); }
+		}
+		
 		.blob {
 			position: absolute;
 			border-radius: 50%;
@@ -381,11 +404,11 @@
         }
         
         .fluid-layer-1 {
-            background: conic-gradient(from 90deg at 50% 50%, #4c1d95 0deg, transparent 120deg, #0e7490 180deg, transparent 300deg, #4c1d95 360deg);
+            background: conic-gradient(from 90deg at 50% 50%, #07101f 0deg, transparent 120deg, #0e7490 180deg, transparent 300deg, #4c1d95 360deg);
         }
         
         .fluid-layer-2 {
-            background: conic-gradient(from 270deg at 50% 50%, transparent 0deg, #312e81 90deg, transparent 180deg, #3b0764 270deg, transparent 360deg);
+            background: conic-gradient(from 270deg at 50% 50%, transparent 0deg, #061736 90deg, transparent 180deg, #07101f 270deg, transparent 360deg);
             animation-duration: 45s;
             animation-direction: reverse;
             opacity: 0.5; 
@@ -463,6 +486,11 @@
         @keyframes sleek-rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        @keyframes mystery-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         @keyframes typing-dot {
@@ -880,28 +908,33 @@
         const { season: currentSeason, categories: seasonalCategories } = getSeasonalInfo();
         
         const OfflineScreen = () => (
-			<div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 bg-slate-950/80 backdrop-blur-sm text-center animate-fadeIn select-none overflow-hidden">
-				<div className="relative z-10 w-full max-w-sm glass-panel p-8 rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-slide-up">
-					
-					<div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-red-500/30 animate-pulse">
-						<FaIcon name="icon-wifi" className=" text-4xl text-red-500" />
-					</div>
+            <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 bg-slate-950 text-center animate-fadeIn select-none overflow-hidden">
+                <div className="absolute inset-0 pointer-events-none">
+                     <div className="blob bg-red-600/10 top-[-20%] left-[-20%] w-[80%] h-[80%] blur-[100px]"></div>
+                     <div className="blob bg-orange-600/10 bottom-[-20%] right-[-20%] w-[80%] h-[80%] blur-[100px] animation-delay-2000"></div>
+                </div>
 
-					<h2 className="text-3xl font-display font-black text-white mb-3 tracking-tight">Connection Lost</h2>
-					
-					<p className="text-white/60 text-sm font-medium leading-relaxed mb-8 max-w-[260px] mx-auto">
-						Oops! We can't reach the servers. Please check your internet connection.
-					</p>
+                <div className="relative z-10 w-full max-w-sm glass-panel p-8 rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-slide-up">
+                    
+                    <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-red-500/30 animate-pulse">
+                        <FaIcon name="icon-wifi" className=" text-4xl text-red-500" />
+                    </div>
 
-					<button 
-						onClick={() => window.location.reload()} 
-						className="w-full bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
-					>
-						<FaIcon name="icon-rotate-right" className=" text-lg" /> TRY AGAIN
-					</button>
-				</div>
-			</div>
-		);
+                    <h2 className="text-3xl font-display font-black text-white mb-3 tracking-tight">Connection Lost</h2>
+                    
+                    <p className="text-white/60 text-sm font-medium leading-relaxed mb-8 max-w-[260px] mx-auto">
+                        Oops! We can't reach the servers. Please check your internet connection.
+                    </p>
+
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="w-full bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
+                    >
+                        <FaIcon name="icon-rotate-right" className=" text-lg" /> TRY AGAIN
+                    </button>
+                </div>
+            </div>
+        );
 
         const SeasonalTitle = ({ season, className }) => {
             const baseWrapperClass = className ? className.replace(/text-transparent|bg-clip-text|bg-gradient-to-br|from-white|via-white|to-white\/50/g, '').trim() : "text-6xl font-display font-black drop-shadow-lg tracking-tight";
@@ -2130,23 +2163,33 @@
                                             ></div>
                                         )}
                                         {isMystery && (
-                                            <div 
-                                                className={`absolute inset-0 pointer-events-none overflow-hidden rounded-[inherit] transition-opacity duration-500 ${isSelected ? 'opacity-100' : 'opacity-0'}`}
-                                                style={{ maskImage: 'radial-gradient(white, black)', WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}
-                                            >
+                                            <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-[inherit] transition-opacity duration-500 ${isSelected ? 'opacity-100' : 'opacity-0'}`}>
+                                                {/* Main nebula cloud */}
                                                 <div 
-                                                    className="liquid-blob top-[-30%] left-[-30%] w-[120%] h-[120%] bg-fuchsia-500/20"
-                                                    style={{ animationName: 'liquid-flow-1', animationDuration: '20s' }}
-                                                ></div>
-                                                <div 
-                                                    className="liquid-blob bottom-[-20%] right-[-30%] w-[130%] h-[130%] bg-cyan-500/20"
-                                                    style={{ animationName: 'liquid-flow-2', animationDuration: '25s', animationDelay: '-5s' }}
-                                                ></div>
-                                                <div 
-                                                    className="liquid-blob top-[-10%] left-[-10%] w-[110%] h-[110%] bg-brand-500/20"
-                                                    style={{ animationName: 'liquid-flow-3', animationDuration: '22s', animationDelay: '-12s' }}
-                                                ></div>
-                                            </div>
+                                                    className="absolute inset-[-100%] animate-[mystery-spin_40s_linear_infinite]"
+                                                    style={{
+                                                        background: 'conic-gradient(from 90deg at 50% 50%, #4c1d95 0deg, #a78bfa 90deg, #0e7490 180deg, #4c1d95 360deg)',
+                                                        filter: 'blur(80px)',
+                                                        opacity: 0.3
+                                                    }}
+                                                />
+                                                {/* Faster inner vortex */}
+                                                <div
+                                                    className="absolute inset-[-50%] animate-[mystery-spin_25s_linear_infinite_reverse]"
+                                                    style={{
+                                                        background: 'radial-gradient(circle at 50% 50%, rgba(232, 121, 249, 0.5) 0%, transparent 50%)',
+                                                        filter: 'blur(50px)',
+                                                        opacity: 0.5
+                                                    }}
+                                                />
+                                                 {/* Subtle static/starfield overlay */}
+                                                 <div
+                                                     className="absolute inset-0 opacity-20"
+                                                     style={{
+                                                         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E")`,
+                                                     }}
+                                                 />
+                                             </div>
                                         )}
 
                                         {isOnline && votes > 0 && (
