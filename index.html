@@ -3263,7 +3263,7 @@
                 </svg>
             ), 
             "icon-no-microphone": (props) => (
-                <svg shapeRendering="geometricPrecision" viewBox="0 0 24 24" width="1.1em" {...props}>
+                <svg shapeRendering="geometricPrecision" viewBox="0 0 25 25" width="1em" {...props}>
                     <path fill="currentColor" d="m5.264,13.908c-.226-.797.238-1.626,1.035-1.852.795-.226,1.626.238,1.852,1.035.375,1.326,1.432,2.383,2.758,2.758.797.226,1.261,1.055,1.035,1.852-.187.661-.789,1.092-1.442,1.092-.135,0-.273-.019-.409-.057-2.321-.657-4.171-2.507-4.828-4.828Zm18.297,7.531c.586.585.586,1.536,0,2.121-.293.293-.677.439-1.061.439s-.768-.146-1.061-.439L.439,2.561C-.146,1.975-.146,1.025.439.439,1.025-.146,1.975-.146,2.561.439l3.277,3.277c1.189-2.231,3.519-3.716,6.162-3.716,3.86,0,7,3.14,7,7v5c0,1.353-.387,2.656-1.104,3.774l1.859,1.859c.807-1.217,1.245-2.645,1.245-4.134,0-.829.671-1.5,1.5-1.5s1.5.671,1.5,1.5c0,2.29-.742,4.475-2.097,6.282l1.657,1.657ZM8.137,6.016l7.541,7.541c.207-.488.322-1.014.322-1.557v-1h-1.5c-.829,0-1.5-.671-1.5-1.5s.671-1.5,1.5-1.5h1.5v-1c0-2.206-1.794-4-4-4-1.841,0-3.417,1.256-3.863,3.016Zm7.177,14.934c-.267.033-.538.05-.813.05h-3c-4.344,0-8.082-3.359-8.507-7.648-.082-.824-.82-1.418-1.641-1.344-.824.082-1.426.816-1.344,1.641.586,5.901,5.527,10.352,11.493,10.352h3c.397,0,.796-.025,1.187-.074.822-.103,1.405-.853,1.302-1.675-.102-.822-.847-1.403-1.675-1.302Z" />
                 </svg>
             ), 
@@ -3726,35 +3726,26 @@
             );
         };
 		
-		const MicDeniedModal = ({ onTryAgain, onCancel }) => {
-            return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 animate-fadeIn">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
-                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-6 border border-white/10 shadow-2xl animate-slide-up text-center">
-                        <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-red-500/20 ring-1 ring-white/10 mx-auto">
-                            <FaIcon name="icon-no-microphone" className=" text-3xl text-red-400" />
-                        </div>
-                        <h2 className="text-2xl font-display font-bold text-white mb-2">Microphone Denied</h2>
-                        <p className="text-white/60 mb-6">Microphone access is currently blocked by your browser.</p>
-                        
-                        <div className="flex flex-col gap-3">
-                            <button 
-                                onClick={onTryAgain}
-                                className="w-full bg-white hover:bg-slate-200 text-slate-950 py-3 rounded-xl font-display font-bold text-base active:scale-95 transition-all"
-                            >
-                                Try Again
-                            </button>
-                            <button 
-                                onClick={onCancel}
-                                className="w-full bg-white/10 hover:bg-white/20 text-white/80 py-3 rounded-xl font-display font-bold text-base active:scale-95 transition-all"
-                            >
-                                Dismiss
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+		const MicPermissionModal = ({ onClose }) => {
+			return (
+				<div className="fixed inset-0 z-[70] flex items-center justify-center p-6 animate-fadeIn">
+					<div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
+					<div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl animate-slide-up text-center">
+						<div className="w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-red-500/20 ring-1 ring-white/10 mx-auto">
+							<FaIcon name="icon-no-microphone" className=" text-3xl text-red-400" />
+						</div>
+						<h2 className="text-2xl font-display font-bold text-white mb-2">Microphone Denied</h2>
+						<p className="text-white/60 mb-6">To record a custom voice note, please enable microphone access in your app or device settings.</p>
+						<button 
+							onClick={onClose}
+							className="w-full bg-white text-slate-950 font-display font-bold py-3 rounded-xl active:scale-95 transition-all"
+						>
+							GOT IT
+						</button>
+					</div>
+				</div>
+			);
+		};
 
         const SetupScreen = ({ onStartGame, audioManager, onBack, displayCategories, wordBank, customCategoryNames = {} }) => {
             const DEFAULT_PLAYERS = [{ name: 'Player 1', audioData: null }, { name: 'Player 2', audioData: null }, { name: 'Player 3', audioData: null }];
@@ -3881,14 +3872,14 @@
             
             const [isRecording, setIsRecording] = useState(false);
             const [recordedAudioData, setRecordedAudioData] = useState(null);
-            const[showMicTooltip, setShowMicTooltip] = useState(false);
+            const [showMicTooltip, setShowMicTooltip] = useState(false);
+            const [showMicPermissionModal, setShowMicPermissionModal] = useState(false);
+            const [isMicPermissionDenied, setIsMicPermissionDenied] = useState(false);
             const mediaRecorderRef = useRef(null);
             const audioChunksRef = useRef([]);
             const micTooltipTimer = useRef(null);
 
             const playerPressTimerRef = useRef(null);
-
-            const[showMicDeniedModal, setShowMicDeniedModal] = useState(false);
             
             useEffect(() => { localStorage.setItem('imposter_players', JSON.stringify(players)); }, [players]);
             useEffect(() => { localStorage.setItem('imposter_category', JSON.stringify(selectedCategory)); }, [selectedCategory]);
@@ -3904,10 +3895,24 @@
                 }
             }, [players]);
 
-            const attemptMicAccess = async () => {
+            const handleMicClick = async () => {
+                if (isRecording) {
+                    mediaRecorderRef.current.stop();
+                    setIsRecording(false);
+                    if (audioManager) audioManager.resumeAllMusic();
+                    return;
+                }
+                
+                if (isMicPermissionDenied) {
+                    setShowMicPermissionModal(true);
+                    return;
+                }
+
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    audioChunksRef.current =[];
+                    if (isMicPermissionDenied) setIsMicPermissionDenied(false);
+                    
+                    audioChunksRef.current = [];
                     const mediaRecorder = new MediaRecorder(stream);
                     mediaRecorderRef.current = mediaRecorder;
 
@@ -3929,33 +3934,10 @@
                     mediaRecorder.start();
                     setIsRecording(true);
                     setRecordedAudioData(null);
-                    setShowMicDeniedModal(false);
                 } catch (err) {
                     console.error("Error accessing microphone:", err);
-                    // If it hits this catch, the browser physically rejected the request.
-                    setShowMicDeniedModal(true);
-                }
-            };
-
-            const handleMicClick = async () => {
-                if (isRecording) {
-                    mediaRecorderRef.current.stop();
-                    setIsRecording(false);
-                    if (audioManager) audioManager.resumeAllMusic();
-                } else {
-                    try {
-                        // Check LIVE browser status instead of checking buggy localStorage
-                        const perm = await navigator.permissions.query({ name: 'microphone' });
-                        if (perm.state === 'denied') {
-                            setShowMicDeniedModal(true); 
-                        } else {
-                            // If it's 'prompt' or 'granted', immediately trigger the native prompt
-                            await attemptMicAccess();
-                        }
-                    } catch (e) {
-                        // Fallback for older browsers
-                        await attemptMicAccess();
-                    }
+                    setIsMicPermissionDenied(true);
+                    setShowMicPermissionModal(true);
                 }
             };
             
@@ -4041,13 +4023,7 @@
 
             return (
                 <div className="flex flex-col h-[100dvh] relative z-10">
-                    {showMicDeniedModal && (
-                        <MicDeniedModal 
-                            onTryAgain={attemptMicAccess} 
-                            onCancel={() => setShowMicDeniedModal(false)} 
-                        />
-                    )}
-                    
+                    {showMicPermissionModal && <MicPermissionModal onClose={() => setShowMicPermissionModal(false)} />}
                     <div className="absolute top-6 left-6 z-20">
                          <button onClick={onBack} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
                             <FaIcon name="icon-chevron-left" className="" />
@@ -4121,9 +4097,9 @@
                                             onMouseLeave={handleMicRelease}
                                             onTouchStart={handleMicPress}
                                             onTouchEnd={handleMicRelease}
-                                            className={`flex-1 flex items-center justify-center rounded-xl font-bold transition-all shadow-lg active:scale-95 border border-white/10 h-14 ${isRecording ? 'bg-red-500 animate-pulse' : (recordedAudioData ? 'bg-green-500' : 'bg-white/10 hover:bg-white/20')}`}
+                                            className={`flex-1 flex items-center justify-center rounded-xl font-bold transition-all shadow-lg active:scale-95 border border-white/10 h-14 ${isMicPermissionDenied ? 'bg-red-500/20' : isRecording ? 'bg-red-500 animate-pulse' : (recordedAudioData ? 'bg-green-500' : 'bg-white/10 hover:bg-white/20')}`}
                                         >
-                                            <FaIcon name={recordedAudioData && !isRecording ? 'icon-check' : 'icon-microphone'} className={`text-white text-lg ${isRecording ? '' : 'opacity-70'}`} />
+                                            <FaIcon name={isMicPermissionDenied ? 'icon-no-microphone' : (recordedAudioData && !isRecording ? 'icon-check' : 'icon-microphone')} className={`text-white text-lg ${isMicPermissionDenied ? 'text-red-400/70' : (isRecording ? '' : 'opacity-70')}`} />
                                         </button>
                                         
                                         <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-xs bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-20 pointer-events-none transition-opacity duration-300 ease-in-out ${showMicTooltip ? 'opacity-100' : 'opacity-0'}`}>
