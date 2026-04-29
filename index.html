@@ -3733,11 +3733,11 @@
 		
 		const MicPermissionModal = ({ onClose }) => {
 			return (
-				<div className="fixed inset-0 z-[70] flex items-center justify-center p-6 animate-fadeIn">
+				<div className="fixed inset-0 z-[160] flex items-center justify-center p-6 animate-fadeIn">
 					<div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
 					<div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl animate-slide-up text-center">
 						<div className="w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-red-500/20 ring-1 ring-white/10 mx-auto">
-							<FaIcon name="icon-no-microphone-modal" className=" text-3xl text-red-400" />
+							<FaIcon name="icon-no-microphone" className=" text-3xl text-red-400" />
 						</div>
 						<h2 className="text-2xl font-display font-bold text-white mb-2">Microphone Denied</h2>
 						<p className="text-white/60 mb-6">To record a custom voice note, please enable microphone access in your app or device settings.</p>
@@ -3772,7 +3772,7 @@
                     if (saved) {
                         let parsed = JSON.parse(saved);
                         if (Array.isArray(parsed) && parsed.length > 0) {
-                            if (typeof parsed === 'string') {
+                            if (typeof parsed[0] === 'string') {
                                 parsed = parsed.map(name => ({ name, audioData: null }));
                             }
                             return parsed;
@@ -3787,9 +3787,7 @@
             const [selectedCategory, setSelectedCategory] = useState(() => {
                 try {
                     const saved = localStorage.getItem('imposter_category');
-                    if (saved) {
-                        return JSON.parse(saved);
-                    }
+                    if (saved) return JSON.parse(saved);
                     return 'Mystery Mode';
                 } catch {
                     return 'Mystery Mode';
@@ -3828,45 +3826,32 @@
                 setTimerMinutes(prev => {
                     const next = prev + increment;
                     const boundedNext = increment > 0 ? Math.min(15, next) : Math.max(1, next);
-                    
                     if (prev !== boundedNext) {
                         if (audioManager) audioManager.playSound('uiClick');
                         if (navigator.vibrate) navigator.vibrate(5);
                     }
-                    
                     return boundedNext;
                 });
             };
 
             const stopTimerHold = () => {
                 isHoldingRef.current = false;
-                if (holdTimerRef.current) {
-                    clearTimeout(holdTimerRef.current);
-                    holdTimerRef.current = null;
-                }
+                if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
             };
 
             const startTimerHold = (increment) => {
                 stopTimerHold(); 
                 isHoldingRef.current = true;
-                
                 handleTimerChange(increment); 
                 holdSpeedRef.current = 400; 
-                
                 const tick = () => {
                     if (!isHoldingRef.current) return;
-                    
                     handleTimerChange(increment);
                     holdSpeedRef.current = Math.max(70, holdSpeedRef.current * 0.8);
                     holdTimerRef.current = setTimeout(tick, holdSpeedRef.current);
                 };
-                
                 holdTimerRef.current = setTimeout(tick, holdSpeedRef.current);
             };
-
-            useEffect(() => {
-                return () => stopTimerHold();
-            }, []);
 
             const [inspectedCategory, setInspectedCategory] = useState(null);
             const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -3883,6 +3868,7 @@
                 return localStorage.getItem('imposter_mic_denied') === 'true';
             });
 
+            // AUTO-DETECTION: Clears the red state when you return from Android Settings
             useEffect(() => {
                 const checkStatus = async () => {
                     if (navigator.permissions && navigator.permissions.query) {
@@ -3892,39 +3878,19 @@
                                 setIsMicPermissionDenied(false);
                                 localStorage.removeItem('imposter_mic_denied');
                             }
-                        } catch (e) { 
-                            console.log("Mic query not supported"); 
-                        }
+                        } catch (e) { console.log("Mic query not supported"); }
                     }
                 };
-
-                const handleVisibility = () => {
-                    if (document.visibilityState === 'visible') checkStatus();
-                };
-
+                const handleVisibility = () => { if (document.visibilityState === 'visible') checkStatus(); };
                 checkStatus();
                 document.addEventListener('visibilitychange', handleVisibility);
                 return () => document.removeEventListener('visibilitychange', handleVisibility);
             }, []);
+
             const mediaRecorderRef = useRef(null);
             const audioChunksRef = useRef([]);
             const micTooltipTimer = useRef(null);
-
             const playerPressTimerRef = useRef(null);
-            
-            useEffect(() => { localStorage.setItem('imposter_players', JSON.stringify(players)); }, [players]);
-            useEffect(() => { localStorage.setItem('imposter_category', JSON.stringify(selectedCategory)); }, [selectedCategory]);
-            useEffect(() => { localStorage.setItem('imposter_speak_category', JSON.stringify(speakCategory)); }, [speakCategory]);
-            useEffect(() => { localStorage.setItem('imposter_fake_word_mode', JSON.stringify(isFakeWordMode)); }, [isFakeWordMode]);
-            useEffect(() => { localStorage.setItem('imposter_timerEnabled', JSON.stringify(timerEnabled)); }, [timerEnabled]);
-            useEffect(() => { localStorage.setItem('imposter_timerMinutes', JSON.stringify(timerMinutes)); }, [timerMinutes]);
-            useEffect(() => { localStorage.setItem('imposter_enableTwoImposters', JSON.stringify(enableTwoImposters)); }, [enableTwoImposters]);
-
-            useEffect(() => {
-                if (players.length < 10) {
-                    setEnableTwoImposters(false);
-                }
-            }, [players]);
 
             const handleMicClick = async () => {
                 if (isRecording) {
@@ -3933,43 +3899,30 @@
                     if (audioManager) audioManager.resumeAllMusic();
                     return;
                 }
-                
                 if (isMicPermissionDenied) {
                     setShowMicPermissionModal(true);
                 }
-
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    
-                    // If successful: clear errors
                     setIsMicPermissionDenied(false);
                     localStorage.removeItem('imposter_mic_denied');
                     if (showMicPermissionModal) setShowMicPermissionModal(false);
-                    
                     audioChunksRef.current = [];
                     const mediaRecorder = new MediaRecorder(stream);
                     mediaRecorderRef.current = mediaRecorder;
-
-                    mediaRecorder.ondataavailable = event => {
-                        audioChunksRef.current.push(event.data);
-                    };
-
+                    mediaRecorder.ondataavailable = event => audioChunksRef.current.push(event.data);
                     mediaRecorder.onstop = () => {
                         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
                         const reader = new FileReader();
                         reader.readAsDataURL(audioBlob);
-                        reader.onloadend = () => {
-                            setRecordedAudioData(reader.result);
-                        };
+                        reader.onloadend = () => setRecordedAudioData(reader.result);
                         stream.getTracks().forEach(track => track.stop());
                     };
-
                     if (audioManager) audioManager.pauseAllMusic();
                     mediaRecorder.start();
                     setIsRecording(true);
                     setRecordedAudioData(null);
                 } catch (err) {
-                    console.error("Error accessing microphone:", err);
                     setIsMicPermissionDenied(true);
                     localStorage.setItem('imposter_mic_denied', 'true');
                     setShowMicPermissionModal(true);
