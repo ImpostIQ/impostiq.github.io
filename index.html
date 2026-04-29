@@ -3882,6 +3882,30 @@
             const [isMicPermissionDenied, setIsMicPermissionDenied] = useState(() => {
                 return localStorage.getItem('imposter_mic_denied') === 'true';
             });
+
+            useEffect(() => {
+                const checkStatus = async () => {
+                    if (navigator.permissions && navigator.permissions.query) {
+                        try {
+                            const result = await navigator.permissions.query({ name: 'microphone' });
+                            if (result.state === 'granted') {
+                                setIsMicPermissionDenied(false);
+                                localStorage.removeItem('imposter_mic_denied');
+                            }
+                        } catch (e) { 
+                            console.log("Mic query not supported"); 
+                        }
+                    }
+                };
+
+                const handleVisibility = () => {
+                    if (document.visibilityState === 'visible') checkStatus();
+                };
+
+                checkStatus();
+                document.addEventListener('visibilitychange', handleVisibility);
+                return () => document.removeEventListener('visibilitychange', handleVisibility);
+            }, []);
             const mediaRecorderRef = useRef(null);
             const audioChunksRef = useRef([]);
             const micTooltipTimer = useRef(null);
@@ -3912,16 +3936,15 @@
                 
                 if (isMicPermissionDenied) {
                     setShowMicPermissionModal(true);
-                    // We don't return here anymore, we try to request again 
-                    // in case they fixed it in settings, but we keep the icon 
-                    // red until the 'try' block succeeds.
                 }
 
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     
+                    // If successful: clear errors
                     setIsMicPermissionDenied(false);
                     localStorage.removeItem('imposter_mic_denied');
+                    if (showMicPermissionModal) setShowMicPermissionModal(false);
                     
                     audioChunksRef.current = [];
                     const mediaRecorder = new MediaRecorder(stream);
@@ -3946,7 +3969,6 @@
                     setIsRecording(true);
                     setRecordedAudioData(null);
                 } catch (err) {
-                    // FAIL: Set the red state and save to memory
                     console.error("Error accessing microphone:", err);
                     setIsMicPermissionDenied(true);
                     localStorage.setItem('imposter_mic_denied', 'true');
