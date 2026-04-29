@@ -3864,39 +3864,43 @@
             const [recordedAudioData, setRecordedAudioData] = useState(null);
             const [showMicTooltip, setShowMicTooltip] = useState(false);
             const [showMicPermissionModal, setShowMicPermissionModal] = useState(false);
-            const [isMicPermissionDenied, setIsMicPermissionDenied] = useState(() => {
-                return localStorage.getItem('imposter_mic_denied') === 'true';
-            });
+            
+            const [isMicPermissionDenied, setIsMicPermissionDenied] = useState(false);
 
             useEffect(() => {
-                const syncWithSystem = async () => {
+                const syncMicStatus = async () => {
                     if (navigator.permissions && navigator.permissions.query) {
                         try {
                             const result = await navigator.permissions.query({ name: 'microphone' });
                             
-                            if (result.state === 'granted') {
-                                setIsMicPermissionDenied(false);
-                                localStorage.removeItem('imposter_mic_denied');
-                            } 
-                            else if (result.state === 'denied') {
-                                setIsMicPermissionDenied(true);
-                                localStorage.setItem('imposter_mic_denied', 'true');
-                            }
-                            result.onchange = () => {
-                                if (result.state === 'granted') {
+                            const updateUI = (state) => {
+                                if (state === 'granted') {
                                     setIsMicPermissionDenied(false);
                                     localStorage.removeItem('imposter_mic_denied');
+                                } else if (state === 'denied') {
+                                    setIsMicPermissionDenied(true);
+                                    localStorage.setItem('imposter_mic_denied', 'true');
                                 }
                             };
-                        } catch (e) {}
+
+                            updateUI(result.state);
+
+                            result.onchange = () => updateUI(result.state);
+                        } catch (e) {
+                            // Fallback for browsers that don't support mic queries
+                            if (localStorage.getItem('imposter_mic_denied') === 'true') {
+                                setIsMicPermissionDenied(true);
+                            }
+                        }
                     }
                 };
 
+                syncMicStatus();
+
                 const handleVisibility = () => {
-                    if (document.visibilityState === 'visible') syncWithSystem();
+                    if (document.visibilityState === 'visible') syncMicStatus();
                 };
 
-                syncWithSystem(); 
                 document.addEventListener('visibilitychange', handleVisibility);
                 return () => document.removeEventListener('visibilitychange', handleVisibility);
             }, []);
@@ -3938,6 +3942,7 @@
                     setIsRecording(true);
                     setRecordedAudioData(null);
                 } catch (err) {
+                    console.error("Mic blocked:", err);
                     setIsMicPermissionDenied(true);
                     localStorage.setItem('imposter_mic_denied', 'true');
                     setShowMicPermissionModal(true);
