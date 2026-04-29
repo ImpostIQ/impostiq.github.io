@@ -3733,11 +3733,11 @@
 		
 		const MicPermissionModal = ({ onClose }) => {
 			return (
-				<div className="fixed inset-0 z-[160] flex items-center justify-center p-6 animate-fadeIn">
+				<div className="fixed inset-0 z-[200] flex items-center justify-center p-6 animate-fadeIn">
 					<div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
 					<div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 border border-white/10 shadow-2xl animate-slide-up text-center">
 						<div className="w-20 h-20 rounded-full flex items-center justify-center mb-4 bg-red-500/20 ring-1 ring-white/10 mx-auto">
-							<FaIcon name="icon-no-microphone" className=" text-3xl text-red-400" />
+							<FaIcon name="icon-no-microphone-modal" className=" text-3xl text-red-400" />
 						</div>
 						<h2 className="text-2xl font-display font-bold text-white mb-2">Microphone Denied</h2>
 						<p className="text-white/60 mb-6">To record a custom voice note, please enable microphone access in your app or device settings.</p>
@@ -3868,9 +3868,8 @@
                 return localStorage.getItem('imposter_mic_denied') === 'true';
             });
 
-            // AUTO-DETECTION: Clears the red state when you return from Android Settings
             useEffect(() => {
-                const checkStatus = async () => {
+                const verifyMicStatus = async () => {
                     if (navigator.permissions && navigator.permissions.query) {
                         try {
                             const result = await navigator.permissions.query({ name: 'microphone' });
@@ -3878,13 +3877,19 @@
                                 setIsMicPermissionDenied(false);
                                 localStorage.removeItem('imposter_mic_denied');
                             }
-                        } catch (e) { console.log("Mic query not supported"); }
+                        } catch (e) {}
                     }
                 };
-                const handleVisibility = () => { if (document.visibilityState === 'visible') checkStatus(); };
-                checkStatus();
-                document.addEventListener('visibilitychange', handleVisibility);
-                return () => document.removeEventListener('visibilitychange', handleVisibility);
+
+                const onVisibilityChange = () => {
+                    if (document.visibilityState === 'visible') {
+                        verifyMicStatus();
+                    }
+                };
+
+                verifyMicStatus(); 
+                document.addEventListener('visibilitychange', onVisibilityChange);
+                return () => document.removeEventListener('visibilitychange', onVisibilityChange);
             }, []);
 
             const mediaRecorderRef = useRef(null);
@@ -3899,14 +3904,18 @@
                     if (audioManager) audioManager.resumeAllMusic();
                     return;
                 }
+                
                 if (isMicPermissionDenied) {
                     setShowMicPermissionModal(true);
+                    return; 
                 }
+
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    
                     setIsMicPermissionDenied(false);
                     localStorage.removeItem('imposter_mic_denied');
-                    if (showMicPermissionModal) setShowMicPermissionModal(false);
+                    
                     audioChunksRef.current = [];
                     const mediaRecorder = new MediaRecorder(stream);
                     mediaRecorderRef.current = mediaRecorder;
@@ -3918,11 +3927,13 @@
                         reader.onloadend = () => setRecordedAudioData(reader.result);
                         stream.getTracks().forEach(track => track.stop());
                     };
+
                     if (audioManager) audioManager.pauseAllMusic();
                     mediaRecorder.start();
                     setIsRecording(true);
                     setRecordedAudioData(null);
                 } catch (err) {
+                    console.error("Mic access denied:", err);
                     setIsMicPermissionDenied(true);
                     localStorage.setItem('imposter_mic_denied', 'true');
                     setShowMicPermissionModal(true);
