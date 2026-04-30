@@ -3730,10 +3730,10 @@
                     if (saved) {
                         let parsed = JSON.parse(saved);
                         if (Array.isArray(parsed) && parsed.length > 0) {
-                            if (typeof parsed[0] === 'string') {
-                                parsed = parsed.map(name => ({ name, audioData: null }));
-                            }
-                            return parsed;
+                            return parsed.map(p => {
+                                if (typeof p === 'string') return { name: p, audioData: null };
+                                return { name: p.name || 'Player', audioData: p.audioData || null };
+                            });
                         }
                     }
                     return DEFAULT_PLAYERS;
@@ -3776,7 +3776,14 @@
                 return saved !== null ? JSON.parse(saved) : true;
             });
 
-            useEffect(() => { localStorage.setItem('imposter_players', JSON.stringify(players.map(p => p.name))); }, [players]);
+            useEffect(() => {
+                try {
+                    localStorage.setItem('imposter_players', JSON.stringify(players));
+                } catch (e) {
+                    console.warn("Storage full, saving players without audio blobs.");
+                    localStorage.setItem('imposter_players', JSON.stringify(players.map(p => ({ name: p.name, audioData: null }))));
+                }
+            }, [players]);
             useEffect(() => { localStorage.setItem('imposter_category', JSON.stringify(selectedCategory)); }, [selectedCategory]);
             useEffect(() => { localStorage.setItem('imposter_speak_category', JSON.stringify(speakCategory)); }, [speakCategory]);
             useEffect(() => { localStorage.setItem('imposter_fake_word_mode', JSON.stringify(isFakeWordMode)); }, [isFakeWordMode]);
@@ -5866,16 +5873,16 @@
                     isMuted: isMuted,
                     isUnlocked: false,
                     currentMusicTrack: null,
+                    isProgrammaticMute: false,
+                    onMuteStateChange: (muted) => setIsMuted(muted),
             
                     unlockAudio: function() {
                         if (this.isUnlocked) return;
                         this.isUnlocked = true;
                         
-                        // 1. Unlock Web Audio API (iOS requirement)
                         const silentSound = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
                         silentSound.play().catch(() => {});
 
-                        // 2. Unlock DeviceMotion API (iOS 13+ Safari requirement for the Shake Easter Egg)
                         if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                             DeviceMotionEvent.requestPermission()
                                 .then(permissionState => {
@@ -5883,7 +5890,7 @@
                                         console.log('DeviceMotion permission granted.');
                                     }
                                 })
-                                .catch(console.error); // Catch if user denies or if it's unsupported
+                                .catch(console.error);
                         }
                     },
             
@@ -5893,6 +5900,18 @@
                             audio.loop = options.loop || false;
                             audio.volume = options.volume || 1.0;
                             audio.preload = 'auto';
+
+                            audio.addEventListener('volumechange', () => {
+                                if (this.isProgrammaticMute) return;
+                                
+                                const isNowMuted = audio.volume === 0 || audio.muted;
+                                if (isNowMuted !== this.isMuted) {
+                                    this.isMuted = isNowMuted;
+                                    if (this.onMuteStateChange) this.onMuteStateChange(isNowMuted);
+                                    
+                                    try { localStorage.setItem('imposter_isMuted', JSON.stringify(isNowMuted)); } catch(e){}
+                                }
+                            });
                             
                             if (options.isMusic) {
                                 this.music[name] = audio;
@@ -5954,14 +5973,12 @@
                     },
             
                     setMuted: function(muted) {
+                        this.isProgrammaticMute = true;
                         this.isMuted = muted;
-                        
-                        // Mute music
                         Object.values(this.music).forEach(track => {
                             track.muted = muted;
                         });
                         
-                        // Mute all sound effects and voice lines
                         Object.entries(this.sounds).forEach(([key, track]) => {
                             if (key === 'categories') {
                                 Object.values(track).forEach(catTrack => {
@@ -5971,6 +5988,8 @@
                                 track.muted = muted;
                             }
                         });
+
+                        setTimeout(() => { this.isProgrammaticMute = false; }, 100);
                     },
             
                     pauseAllMusic: function() {
