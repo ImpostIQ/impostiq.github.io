@@ -2832,7 +2832,6 @@
                     let nextFrameDelay;
                     
                     if (isTrueLoadingComplete) {
-                        // THE SMOOTH FINISH: If loading is done, slide to 100 smoothly, NEVER teleport
                         if (currentProgress >= 100) {
                             setTimeout(() => {
                                 onFinishedLoading();
@@ -2840,19 +2839,18 @@
                             }, 500);
                             return;
                         }
-                        // Glide forward rapidly but smoothly to catch up
-                        increment = 4.5;
+                        increment = 1;
                         nextFrameDelay = 15;
                     } else {
                         const rand = Math.random();
                         if (rand < 0.25) { 
-                            increment = Math.random() * 0.5 + 0.1; 
+                            increment = Math.random() * 0.3 + 0.3; 
                             nextFrameDelay = Math.random() * 150 + 100;
                         } else if (rand < 0.55) {
-                            increment = Math.random() * 2.5 + 2.5; 
+                            increment = Math.random() * 1.5 + 1.5; 
                             nextFrameDelay = Math.random() * 30 + 20; 
                         } else { 
-                            increment = Math.random() * 2 + 4; 
+                            increment = Math.random() * 2 + 2; 
                             nextFrameDelay = Math.random() * 15 + 15; 
                         }
                     }
