@@ -536,7 +536,7 @@
         <h3>B. Play on This Device (Local Mode)</h3>
         <ul>
             <li><strong>Add Player UI:</strong> The host types a name (max 25 chars) and clicks the violet/purple brand-colored button with a plus SVG icon (`icon-plus`). To delete, click the faint 'X' next to their name. The player list dynamically collapses behind a "Show More" button if there are more than 6 players (or 3 on mobile screens).</li>
-            <li><strong>Voice Notes (Local Exclusive):</strong> Next to the add button is a microphone icon. Tapping it records microphone audio. When the device is passed to that player, the custom voice note plays automatically (e.g., "Hey John, it's your turn!").</li>
+            <li><strong>Voice Notes (Local Exclusive):</strong> Next to the add button is a microphone icon. Tapping it records up to 3.5 seconds of microphone audio (hard-capped to prevent hitting the browser's 5MB localStorage cache limit). When the device is passed to that player, the custom voice note plays automatically (e.g., "Hey John, it's your turn!"). These recordings persist locally between sessions!</li>
             <li><strong>Timer Settings:</strong> Unlike Online, Local Mode has an adjustable timer (Sky Blue clock icon). Host clicks '+' or '-' to set it between 1 to 15 minutes. It can also be toggled off entirely for "Untimed Mode", which replaces the countdown circle with an infinity SVG icon (`icon-infinity`).</li>
             <li><strong>Handover UI:</strong> The screen says "Pass the device to [Player]". The player must tap the "Verify Identity" button (fingerprint SVG icon `icon-fingerprint`) to view their card secretly.</li>
             <li><strong>Voting:</strong> There is NO interactive voting screen. Players argue in real life. Once the group agrees, the host taps "IDENTIFY IMPOSTER" which skips straight to the results reveal.</li>
@@ -614,7 +614,7 @@
             <li>The first player on the turn order list asks the first question.</li>
             <li>Innocent agents should try to prove they know the word without giving it away.</li>
             <li>Random Mode chooses a category from the entire word bank for an extra challenge.</li>
-            <li>You can record your own 'It's your turn!' voice note by tapping the microphone icon when adding a player in local mode.</li>
+            <li>You can record your own 3-second 'It's your turn!' voice note by tapping the microphone icon when adding a player in local mode.</li>
             <li>Use the untimed mode for a more relaxed, deduction-focused game.</li>
             <li>The Imposter's goal is to survive the round without being identified.</li>
             <li>As an agent, be specific enough to prove you're innocent but vague enough not to reveal the word to the Imposter.</li>
@@ -3730,10 +3730,10 @@
                     if (saved) {
                         let parsed = JSON.parse(saved);
                         if (Array.isArray(parsed) && parsed.length > 0) {
-                            return parsed.map(p => {
-                                if (typeof p === 'string') return { name: p, audioData: null };
-                                return { name: p.name || 'Player', audioData: p.audioData || null };
-                            });
+                            if (typeof parsed[0] === 'string') {
+                                parsed = parsed.map(name => ({ name, audioData: null }));
+                            }
+                            return parsed;
                         }
                     }
                     return DEFAULT_PLAYERS;
@@ -3776,11 +3776,11 @@
                 return saved !== null ? JSON.parse(saved) : true;
             });
 
-            useEffect(() => {
+            useEffect(() => { 
                 try {
-                    localStorage.setItem('imposter_players', JSON.stringify(players));
+                    localStorage.setItem('imposter_players', JSON.stringify(players)); 
                 } catch (e) {
-                    console.warn("Storage full, saving players without audio blobs.");
+                    console.error("Storage limit reached! Falling back to saving names only.");
                     localStorage.setItem('imposter_players', JSON.stringify(players.map(p => ({ name: p.name, audioData: null }))));
                 }
             }, [players]);
@@ -3919,6 +3919,14 @@
                     mediaRecorder.start();
                     setIsRecording(true);
                     setRecordedAudioData(null);
+
+                    setTimeout(() => {
+                        if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+                            mediaRecorderRef.current.stop();
+                            setIsRecording(false);
+                            if (audioManager) audioManager.resumeAllMusic();
+                        }
+                    }, 3500);
                 } catch (err) {
                     console.error("Mic blocked:", err);
                     setIsMicPermissionDenied(true);
@@ -5873,16 +5881,16 @@
                     isMuted: isMuted,
                     isUnlocked: false,
                     currentMusicTrack: null,
-                    isProgrammaticMute: false,
-                    onMuteStateChange: (muted) => setIsMuted(muted),
             
                     unlockAudio: function() {
                         if (this.isUnlocked) return;
                         this.isUnlocked = true;
                         
+                        // 1. Unlock Web Audio API (iOS requirement)
                         const silentSound = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA");
                         silentSound.play().catch(() => {});
 
+                        // 2. Unlock DeviceMotion API (iOS 13+ Safari requirement for the Shake Easter Egg)
                         if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                             DeviceMotionEvent.requestPermission()
                                 .then(permissionState => {
@@ -5890,7 +5898,7 @@
                                         console.log('DeviceMotion permission granted.');
                                     }
                                 })
-                                .catch(console.error);
+                                .catch(console.error); // Catch if user denies or if it's unsupported
                         }
                     },
             
@@ -5900,18 +5908,6 @@
                             audio.loop = options.loop || false;
                             audio.volume = options.volume || 1.0;
                             audio.preload = 'auto';
-
-                            audio.addEventListener('volumechange', () => {
-                                if (this.isProgrammaticMute) return;
-                                
-                                const isNowMuted = audio.volume === 0 || audio.muted;
-                                if (isNowMuted !== this.isMuted) {
-                                    this.isMuted = isNowMuted;
-                                    if (this.onMuteStateChange) this.onMuteStateChange(isNowMuted);
-                                    
-                                    try { localStorage.setItem('imposter_isMuted', JSON.stringify(isNowMuted)); } catch(e){}
-                                }
-                            });
                             
                             if (options.isMusic) {
                                 this.music[name] = audio;
@@ -5973,12 +5969,14 @@
                     },
             
                     setMuted: function(muted) {
-                        this.isProgrammaticMute = true;
                         this.isMuted = muted;
+                        
+                        // Mute music
                         Object.values(this.music).forEach(track => {
                             track.muted = muted;
                         });
                         
+                        // Mute all sound effects and voice lines
                         Object.entries(this.sounds).forEach(([key, track]) => {
                             if (key === 'categories') {
                                 Object.values(track).forEach(catTrack => {
@@ -5988,8 +5986,6 @@
                                 track.muted = muted;
                             }
                         });
-
-                        setTimeout(() => { this.isProgrammaticMute = false; }, 100);
                     },
             
                     pauseAllMusic: function() {
