@@ -2868,9 +2868,15 @@
                     }, nextFrameDelay);
                 };
 
-                timeoutId = setTimeout(() => {
-                    animateProgress(visualProgress);
-                }, isTrueLoadingComplete ? 0 : 200);
+                const startProgressSequence = () => {
+                    if (document.body.classList.contains('uninitialized')) {
+                        timeoutId = setTimeout(startProgressSequence, 100);
+                    } else {
+                        timeoutId = setTimeout(() => animateProgress(visualProgress), 300);
+                    }
+                };
+
+                timeoutId = setTimeout(startProgressSequence, isTrueLoadingComplete ? 0 : 200);
 
                 return () => clearTimeout(timeoutId);
 
