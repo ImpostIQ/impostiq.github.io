@@ -3818,6 +3818,14 @@
                 return saved !== null ? JSON.parse(saved) : true;
             });
 
+            useEffect(() => { localStorage.setItem('imposter_players', JSON.stringify(players.map(p => p.name))); }, [players]);
+            useEffect(() => { localStorage.setItem('imposter_category', JSON.stringify(selectedCategory)); }, [selectedCategory]);
+            useEffect(() => { localStorage.setItem('imposter_speak_category', JSON.stringify(speakCategory)); }, [speakCategory]);
+            useEffect(() => { localStorage.setItem('imposter_fake_word_mode', JSON.stringify(isFakeWordMode)); }, [isFakeWordMode]);
+            useEffect(() => { localStorage.setItem('imposter_timerMinutes', JSON.stringify(timerMinutes)); }, [timerMinutes]);
+            useEffect(() => { localStorage.setItem('imposter_timerEnabled', JSON.stringify(timerEnabled)); }, [timerEnabled]);
+            useEffect(() => { localStorage.setItem('imposter_enableTwoImposters', JSON.stringify(enableTwoImposters)); }, [enableTwoImposters]);
+
             const holdTimerRef = useRef(null);
             const holdSpeedRef = useRef(300);
             const isHoldingRef = useRef(false); 
@@ -3915,6 +3923,11 @@
                     mediaRecorderRef.current.stop();
                     setIsRecording(false);
                     if (audioManager) audioManager.resumeAllMusic();
+                    return;
+                }
+
+                if (isMicPermissionDenied) {
+                    setShowMicPermissionModal(true);
                     return;
                 }
 
@@ -5530,7 +5543,8 @@
                 'https://em-content.zobj.net/source/microsoft-teams/337/busts-in-silhouette_1f465.png',
                 'https://em-content.zobj.net/source/microsoft-teams/337/hammer-and-pick_2692-fe0f.png',
                 'https://img.freepik.com/free-vector/dark-halloween-background-with-cemetery-scary-pumpkin_23-2148632375.jpg?semt=ais_incoming&w=740&q=80',
-                'https://i.ibb.co/sJ5r3z3n/christmasimage.png'
+                'https://i.ibb.co/sJ5r3z3n/christmasimage.png',
+                "https://impostiq.github.io/images/displayimage512.png"
             ].forEach(url => imageUrls.add(url));
 
             Object.values(CATEGORY_ICONS).forEach(icon => {
@@ -5583,9 +5597,9 @@
 
         const App = () => {
             useEffect(() => {
-                // Determine which critical images are needed on the initial loading screen
                 const imagesToLoad = [
-                    "https://em-content.zobj.net/source/microsoft-teams/400/disguised-face_1f978.png"
+                    "https://em-content.zobj.net/source/microsoft-teams/400/disguised-face_1f978.png",
+                    "https://impostiq.github.io/images/displayimage512.png"
                 ];
                 
                 if (currentSeason === 'halloween') {
