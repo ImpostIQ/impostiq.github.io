@@ -2818,7 +2818,7 @@
                 
                 Promise.all([
                     assetPromise,
-                    new Promise(resolve => setTimeout(resolve, 4000)) 
+                    new Promise(resolve => setTimeout(resolve, 2000)) 
                 ]).then(() => {
                     setIsTrueLoadingComplete(true);
                 });
@@ -2828,26 +2828,40 @@
                 let timeoutId;
 
                 const animateProgress = (currentProgress) => {
-                    if (isTrueLoadingComplete) {
-                        return;
-                    }
-
                     let increment;
                     let nextFrameDelay;
                     
-                    const rand = Math.random();
-                    if (rand < 0.12) {
-                        increment = Math.random() * 9 + 1; 
-                        nextFrameDelay = Math.random() * 100 + 80;
-                    } else if (rand < 0.22) {
-                        increment = Math.random() * 0.5 + 0.1; 
-                        nextFrameDelay = Math.random() * 150 + 100;
+                    if (isTrueLoadingComplete) {
+                        // THE SMOOTH FINISH: If loading is done, slide to 100 smoothly, NEVER teleport
+                        if (currentProgress >= 100) {
+                            setTimeout(() => {
+                                onFinishedLoading();
+                                setIsReady(true);
+                            }, 500);
+                            return;
+                        }
+                        // Glide forward rapidly but smoothly to catch up
+                        increment = 4.5;
+                        nextFrameDelay = 15;
                     } else {
-                        increment = Math.random() * 1.5 + 0.8;
-                        nextFrameDelay = Math.random() * 40 + 20;
+                        const rand = Math.random();
+                        if (rand < 0.25) { 
+                            increment = Math.random() * 0.5 + 0.1; 
+                            nextFrameDelay = Math.random() * 150 + 100;
+                        } else if (rand < 0.55) {
+                            increment = Math.random() * 2.5 + 2.5; 
+                            nextFrameDelay = Math.random() * 30 + 20; 
+                        } else { 
+                            increment = Math.random() * 2 + 4; 
+                            nextFrameDelay = Math.random() * 15 + 15; 
+                        }
                     }
 
-                    let nextProgress = Math.min(currentProgress + increment, 99);
+                    let nextProgress = Math.min(currentProgress + increment, 100);
+                    
+                    if (!isTrueLoadingComplete && nextProgress === 100) {
+                        nextProgress = 99;
+                    }
 
                     setVisualProgress(nextProgress);
 
@@ -2856,20 +2870,9 @@
                     }, nextFrameDelay);
                 };
 
-                if (isTrueLoadingComplete) {
-                    clearTimeout(timeoutId);
-                    setVisualProgress(100); 
-                    
-                    setTimeout(() => {
-                        onFinishedLoading();
-                        setIsReady(true);
-                    }, 700);
-
-                } else {
-                    timeoutId = setTimeout(() => {
-                        animateProgress(visualProgress);
-                    }, 400);
-                }
+                timeoutId = setTimeout(() => {
+                    animateProgress(visualProgress);
+                }, isTrueLoadingComplete ? 0 : 200);
 
                 return () => clearTimeout(timeoutId);
 
@@ -2926,15 +2929,13 @@
                                     ></div>
                                 </div>
                                 
-                                {/* The Percentage Text */}
                                 <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]
                                     ${(isFullyReady || showRestartBtn) ? 'opacity-0 scale-125' : 'opacity-100 scale-100'}`}>
-                                    <span className="text-[10px] font-display font-black text-white drop-shadow-md tracking-wider">
+                                    <span className="text-[10px] leading-none font-display font-black text-white drop-shadow-md tracking-wider mt-[1px]">
                                         {`${Math.floor(visualProgress)}%`}
                                     </span>
                                 </div>
 
-                                {/* The Button Text (START or RESTART) */}
                                 <div className={`absolute inset-0 flex items-center justify-center gap-3 text-slate-950 font-display font-bold text-lg pointer-events-none transition-all duration-[700ms] ease-[cubic-bezier(0.16,1,0.3,1)]
                                     ${(isFullyReady || showRestartBtn) ? 'opacity-100 translate-y-0 delay-[100ms]' : 'opacity-0 translate-y-6'}`}>
                                     {isFullyReady ? (
@@ -5585,8 +5586,7 @@
                     ...imagePromises
                 ]);
 
-                // Fallback timeout to ensure the app doesn't stay hidden forever if a network request hangs
-                const timeoutPromise = new Promise(resolve => setTimeout(resolve, 400));
+                const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3000));
 
                 Promise.race([allAssetsPromise, timeoutPromise]).then(() => {
                     document.body.classList.remove('uninitialized');
