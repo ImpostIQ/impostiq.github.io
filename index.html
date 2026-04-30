@@ -312,33 +312,9 @@
             overflow: hidden;
             z-index: 0;
             border-radius: inherit;
-        }
-
-        .supercell-bg-1, .supercell-bg-2 {
-            position: absolute;
-            inset: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://i.ibb.co/ycdC1cdc/supbackg.webp');
             background-size: cover;
             background-position: center;
-            mix-blend-mode: overlay;
-            opacity: 0;
-            animation: alternateFade 16s infinite;
-        }
-
-        .supercell-bg-1 {
-            background-image: url('https://www.clashchamps.com/wp-content/uploads/2024/06/czJOx2-Q.png');
-        }
-
-        .supercell-bg-2 {
-            background-image: url('https://wallpapercat.com/w/full/0/4/f/283609-2500x1466-desktop-hd-clash-of-clans-wallpaper.jpg');
-            animation-delay: 8s;
-        }
-
-        @keyframes alternateFade {
-            0%   { opacity: 0; animation-timing-function: ease-in; }
-            25%  { opacity: 0.6; }
-            50%  { opacity: 0.6; animation-timing-function: ease-out; }
-            75%  { opacity: 0; }
-            100% { opacity: 0; }
         }
 		
 		.blob {
@@ -1985,10 +1961,12 @@
         const CategorySelectionModal = ({ isOpen, onClose, isOnline, displayCategories, onSelect, currentSelection, voteCounts, categoryVoters = {}, onInspect, audioManager, season, customCategoryNames = {} }) => {
             if (!isOpen) return null;
 
-            const allOptions = ['Mystery Mode', ...displayCategories];
             const categoryLongPressTimerRef = useRef(null);
             const isLongPressRef = useRef(false);
             const [viewingVotersFor, setViewingVotersFor] = useState(null);
+
+            const officialOptions = ['Mystery Mode', ...displayCategories.filter(cat => AUDIO_URLS.categories[cat])];
+            const customOptions = displayCategories.filter(cat => !AUDIO_URLS.categories[cat]);
 
             const handleTouchStart = (cat) => {
                 isLongPressRef.current = false; 
@@ -2010,6 +1988,139 @@
                 }
             };
 
+            const renderCategoryCard = (cat) => {
+                const isMystery = cat === 'Mystery Mode';
+                const iconSource = isMystery ? 'https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png' : CATEGORY_ICONS[cat];
+                const isSelected = currentSelection === cat;
+                const votes = isOnline && voteCounts ? voteCounts[cat] || 0 : 0;
+                const isSupercell = cat === 'Supercell';
+                const isChristmas = cat === 'Christmas';
+                const isHalloween = cat === 'Halloween';
+                const isSeasonal = isChristmas || isHalloween;
+
+                let cardClasses = `relative overflow-hidden flex flex-col items-center justify-center gap-3 p-5 rounded-[1.5rem] transition-all duration-300 group min-h-[120px] border `;
+
+                if (isChristmas) {
+                    if (isSelected) {
+                        cardClasses += 'bg-red-500/10 border-red-500 shadow-[inset_0_0_0_1px_rgba(239,68,68,1)] text-white';
+                    } else {
+                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
+                    }
+                } else if (isHalloween) {
+                    if (isSelected) {
+                        cardClasses += 'bg-orange-500/10 border-orange-500 shadow-[inset_0_0_0_1px_rgba(249,115,22,1)] text-white';
+                    } else {
+                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
+                    }
+                } else if (isSupercell) {
+                    if (isSelected) {
+                        cardClasses += 'border-2 border-blue-500 shadow-[inset_0_0_0_1px_rgba(59,130,246,1)] text-white';
+                    } else {
+                        cardClasses += 'border-white/5 opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
+                    }
+                } else if (isMystery) {
+                    if (isSelected) {
+                        cardClasses += 'bg-slate-800/60 border-fuchsia-400 shadow-[inset_0_0_0_1px_rgba(232,121,249,1)] text-white';
+                    } else {
+                        cardClasses += 'bg-slate-800/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] text-slate-400 hover:bg-white/5 hover:border-white/10';
+                    }
+                } else {
+                    if (isSelected) {
+                        cardClasses += 'bg-brand-500/10 border-brand-500 shadow-[inset_0_0_0_1px_rgba(139,92,246,1)] text-white';
+                    } else {
+                        cardClasses += 'bg-slate-800/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] text-slate-400 hover:bg-white/5 hover:border-white/10';
+                    }
+                }
+
+                return (
+                    <button
+                        key={cat}
+                        onClick={(e) => {
+                            if (isLongPressRef.current) {
+                                e.preventDefault();
+                                return; 
+                            }
+                            audioManager.playSound(isSelected && isOnline ? 'deselectCategory' : 'selectCategory');
+                            onSelect(cat);
+                            if (!isOnline) onClose();
+                        }}
+                        onMouseDown={() => handleTouchStart(cat)}
+                        onMouseUp={handleTouchEnd}
+                        onMouseLeave={handleTouchEnd}
+                        onTouchStart={() => handleTouchStart(cat)}
+                        onTouchEnd={handleTouchEnd}
+                        onTouchMove={handleTouchEnd}
+                        className={cardClasses}
+                    >
+                        {isSupercell && (
+                            <div className="supercell-container pointer-events-none"></div>
+                        )}
+                        {isSeasonal && (
+                            <div 
+                                className="absolute inset-0 bg-cover bg-center pointer-events-none"
+                                style={{
+                                    backgroundImage: isChristmas 
+                                        ? `url("https://i.ibb.co/sJ5r3z3n/christmasimage.png")`
+                                        : `url("https://img.freepik.com/free-vector/dark-halloween-background-with-cemetery-scary-pumpkin_23-2148632375.jpg?semt=ais_incoming&w=740&q=80")`
+                                }}
+                            ></div>
+                        )}
+                        {isMystery && (
+                            <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-[inherit] transition-opacity duration-500 ${isSelected ? 'opacity-100' : 'opacity-0'}`}>
+                                <div 
+                                    className="absolute inset-[-100%] animate-[mystery-spin_40s_linear_infinite]"
+                                    style={{
+                                        background: 'conic-gradient(from 90deg at 50% 50%, #4c1d95 0deg, #a78bfa 90deg, #0e7490 180deg, #4c1d95 360deg)',
+                                        filter: 'blur(80px)',
+                                        opacity: 0.3
+                                    }}
+                                />
+                                <div
+                                    className="absolute inset-[-50%] animate-[mystery-spin_25s_linear_infinite_reverse]"
+                                    style={{
+                                        background: 'radial-gradient(circle at 50% 50%, rgba(232, 121, 249, 0.5) 0%, transparent 50%)',
+                                        filter: 'blur(50px)',
+                                        opacity: 0.5
+                                    }}
+                                />
+                                 <div
+                                     className="absolute inset-0 opacity-20"
+                                     style={{
+                                         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E")`,
+                                     }}
+                                 />
+                             </div>
+                        )}
+
+                        {isOnline && votes > 0 && (
+                            <button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    setViewingVotersFor(cat);
+                                }}
+                                className="absolute top-3 left-3 bg-black/60 hover:bg-black/80 active:scale-95 backdrop-blur-sm px-2 py-1 rounded-md text-[10px] font-bold text-white flex items-center gap-1.5 shadow-sm border border-white/10 z-20 transition-all cursor-pointer"
+                            >
+                                <FaIcon name="icon-fire" className=" text-orange-400" /> {votes}
+                            </button>
+                        )}
+
+                        <div className="relative z-10 flex flex-col items-center gap-3 transition-transform duration-150 group-active:scale-[0.98]">
+                            {isMystery ? (
+                                 <img src={iconSource} alt="Dice" draggable="false" className={`w-10 h-10 transition-transform duration-300 drop-shadow-md ${isSelected ? 'rotate-12 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:rotate-12'}`} />
+                            ) : (
+                                <FaIcon 
+                                    name={iconSource} 
+                                    sizeClass="text-3xl" 
+                                    className={`transition-colors duration-300 ${isSupercell || isSeasonal ? "brightness-125" : (isSelected ? "text-brand-400" : "text-slate-500 group-hover:text-slate-300")}`} 
+                                />
+                            )}
+                            <span className={`text-xs font-bold tracking-wide ${isSupercell || isSeasonal || isMystery ? 'text-white' : ''}`}>{customCategoryNames[cat] || cat}</span>
+                        </div>
+                    </button>
+                );
+            };
+
             return (
                 <div className="fixed inset-0 z-[55] flex items-center justify-center sm:p-6 bg-slate-950/95 sm:bg-black/60 backdrop-blur-xl sm:backdrop-blur-md animate-fadeIn">
                     <div className="absolute inset-0 hidden sm:block" onClick={onClose}></div>
@@ -2024,150 +2135,23 @@
                                 <FaIcon name="icon-xmark" className=" text-lg" />
                             </button>
                         </div>
+                        
                         <div className="flex-1 overflow-y-auto p-6 no-scrollbar relative">
-                            <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 ${viewingVotersFor ? 'blur pointer-events-none' : ''}`}>
-                            {allOptions.map(cat => {
-                                const isMystery = cat === 'Mystery Mode';
-                                const iconSource = isMystery ? 'https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png' : CATEGORY_ICONS[cat];
-                                const isSelected = currentSelection === cat;
-                                const votes = isOnline && voteCounts ? voteCounts[cat] || 0 : 0;
-                                const isSupercell = cat === 'Supercell';
-                                const isChristmas = cat === 'Christmas';
-                                const isHalloween = cat === 'Halloween';
-                                const isSeasonal = isChristmas || isHalloween;
+                            <div className={`flex flex-col gap-4 ${viewingVotersFor ? 'blur pointer-events-none' : ''}`}>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                    {officialOptions.map(cat => renderCategoryCard(cat))}
+                                </div>
 
-                                let cardClasses = `relative overflow-hidden flex flex-col items-center justify-center gap-3 p-5 rounded-[1.5rem] transition-all duration-300 group min-h-[120px] border `;
-                                let checkmarkBg = 'bg-teal-500 text-slate-900';
-
-                                if (isChristmas) {
-                                    if (isSelected) {
-                                        cardClasses += 'bg-red-500/10 border-red-500 shadow-[inset_0_0_0_1px_rgba(239,68,68,1)] text-white';
-                                    } else {
-                                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-                                    }
-                                } else if (isHalloween) {
-                                    if (isSelected) {
-                                        cardClasses += 'bg-orange-500/10 border-orange-500 shadow-[inset_0_0_0_1px_rgba(249,115,22,1)] text-white';
-                                    } else {
-                                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-                                    }
-                                } else if (isSupercell) {
-                                    if (isSelected) {
-                                        cardClasses += 'bg-blue-500/10 border-blue-500 shadow-[inset_0_0_0_1px_rgba(59,130,246,1)] text-white';
-                                    } else {
-                                        cardClasses += 'bg-slate-900/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] opacity-60 grayscale-[0.5] hover:opacity-100 hover:grayscale-0 text-slate-300';
-                                    }
-                                } else if (isMystery) {
-                                    if (isSelected) {
-                                        cardClasses += 'bg-slate-800/60 border-fuchsia-400 shadow-[inset_0_0_0_1px_rgba(232,121,249,1)] text-white';
-                                    } else {
-                                        cardClasses += 'bg-slate-800/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] text-slate-400 hover:bg-white/5 hover:border-white/10';
-                                    }
-                                } else {
-                                    if (isSelected) {
-                                        cardClasses += 'bg-brand-500/10 border-brand-500 shadow-[inset_0_0_0_1px_rgba(139,92,246,1)] text-white';
-                                    } else {
-                                        cardClasses += 'bg-slate-800/40 border-white/5 shadow-[inset_0_0_0_0px_transparent] text-slate-400 hover:bg-white/5 hover:border-white/10';
-                                    }
-                                }
-
-                                return (
-                                    <button
-                                        key={cat}
-                                        onClick={(e) => {
-                                            if (isLongPressRef.current) {
-                                                e.preventDefault();
-                                                return; 
-                                            }
-                                            audioManager.playSound(isSelected && isOnline ? 'deselectCategory' : 'selectCategory');
-                                            onSelect(cat);
-                                            if (!isOnline) onClose();
-                                        }}
-                                        onMouseDown={() => handleTouchStart(cat)}
-                                        onMouseUp={handleTouchEnd}
-                                        onMouseLeave={handleTouchEnd}
-                                        onTouchStart={() => handleTouchStart(cat)}
-                                        onTouchEnd={handleTouchEnd}
-                                        onTouchMove={handleTouchEnd}
-                                        className={cardClasses}
-                                    >
-                                        {/* --- BACKGROUNDS --- */}
-                                        {isSupercell && (
-                                            <div className="supercell-container pointer-events-none">
-                                                <div className="supercell-bg-1"></div>
-                                                <div className="supercell-bg-2"></div>
-                                            </div>
-                                        )}
-                                        {isSeasonal && (
-                                            <div 
-                                                className="absolute inset-0 bg-cover bg-center pointer-events-none"
-                                                style={{
-                                                    backgroundImage: isChristmas 
-                                                        ? `url("https://i.ibb.co/sJ5r3z3n/christmasimage.png")`
-                                                        : `url("https://img.freepik.com/free-vector/dark-halloween-background-with-cemetery-scary-pumpkin_23-2148632375.jpg?semt=ais_incoming&w=740&q=80")`
-                                                }}
-                                            ></div>
-                                        )}
-                                        {isMystery && (
-                                            <div className={`absolute inset-0 pointer-events-none overflow-hidden rounded-[inherit] transition-opacity duration-500 ${isSelected ? 'opacity-100' : 'opacity-0'}`}>
-                                                {/* Main nebula cloud */}
-                                                <div 
-                                                    className="absolute inset-[-100%] animate-[mystery-spin_40s_linear_infinite]"
-                                                    style={{
-                                                        background: 'conic-gradient(from 90deg at 50% 50%, #4c1d95 0deg, #a78bfa 90deg, #0e7490 180deg, #4c1d95 360deg)',
-                                                        filter: 'blur(80px)',
-                                                        opacity: 0.3
-                                                    }}
-                                                />
-                                                {/* Faster inner vortex */}
-                                                <div
-                                                    className="absolute inset-[-50%] animate-[mystery-spin_25s_linear_infinite_reverse]"
-                                                    style={{
-                                                        background: 'radial-gradient(circle at 50% 50%, rgba(232, 121, 249, 0.5) 0%, transparent 50%)',
-                                                        filter: 'blur(50px)',
-                                                        opacity: 0.5
-                                                    }}
-                                                />
-                                                 {/* Subtle static/starfield overlay */}
-                                                 <div
-                                                     className="absolute inset-0 opacity-20"
-                                                     style={{
-                                                         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E")`,
-                                                     }}
-                                                 />
-                                             </div>
-                                        )}
-
-                                        {isOnline && votes > 0 && (
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    e.preventDefault();
-                                                    setViewingVotersFor(cat);
-                                                }}
-                                                className="absolute top-3 left-3 bg-black/60 hover:bg-black/80 active:scale-95 backdrop-blur-sm px-2 py-1 rounded-md text-[10px] font-bold text-white flex items-center gap-1.5 shadow-sm border border-white/10 z-20 transition-all cursor-pointer"
-                                            >
-                                                <FaIcon name="icon-fire" className=" text-orange-400" /> {votes}
-                                            </button>
-                                        )}
-
-                                        <div className="relative z-10 flex flex-col items-center gap-3 transition-transform duration-150 group-active:scale-[0.98]">
-                                            {isMystery ? (
-                                                 <img src={iconSource} alt="Dice" draggable="false" className={`w-10 h-10 transition-transform duration-300 drop-shadow-md ${isSelected ? 'rotate-12 opacity-100' : 'opacity-60 group-hover:opacity-100 group-hover:rotate-12'}`} />
-                                            ) : (
-                                                <FaIcon 
-                                                    name={iconSource} 
-                                                    sizeClass="text-3xl" 
-                                                    className={`transition-colors duration-300 ${isSupercell || isSeasonal ? "brightness-125" : (isSelected ? "text-brand-400" : "text-slate-500 group-hover:text-slate-300")}`} 
-                                                />
-                                            )}
-                                            <span className={`text-xs font-bold tracking-wide ${isSupercell || isSeasonal || isMystery ? 'text-white' : ''}`}>{customCategoryNames[cat] || cat}</span>
+                                {customOptions.length > 0 && (
+                                    <div className="bg-black/20 p-4 rounded-[2rem] border border-white/5 shadow-inner mt-2">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                            {customOptions.map(cat => renderCategoryCard(cat))}
                                         </div>
-                                    </button>
-                                )
-                            })}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+
                     {isOnline && (
                         <div className="flex-shrink-0 p-4 pt-4 bg-slate-900/80 border-t border-white/5 backdrop-blur-xl">
                             <button onClick={onClose} className="w-full max-w-md mx-auto flex items-center justify-center bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-[1.25rem] active:scale-[0.98] transition-all">
@@ -5533,8 +5517,6 @@
                 'https://em-content.zobj.net/source/microsoft-teams/337/clipboard_1f4cb.png',
                 'https://em-content.zobj.net/source/microsoft-teams/337/ninja_medium-light-skin-tone_1f977-1f3fc_1f3fc.png',
                 'https://em-content.zobj.net/source/microsoft-teams/337/three-oclock_1f552.png',
-                'https://www.clashchamps.com/wp-content/uploads/2024/06/czJOx2-Q.png',
-                'https://wallpapercat.com/w/full/0/4/f/283609-2500x1466-desktop-hd-clash-of-clans-wallpaper.jpg',
                 'https://em-content.zobj.net/source/microsoft-teams/337/direct-hit_1f3af.png',
                 'https://em-content.zobj.net/source/microsoft-teams/363/speaking-head_1f5e3-fe0f.png',
                 'https://em-content.zobj.net/source/microsoft-teams/363/eyes_1f440.png',
@@ -5544,7 +5526,8 @@
                 'https://em-content.zobj.net/source/microsoft-teams/337/hammer-and-pick_2692-fe0f.png',
                 'https://img.freepik.com/free-vector/dark-halloween-background-with-cemetery-scary-pumpkin_23-2148632375.jpg?semt=ais_incoming&w=740&q=80',
                 'https://i.ibb.co/sJ5r3z3n/christmasimage.png',
-                "https://impostiq.github.io/images/displayimage512.png"
+                'https://impostiq.github.io/images/displayimage512.png',
+				'https://i.ibb.co/ycdC1cdc/supbackg.webp'
             ].forEach(url => imageUrls.add(url));
 
             Object.values(CATEGORY_ICONS).forEach(icon => {
