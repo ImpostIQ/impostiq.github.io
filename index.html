@@ -3360,7 +3360,8 @@
             }
 
             if (name && typeof name === 'string' && name.startsWith('http')) {
-                return <img src={name} alt="icon" draggable="false" className={`w-8 h-8 object-contain ${className}`} />;
+                const isSupercell = name.includes('supercell-logo');
+                return <img src={name} alt="icon" draggable="false" className={`${isSupercell ? 'w-10' : 'w-8 h-8'} object-contain ${className}`} />;
             }
 
             let iconKey = name;
