@@ -143,11 +143,11 @@
             ],
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans:['Inter', '"Fluent Emoji Color"', 'sans-serif'],
-                        display:['Outfit', '"Fluent Emoji Color"', 'sans-serif'],
-                        mono:['JetBrains Mono', '"Fluent Emoji Color"', 'monospace'],
-                    },
+                    fontFamily: { 
+						sans: ['"Fluent Emoji Color"', 'Inter', 'sans-serif'], 
+						display: ['"Fluent Emoji Color"', 'Outfit', 'sans-serif'], 
+						mono: ['"Fluent Emoji Color"', 'JetBrains Mono', 'monospace'] 
+					},
                     cursor: {
                         default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
                         pointer: "url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer",
@@ -213,10 +213,18 @@
 
     <style>
         @font-face {
-            font-family: 'Fluent Emoji Color';
-            src: url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2') format('woff2');
-            font-display: block;
-        }
+			font-family: 'Fluent Emoji Color';
+			src: url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2') format('woff2');
+			font-display: swap;
+			/* CATCH-ALL EMOJI RANGE: Covers all Dingbats, Symbols, Modifiers, and the entire 1F000 block where all face/object emojis exist */
+			unicode-range: U+200D, U+2300-23FF, U+24C2, U+25A0-25FF, U+2600-26FF, U+2700-27BF, U+2B00-2BFF, U+FE00-FE0F, U+1F000-1FAFF;
+		}
+
+		/* Force the Emoji font to be EVALUATED FIRST for inputs */
+		input, textarea {
+			font-family: 'Fluent Emoji Color', 'Inter', sans-serif !important;
+			font-variant-emoji: emoji;
+		}
 
         * {
             -webkit-tap-highlight-color: transparent;
@@ -226,12 +234,11 @@
         }
         *:focus { outline: none !important; }
 
-        input, textarea {
-            caret-color: #8b5cf6; 
-            font-family: 'Inter', 'Fluent Emoji Color', sans-serif;
-            font-variant-emoji: emoji;
-            letter-spacing: normal;
-        }
+        /* Force the Emoji font to be EVALUATED FIRST for inputs */
+		input, textarea {
+			font-family: 'Fluent Emoji Color', 'Inter', sans-serif !important;
+			font-variant-emoji: emoji;
+		}
         ::selection {
             background: rgba(139, 92, 246, 0.4);
             color: #ffffff;
