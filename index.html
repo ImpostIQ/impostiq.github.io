@@ -144,9 +144,9 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans:['Inter', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'],
-                        display:['Outfit', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'],
-                        mono:['JetBrains Mono', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'monospace'],
+                        sans:['Inter', '"Fluent Emoji Color"', 'sans-serif'],
+                        display: ['Outfit', '"Fluent Emoji Color"', 'sans-serif'],
+                        mono: ['JetBrains Mono', '"Fluent Emoji Color"', 'monospace'],
                     },
                     cursor: {
                         default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
@@ -212,7 +212,11 @@
     </script>
 
     <style>
-        @import url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.css');
+        @font-face {
+            font-family: 'Fluent Emoji Color';
+            src: url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2') format('woff2');
+            font-display: block;
+        }
 
         * {
             -webkit-tap-highlight-color: transparent;
@@ -224,7 +228,7 @@
 
         input, textarea {
             caret-color: #8b5cf6; 
-            font-family: 'Inter', 'Segoe UI Emoji', 'Fluent Emoji Color', sans-serif;
+            font-family: 'Inter', 'Fluent Emoji Color', sans-serif;
             font-variant-emoji: emoji;
             letter-spacing: normal;
         }
