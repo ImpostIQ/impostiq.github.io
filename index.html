@@ -58,6 +58,8 @@
     <meta name="twitter:title" content="Impostiq • Find the Spy" />
     <meta name="twitter:image" id="twitter-image" content="https://impostiq.github.io/images/ogimage.png" />
     <meta name="twitter:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
+	
+    <link rel="preload" href="https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     
     <script>
 		(function() {
@@ -142,9 +144,9 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Outfit', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
+                        sans:['Inter', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'],
+                        display:['Outfit', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'],
+                        mono:['JetBrains Mono', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'monospace'],
                     },
                     cursor: {
                         default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
@@ -210,6 +212,8 @@
     </script>
 
     <style>
+        @import url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.css');
+
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -220,6 +224,9 @@
 
         input, textarea {
             caret-color: #8b5cf6; 
+            font-family: 'Inter', 'Segoe UI Emoji', 'Fluent Emoji Color', sans-serif;
+            font-variant-emoji: emoji;
+            letter-spacing: normal;
         }
         ::selection {
             background: rgba(139, 92, 246, 0.4);
@@ -909,7 +916,13 @@
             };
             const isSpy = !!spyMapping[cleanName];
             
-            let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(name)}&backgroundColor=transparent`;
+            let safeName = "Agent";
+            try {
+                safeName = encodeURIComponent(name);
+            } catch (e) {
+                safeName = encodeURIComponent(name.replace(/[\uD800-\uDFFF]/g, ''));
+            }
+            let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${safeName}&backgroundColor=transparent`;
             let spyScaleClass = '';
             
             if (isSpy) {
@@ -1562,9 +1575,17 @@
                                         <input
                                                 type="text"
                                                 value={username}
-                                                onChange={(e) => { setUsername(e.target.value.slice(0, 25)); if (error) setError(''); }}
+                                                onChange={(e) => { 
+                                                    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+                                                    const newGraphemes = Array.from(segmenter.segment(e.target.value)).map(s => s.segment);
+                                                    if (newGraphemes.length > 25) {
+                                                        e.target.value = username; 
+                                                        return; 
+                                                    }
+                                                    setUsername(e.target.value);
+                                                    if (error) setError(''); 
+                                                }}
                                                 placeholder="Enter name..."
-                                                maxLength="25"
                                                 className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
                                             />
                                         {username.trim() && <PlayerAvatar name={username} className="w-8 h-8 rounded-full" />}
@@ -4069,12 +4090,17 @@
                                                     type="text"
                                                     value={newPlayerName}
                                                     onChange={(e) => {
-                                                        setNewPlayerName(e.target.value.slice(0, 25));
+                                                        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+                                                        const newGraphemes = Array.from(segmenter.segment(e.target.value)).map(s => s.segment);
+                                                        if (newGraphemes.length > 25) {
+                                                            e.target.value = newPlayerName;
+                                                            return;
+                                                        }
+                                                        setNewPlayerName(e.target.value);
                                                         if (playerError) setPlayerError('');
                                                     }}
                                                     onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
                                                     placeholder="Enter name..."
-                                                    maxLength="25"
                                                     className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
                                                 />
                                                 {newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
@@ -4557,7 +4583,7 @@
                         <h2 className="text-xl font-display text-white/60 font-bold tracking-wide mb-1">
                             Pass the device to
                         </h2>
-                        <h1 className="text-6xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white/90 to-white/70 drop-shadow-xl break-words max-w-full mb-12">
+                        <h1 className="text-6xl font-display font-black text-white antialiased drop-shadow-xl break-words max-w-full pb-4 mb-8" style={{ WebkitMaskImage: 'linear-gradient(to bottom right, rgba(0,0,0,1), rgba(0,0,0,0.9), rgba(0,0,0,0.7))', maskImage: 'linear-gradient(to bottom right, rgba(0,0,0,1), rgba(0,0,0,0.9), rgba(0,0,0,0.7))' }}>
                             {player.name}
                         </h1>
                         
