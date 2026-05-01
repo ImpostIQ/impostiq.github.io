@@ -58,8 +58,6 @@
     <meta name="twitter:title" content="Impostiq • Find the Spy" />
     <meta name="twitter:image" id="twitter-image" content="https://impostiq.github.io/images/ogimage.png" />
     <meta name="twitter:description" content="Can you blend in? Find the spy before time runs out. Play with friends online or on one device!" />
-	
-    <link rel="preload" href="https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     
     <script>
 		(function() {
@@ -143,11 +141,11 @@
             ],
             theme: {
                 extend: {
-                    fontFamily: { 
-						sans: ['"Fluent Emoji Color"', 'Inter', 'sans-serif'], 
-						display: ['"Fluent Emoji Color"', 'Outfit', 'sans-serif'], 
-						mono: ['"Fluent Emoji Color"', 'JetBrains Mono', 'monospace'] 
-					},
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
                     cursor: {
                         default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
                         pointer: "url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer",
@@ -212,20 +210,6 @@
     </script>
 
     <style>
-        @font-face {
-			font-family: 'Fluent Emoji Color';
-			src: url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2') format('woff2');
-			font-display: swap;
-			/* CATCH-ALL EMOJI RANGE: Covers all Dingbats, Symbols, Modifiers, and the entire 1F000 block where all face/object emojis exist */
-			unicode-range: U+200D, U+2300-23FF, U+24C2, U+25A0-25FF, U+2600-26FF, U+2700-27BF, U+2B00-2BFF, U+FE00-FE0F, U+1F000-1FAFF;
-		}
-
-		/* Force the Emoji font to be EVALUATED FIRST for inputs */
-		input, textarea {
-			font-family: 'Fluent Emoji Color', 'Inter', sans-serif !important;
-			font-variant-emoji: emoji;
-		}
-
         * {
             -webkit-tap-highlight-color: transparent;
         }
@@ -234,11 +218,9 @@
         }
         *:focus { outline: none !important; }
 
-        /* Force the Emoji font to be EVALUATED FIRST for inputs */
-		input, textarea {
-			font-family: 'Fluent Emoji Color', 'Inter', sans-serif !important;
-			font-variant-emoji: emoji;
-		}
+        input, textarea {
+            caret-color: #8b5cf6; 
+        }
         ::selection {
             background: rgba(139, 92, 246, 0.4);
             color: #ffffff;
@@ -927,13 +909,7 @@
             };
             const isSpy = !!spyMapping[cleanName];
             
-            let safeName = "Agent";
-            try {
-                safeName = encodeURIComponent(name);
-            } catch (e) {
-                safeName = encodeURIComponent(name.replace(/[\uD800-\uDFFF]/g, ''));
-            }
-            let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${safeName}&backgroundColor=transparent`;
+            let avatarUrl = `https://api.dicebear.com/9.x/thumbs/svg?seed=${encodeURIComponent(name)}&backgroundColor=transparent`;
             let spyScaleClass = '';
             
             if (isSpy) {
@@ -1586,17 +1562,9 @@
                                         <input
                                                 type="text"
                                                 value={username}
-                                                onChange={(e) => { 
-                                                    const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-                                                    const newGraphemes = Array.from(segmenter.segment(e.target.value)).map(s => s.segment);
-                                                    if (newGraphemes.length > 25) {
-                                                        e.target.value = username; 
-                                                        return; 
-                                                    }
-                                                    setUsername(e.target.value);
-                                                    if (error) setError(''); 
-                                                }}
+                                                onChange={(e) => { setUsername(e.target.value.slice(0, 25)); if (error) setError(''); }}
                                                 placeholder="Enter name..."
+                                                maxLength="25"
                                                 className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
                                             />
                                         {username.trim() && <PlayerAvatar name={username} className="w-8 h-8 rounded-full" />}
@@ -4101,17 +4069,12 @@
                                                     type="text"
                                                     value={newPlayerName}
                                                     onChange={(e) => {
-                                                        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-                                                        const newGraphemes = Array.from(segmenter.segment(e.target.value)).map(s => s.segment);
-                                                        if (newGraphemes.length > 25) {
-                                                            e.target.value = newPlayerName;
-                                                            return;
-                                                        }
-                                                        setNewPlayerName(e.target.value);
+                                                        setNewPlayerName(e.target.value.slice(0, 25));
                                                         if (playerError) setPlayerError('');
                                                     }}
                                                     onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
                                                     placeholder="Enter name..."
+                                                    maxLength="25"
                                                     className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
                                                 />
                                                 {newPlayerName.trim() && <PlayerAvatar name={newPlayerName.trim()} className="w-8 h-8 rounded-full" />}
@@ -5637,18 +5600,17 @@
                     });
                 });
 
-                const fontPromise = document.fonts ? document.fonts.load('1em "Fluent Emoji Color"').catch(() => null) : Promise.resolve();
-
+                // Wait for both custom fonts and the main images to download
                 const allAssetsPromise = Promise.all([
-                    fontPromise,
+                    document.fonts ? document.fonts.ready : Promise.resolve(),
                     ...imagePromises
                 ]);
 
                 const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3000));
 
-                Promise.race([allAssetsPromise, timeoutPromise])
-                    .then(() => { document.body.classList.remove('uninitialized'); })
-                    .catch(() => { document.body.classList.remove('uninitialized'); }); 
+                Promise.race([allAssetsPromise, timeoutPromise]).then(() => {
+                    document.body.classList.remove('uninitialized');
+                });
             }, []);
 			
             const [isOnlineStatus, setIsOnlineStatus] = useState(navigator.onLine);
