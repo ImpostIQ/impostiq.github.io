@@ -31,6 +31,7 @@
 	<link rel="apple-touch-icon" href="https://impostiq.github.io/images/imagerounded576.png">
     
     <link rel="preload" as="image" href="https://impostiq.github.io/images/displayimage512_communigories.png">
+    <link rel="preload" href="https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     <meta name="thumbnail" content="https://impostiq.github.io/images/displayimage512_communigories.png" />
 	<link rel="image_src" href="https://impostiq.github.io/images/displayimage512_communigories.png" />
 	<meta itemprop="image" content="https://impostiq.github.io/images/displayimage512_communigories.png">
@@ -139,11 +140,7 @@
             ],
             theme: {
                 extend: {
-                    fontFamily: { 
-                        sans: ['Inter', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'], 
-                        display: ['Outfit', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'], 
-                        mono:['JetBrains Mono', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'monospace'] 
-                    },
+                    fontFamily: { sans: ['Inter', '"Fluent Emoji Color"', 'sans-serif'], display: ['Outfit', '"Fluent Emoji Color"', 'sans-serif'], mono: ['JetBrains Mono', '"Fluent Emoji Color"', 'monospace'] },
                     cursor: {
                         default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
                         pointer: "url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer",
@@ -169,14 +166,22 @@
         }
     </script>
     <style>
-        @import url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.css');
+        @font-face {
+            font-family: 'Fluent Emoji Color';
+            src: url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.woff2') format('woff2');
+            font-display: block;
+        }
 
         * { -webkit-tap-highlight-color: transparent; }
         *:focus { outline: none !important; }
+
+        body.uninitialized {
+            opacity: 0 !important;
+        }
         
         input, textarea {
             caret-color: #8b5cf6; 
-            font-family: 'Inter', 'Segoe UI Emoji', 'Fluent Emoji Color', sans-serif;
+            font-family: 'Inter', 'Fluent Emoji Color', sans-serif;
             font-variant-emoji: emoji;
             letter-spacing: normal;
         }
@@ -188,7 +193,7 @@
             background: rgba(139, 92, 246, 0.4);
             color: #ffffff;
         }
-        html, body { position: fixed; inset: 0; overflow: hidden; background-color: #020617; color: #f8fafc; touch-action: none; user-select: none; -webkit-user-select: none; }
+        html, body { position: fixed; inset: 0; overflow: hidden; background-color: #020617; color: #f8fafc; touch-action: none; user-select: none; -webkit-user-select: none; transition: opacity 0.3s ease-out; }
         img { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; pointer-events: none; }
         
 		body, button:disabled, .cursor-default, .cursor-wait { 
@@ -243,7 +248,7 @@
         @keyframes subtleShine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     </style>
 </head>
-<body class="select-none">
+<body class="select-none uninitialized">
     <noscript>
         <img src="https://impostiq.github.io/images/displayimage512_communigories.png" alt="Communigories Vault" width="512" height="512" style="display:none;">
         <h1>Communigories • Impostiq</h1>
@@ -256,6 +261,20 @@
     </div>
     
     <div id="root"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if (document.fonts) {
+                document.fonts.load('1em "Fluent Emoji Color"').then(() => {
+                    document.body.classList.remove('uninitialized');
+                }).catch(() => {
+                    document.body.classList.remove('uninitialized');
+                });
+            } else {
+                document.body.classList.remove('uninitialized');
+            }
+        });
+    </script>
 	
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
@@ -1296,27 +1315,20 @@
                                             </div>
 
                                             <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors pr-4 relative z-10">
-                                                <input 
-                                                    type="text" 
-                                                    placeholder="Category Name" 
-                                                    value={newCatName} 
+                                                <input type="text" placeholder="Category Name" value={newCatName} 
                                                     onChange={e => {
                                                         const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-                                                        const newGraphemes = Array.from(segmenter.segment(e.target.value)).map(s => s.segment);
-                                                        
-                                                        if (newGraphemes.length > 25) {
-                                                            e.target.value = newCatName;
-                                                            return;
+                                                        const segments = Array.from(segmenter.segment(e.target.value)).map(s => s.segment);
+                                                        if (segments.length <= 25) {
+                                                            setNewCatName(e.target.value);
+                                                        } else {
+                                                            setNewCatName(segments.slice(0, 25).join(''));
                                                         }
-                                                        
-                                                        setNewCatName(e.target.value);
                                                         setError('');
                                                     }}
                                                     className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
                                                 />
-                                                <span className="text-xs font-bold text-white/30 tracking-wider">
-                                                    {Array.from(new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(newCatName || '')).length}/25
-                                                </span>
+                                                <span className="text-xs font-bold text-white/30 tracking-wider">{Array.from(new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(newCatName)).length}/25</span>
                                             </div>
 
                                             <div className="bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors relative z-10">
