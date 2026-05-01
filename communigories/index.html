@@ -139,7 +139,11 @@
             ],
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    fontFamily: { 
+                        sans: ['Inter', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'], 
+                        display: ['Outfit', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'sans-serif'], 
+                        mono:['JetBrains Mono', '"Segoe UI Emoji"', '"Fluent Emoji Color"', 'monospace'] 
+                    },
                     cursor: {
                         default: "url('https://impostiq.github.io/images/cursors/default.cur'), default",
                         pointer: "url('https://impostiq.github.io/images/cursors/pointer.cur'), pointer",
@@ -165,11 +169,16 @@
         }
     </script>
     <style>
+        @import url('https://tetunori.github.io/fluent-emoji-webfont/dist/FluentEmojiColor.css');
+
         * { -webkit-tap-highlight-color: transparent; }
         *:focus { outline: none !important; }
         
         input, textarea {
             caret-color: #8b5cf6; 
+            font-family: 'Inter', 'Segoe UI Emoji', 'Fluent Emoji Color', sans-serif;
+            font-variant-emoji: emoji;
+            letter-spacing: normal;
         }
         ::selection {
             background: rgba(139, 92, 246, 0.4);
@@ -1287,10 +1296,27 @@
                                             </div>
 
                                             <div className="flex items-center gap-3 bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors pr-4 relative z-10">
-                                                <input type="text" maxLength="25" placeholder="Category Name" value={newCatName} onChange={e => {setNewCatName(e.target.value.slice(0, 25)); setError('');}}
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Category Name" 
+                                                    value={newCatName} 
+                                                    onChange={e => {
+                                                        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+                                                        const newGraphemes = Array.from(segmenter.segment(e.target.value)).map(s => s.segment);
+                                                        
+                                                        if (newGraphemes.length > 25) {
+                                                            e.target.value = newCatName;
+                                                            return;
+                                                        }
+                                                        
+                                                        setNewCatName(e.target.value);
+                                                        setError('');
+                                                    }}
                                                     className="flex-1 bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white min-w-0"
                                                 />
-                                                <span className="text-xs font-bold text-white/30 tracking-wider">{newCatName.length}/25</span>
+                                                <span className="text-xs font-bold text-white/30 tracking-wider">
+                                                    {Array.from(new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(newCatName || '')).length}/25
+                                                </span>
                                             </div>
 
                                             <div className="bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors relative z-10">
