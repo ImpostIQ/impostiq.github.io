@@ -5069,7 +5069,7 @@
                                                 <input
                                                     type="text"
                                                     value={guessInput}
-                                                    onChange={(e) => setGuessInput(e.target.value.slice(0, 30))}
+                                                    onChange={(e) => setGuessInput(e.target.value.slice(0, 50))}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter' && guessInput.trim()) {
                                                             e.preventDefault();
