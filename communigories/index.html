@@ -1340,8 +1340,17 @@
                                         <div className="relative mb-6">
                                             <div className="absolute left-5 top-1/2 -translate-y-1/2 text-white/30 text-lg flex items-center justify-center"><FaIcon name="icon-search" /></div>
                                             <input type="text" placeholder="Search categories..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                                                className="w-full bg-slate-950/50 rounded-xl pl-14 pr-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-colors placeholder:text-white/20 font-display font-semibold text-lg text-white"
+                                                className="w-full bg-slate-950/50 rounded-xl pl-14 pr-14 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none border border-white/5 focus:border-brand-500/50 focus:bg-slate-950/80 transition-colors placeholder:text-white/20 font-display font-semibold text-lg text-white"
                                             />
+                                            {searchQuery && (
+                                                <button 
+                                                    onClick={() => { playSound(); setSearchQuery(''); }}
+                                                    className="absolute right-5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-white/30 hover:text-white hover:bg-white/10 rounded-full transition-all active:scale-90"
+                                                    aria-label="Clear search"
+                                                >
+                                                    <FaIcon name="icon-xmark" className="text-sm" />
+                                                </button>
+                                            )}
                                         </div>
 
                                         {isLoading ? (
