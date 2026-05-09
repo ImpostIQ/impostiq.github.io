@@ -179,6 +179,22 @@
             background: rgba(139, 92, 246, 0.4);
             color: #ffffff;
         }
+        
+        .text-overlay-textarea {
+            color: transparent !important;
+            -webkit-text-fill-color: transparent !important;
+            text-shadow: none !important;
+        }
+        .text-overlay-textarea::selection {
+            color: transparent !important;
+            -webkit-text-fill-color: transparent !important;
+            background: rgba(139, 92, 246, 0.4) !important;
+        }
+        .text-overlay-textarea::-moz-selection {
+            color: transparent !important;
+            -webkit-text-fill-color: transparent !important;
+            background: rgba(139, 92, 246, 0.4) !important;
+        }
         html, body { position: fixed; inset: 0; overflow: hidden; background-color: #020617; color: #f8fafc; touch-action: none; user-select: none; -webkit-user-select: none; }
         img { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; pointer-events: none; }
         
@@ -238,7 +254,28 @@
     <noscript>
         <img src="https://impostiq.github.io/images/displayimage512_communigories.png" alt="Communigories Vault" width="512" height="512" style="display:none;">
         <h1>Communigories • Impostiq</h1>
-        <p>Communigories is a built-in feature and community vault for the social deduction game Impostiq. It is not a separate game. Players can use this section to discover, share, and download custom user-generated word categories to use in their Impostiq matches. Browse hundreds of unique community packs or create your own to play with friends online and locally!</p>
+        <p>Communigories is a built-in community vault feature for the social deduction game Impostiq. Players can use this section to discover, share, and download custom user-generated word categories to use in their Impostiq matches.</p>
+        
+        <h2>1. Features & Capabilities</h2>
+        <ul>
+            <li><strong>Cross-Compatibility:</strong> Custom categories downloaded here can be played in both Local (Same Device) and Online Multiplayer lobbies.</li>
+            <li><strong>Offline Support:</strong> The vault utilizes Firebase Firestore with IndexedDB offline persistence. Once loaded, you can swap between the main game and the vault instantly without loading screens.</li>
+            <li><strong>Deep Linking:</strong> Custom share links instantly route friends directly to a specific category page.</li>
+        </ul>
+
+        <h2>2. Uploading & Creating Categories</h2>
+        <ul>
+            <li><strong>Word Bank Rules:</strong> Minimum 10 words required. Words must be separated by commas. To include a comma within a single word, wrap the word in curly braces (e.g., {Good Night, and Good Luck}).</li>
+            <li><strong>Duplicate Prevention:</strong> Duplicate words are strictly prohibited and will automatically block the upload, highlighting the duplicates in red.</li>
+            <li><strong>Icons:</strong> Creators must assign a 3D visual icon to their category from a curated list of high-quality emojis, a design choice that inherently prevents the upload of inappropriate imagery.</li>
+        </ul>
+
+        <h2>3. Library Management & Privacy</h2>
+        <ul>
+            <li><strong>Privacy Controls:</strong> Creators can toggle "Private Category". Private categories are hidden from the public 'Trending' and 'Newest' feeds and can only be accessed via direct share links.</li>
+            <li><strong>Selective Toggles:</strong> Once downloaded, users can selectively toggle `useLocal` and `useOnline` switches. This allows you to hide a pack from your host menus without deleting it from your device.</li>
+            <li><strong>Tracking:</strong> The vault actively tracks total downloads and edit counts for public categories.</li>
+        </ul>
     </noscript>
     <div class="fixed inset-0 bg-[#020617] -z-10"></div>
     <div class="absolute inset-0 pointer-events-none z-0">
@@ -558,7 +595,7 @@
                                         <button
                                             key={iconObj.url}
                                             onClick={() => { if(playSound) playSound('selectCategory'); onSelect(iconObj.url); onClose(); }}
-                                            className={`relative overflow-hidden flex flex-col items-center rounded-[1.25rem] sm:rounded-[1.5rem] transition-all duration-300 group aspect-square ${isSelected ? 'bg-brand-500/10' : 'bg-slate-800/40 backdrop-blur-md'}`}
+                                            className={`relative overflow-hidden flex flex-col items-center rounded-[1.25rem] sm:rounded-[1.5rem] transition duration-300 group aspect-square ${isSelected ? 'bg-brand-500/10' : 'bg-slate-800/40 backdrop-blur-md'}`}
                                         >
                                             <div className="flex-1 flex items-center justify-center w-full relative z-0 mt-1">
                                                 <img 
@@ -597,7 +634,7 @@
             return (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => { playSound(); onClose(); }}></div>
-                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl animate-modal-show transform transition-all flex flex-col">
+                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-5 sm:p-6 border border-white/10 shadow-2xl animate-modal-show transform transition flex flex-col">
                         <button onClick={() => { playSound(); onClose(); }} className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 active:scale-95">
                             <FaIcon name="icon-xmark" className="" />
                         </button>
@@ -797,13 +834,12 @@
                 audioManagerRef.current?.playSound(name);
             };
 
-            // Upload/Edit State
-            const [editId, setEditId] = useState(null);
+            const[editId, setEditId] = useState(null);
             const [newCatName, setNewCatName] = useState('');
             const [newCatWords, setNewCatWords] = useState('');
             const [isPrivate, setIsPrivate] = useState(false);
+            const wordsBackdropRef = useRef(null);
             
-            // Icon Selection Modal
             const [isIconModalOpen, setIsIconModalOpen] = useState(false);
             const [selectedIcon, setSelectedIcon] = useState(ICONS_LIST[0].url);
 
@@ -933,7 +969,21 @@
 
             const handleUpload = async () => {
                 if (!newCatName.trim()) { setError('Category name is required.'); return; }
-                const wordsArray = newCatWords.split(',').map(w => w.trim()).filter(w => w.length > 0);
+                
+                const splitRegex = /,(?![^{]*\})/;
+                const wordsArray = newCatWords.split(splitRegex)
+                    .map(w => w.trim().replace(/^\{(.*)\}$/, '$1').trim())
+                    .filter(w => w.length > 0);
+                
+                const lowerCaseWords = wordsArray.map(w => w.toLowerCase());
+                const duplicates = wordsArray.filter((item, index) => lowerCaseWords.indexOf(item.toLowerCase()) !== index);
+                const uniqueDuplicates =[...new Set(duplicates)];
+                
+                if (uniqueDuplicates.length > 0) { 
+                    setError(`Remove duplicate words: ${uniqueDuplicates.join(', ')}`); 
+                    return; 
+                }
+                
                 if (wordsArray.length < 10) { setError('Please add at least 10 words.'); return; }
 
                 setIsLoading(true);
@@ -1101,7 +1151,36 @@
                 });
             };
 
-            const currentWordCount = newCatWords.split(',').filter(w=>w.trim()).length;
+            const splitRegex = /,(?![^{]*\})/;
+            const splitWithCommaRegex = /(,(?![^{]*\}))/;
+
+            const currentWordsArray = newCatWords.split(splitRegex)
+                .map(w => w.trim().replace(/^\{(.*)\}$/, '$1').trim())
+                .filter(w => w.length > 0);
+            const currentWordCount = currentWordsArray.length;
+
+            const renderStyledWords = () => {
+                if (!newCatWords) return null;
+                const parts = newCatWords.split(splitWithCommaRegex);
+                const seenWords = new Set();
+                
+                return parts.map((part, i) => {
+                    if (part === ',') return <span key={i} className="text-white">{part}</span>;
+                    
+                    // Remove wrapping braces before checking for duplicates
+                    const actualWord = part.trim().replace(/^\{(.*)\}$/, '$1').trim().toLowerCase();
+                    
+                    if (actualWord.length > 0) {
+                        if (seenWords.has(actualWord)) {
+                            return <span key={i} className="text-red-400">{part}</span>;
+                        } else {
+                            seenWords.add(actualWord);
+                            return <span key={i} className="text-white">{part}</span>;
+                        }
+                    }
+                    return <span key={i} className="text-white">{part}</span>;
+                });
+            };
 
             let emptyTitle = "No categories found";
             let emptyDesc = "Try adjusting your search or upload a new category to the community.";
@@ -1280,7 +1359,7 @@
                                                         <p className="text-white/40 text-xs mt-1 leading-relaxed">The visual symbol for your category in the community feed.</p>
                                                     </div>
                                                 </div>
-                                                <button onClick={() => { playSound(); setIsIconModalOpen(true); }} className="w-full sm:w-12 sm:h-12 flex items-center justify-center gap-2 px-4 py-3 sm:p-0 bg-white/10 hover:bg-white/20 text-white rounded-lg sm:rounded-[1rem] text-xs font-bold transition-all active:scale-95 flex-shrink-0 border border-white/5 sm:border-transparent">
+                                                <button onClick={() => { playSound(); setIsIconModalOpen(true); }} className="w-full sm:w-12 sm:h-12 flex items-center justify-center gap-2 px-4 py-3 sm:p-0 bg-white/10 hover:bg-white/20 text-white rounded-lg sm:rounded-[1rem] text-xs font-bold transition active:scale-95 flex-shrink-0 border border-white/5 sm:border-transparent">
                                                     <FaIcon name="icon-change" className="text-sm" />
                                                     <span className="sm:hidden tracking-wider">CHANGE</span>
                                                 </button>
@@ -1294,8 +1373,25 @@
                                             </div>
 
                                             <div className="bg-slate-950/50 rounded-xl border border-white/5 focus-within:border-brand-500/50 focus-within:bg-slate-950/80 transition-colors relative z-10">
-                                                <textarea rows="5" placeholder="Spongebob, iCarly, Drake & Josh..." value={newCatWords} onChange={e => {setNewCatWords(e.target.value); setError('');}}
-                                                    className="w-full bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none placeholder:text-white/20 font-display font-semibold text-lg text-white resize-none leading-relaxed no-scrollbar"
+                                                <div 
+                                                    ref={wordsBackdropRef}
+                                                    aria-hidden="true"
+                                                    className="absolute inset-0 px-5 py-4 font-display font-semibold text-lg leading-relaxed whitespace-pre-wrap break-words overflow-hidden pointer-events-none"
+                                                >
+                                                    {renderStyledWords()}
+                                                </div>
+                                                
+                                                <textarea 
+                                                    rows="5" 
+                                                    placeholder={newCatWords ? "" : "Spongebob, iCarly, Drake & Josh..."}
+                                                    value={newCatWords} 
+                                                    onChange={e => {setNewCatWords(e.target.value); setError('');}}
+                                                    onScroll={e => {
+                                                        if (wordsBackdropRef.current) {
+                                                            wordsBackdropRef.current.scrollTop = e.target.scrollTop;
+                                                        }
+                                                    }}
+                                                    className={`w-full block bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none font-display font-semibold text-lg resize-none leading-relaxed no-scrollbar ${newCatWords ? 'text-overlay-textarea' : 'text-white placeholder:text-white/20'}`}
                                                 ></textarea>
                                             </div>
 
