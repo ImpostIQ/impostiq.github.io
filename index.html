@@ -6819,6 +6819,20 @@
             };
 
             const handleStart = () => {
+                // Request fullscreen mode with cross-browser fallbacks
+                try {
+                    const elem = document.documentElement;
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen().catch(err => console.log("Fullscreen error:", err));
+                    } else if (elem.webkitRequestFullscreen) { /* Safari */
+                        elem.webkitRequestFullscreen();
+                    } else if (elem.msRequestFullscreen) { /* IE11 */
+                        elem.msRequestFullscreen();
+                    }
+                } catch (e) {
+                    console.log("Fullscreen API not supported:", e);
+                }
+
                 if (audioManagerRef.current) {
                     audioManagerRef.current.unlockAudio();
                     audioManagerRef.current.playSound('uiClick');
