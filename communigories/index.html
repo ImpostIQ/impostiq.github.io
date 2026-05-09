@@ -357,102 +357,102 @@
             return null;
         };
 
-        const ICONS_LIST = [
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/fire_1f525.png", name: "Trending" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/star_2b50.png", name: "Favorites" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/trophy_1f3c6.png", name: "Champions" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/popcorn_1f37f.png", name: "Cinema" },
+        const ICONS_LIST =[
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/fire_1f525.png", name: "Fire" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/star_2b50.png", name: "Star" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/trophy_1f3c6.png", name: "Trophy" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/popcorn_1f37f.png", name: "Movies" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/television_1f4fa.png", name: "TV Shows" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/joystick_1f579-fe0f.png", name: "Gaming" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png", name: "Tabletop" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/joystick_1f579-fe0f.png", name: "Video Games" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/game-die_1f3b2.png", name: "Board Games" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/musical-notes_1f3b6.png", name: "Music" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/364/artist-palette_1f3a8.png", name: "Creativity" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/crown_1f451.png", name: "Elite" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/money-bag_1f4b0.png", name: "Finance" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/light-bulb_1f4a1.png", name: "General" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/books_1f4da.png", name: "Literature" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/364/artist-palette_1f3a8.png", name: "Art" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/crown_1f451.png", name: "Royalty" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/money-bag_1f4b0.png", name: "Wealth" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/light-bulb_1f4a1.png", name: "Ideas" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/books_1f4da.png", name: "Books" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/globe-showing-americas_1f30e.png", name: "Geography" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/rocket_1f680.png", name: "Space" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/microscope_1f52c.png", name: "Science" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/hamburger_1f354.png", name: "Cuisine" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/hot-beverage_2615.png", name: "Café" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/red-apple_1f34e.png", name: "Nature" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/hamburger_1f354.png", name: "Food" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/hot-beverage_2615.png", name: "Drinks" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/red-apple_1f34e.png", name: "Fruits" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/dog-face_1f436.png", name: "Animals" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/airplane_2708-fe0f.png", name: "Travel" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/automobile_1f697.png", name: "Vehicles" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/shopping-bags_1f6cd-fe0f.png", name: "Brands" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/shopping-bags_1f6cd-fe0f.png", name: "Shopping" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/laptop_1f4bb.png", name: "Technology" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/gear_2699-fe0f.png", name: "Mechanical" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/magic-wand_1fa84.png", name: "Fantasy" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/gear_2699-fe0f.png", name: "Mechanics" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/magic-wand_1fa84.png", name: "Magic" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/crossed-swords_2694-fe0f.png", name: "History" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/heart-suit_2665-fe0f.png", name: "Romance" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/camera_1f4f7.png", name: "Media" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/camera_1f4f7.png", name: "Photography" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/speech-balloon_1f4ac.png", name: "Quotes" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/smiling-face-with-sunglasses_1f60e.png", name: "Pop Culture" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/ghost_1f47b.png", name: "Spooky" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/jack-o-lantern_1f383.png", name: "Halloween" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/364/christmas-tree_1f384.png", name: "Christmas" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/party-popper_1f389.png", name: "Celebration" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/lipstick_1f484.png", name: "Fashion" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/party-popper_1f389.png", name: "Party" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/lipstick_1f484.png", name: "Beauty" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/soccer-ball_26bd.png", name: "Sports" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/man-lifting-weights-light-skin-tone_1f3cb-1f3fb-200d-2642-fe0f.png", name: "Fitness" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/magnifying-glass-tilted-right_1f50e.png", name: "Mystery" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/gem-stone_1f48e.png", name: "Luxury" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/magnifying-glass-tilted-right_1f50e.png", name: "Investigation" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/gem-stone_1f48e.png", name: "Gems" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/alien_1f47d.png", name: "Aliens" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/robot_1f916.png", name: "Robots" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/ninja_light-skin-tone_1f977-1f3fb_1f3fb.png", name: "Ninjas" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/skull_1f480.png", name: "Horror" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/detective_light-skin-tone_1f575-1f3fb_1f3fb.png", name: "Crime" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/detective_light-skin-tone_1f575-1f3fb_1f3fb.png", name: "Detectives" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/cowboy-hat-face_1f920.png", name: "Western" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/clown-face_1f921.png", name: "Circus" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/brain_1f9e0.png", name: "Anatomy" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/brain_1f9e0.png", name: "Brains" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/bone_1f9b4.png", name: "Bones" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/dragon-face_1f432.png", name: "Dragons" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/unicorn_1f984.png", name: "Mythology" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/butterfly_1f98b.png", name: "Insects" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/snake_1f40d.png", name: "Reptiles" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/turtle_1f422.png", name: "Turtles" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/spouting-whale_1f433.png", name: "Ocean" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/mushroom_1f344.png", name: "Fungi" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/spouting-whale_1f433.png", name: "Marine Life" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/mushroom_1f344.png", name: "Mushrooms" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/cherry-blossom_1f338.png", name: "Flowers" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/evergreen-tree_1f332.png", name: "Forest" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/evergreen-tree_1f332.png", name: "Trees" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/cactus_1f335.png", name: "Desert" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/pizza_1f355.png", name: "Pizza" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/doughnut_1f369.png", name: "Sweets" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/doughnut_1f369.png", name: "Desserts" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/taco_1f32e.png", name: "Mexican" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/sushi_1f363.png", name: "Sushi" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/french-fries_1f35f.png", name: "Fast Food" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/stadium_1f3df-fe0f.png", name: "Venues" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/ferris-wheel_1f3a1.png", name: "Amusement" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/french-fries_1f35f.png", name: "Fries" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/stadium_1f3df-fe0f.png", name: "Stadiums" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/ferris-wheel_1f3a1.png", name: "Theme Parks" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/roller-coaster_1f3a2.png", name: "Rides" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/363/tent_26fa.png", name: "Camping" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/classical-building_1f3db-fe0f.png", name: "Architecture" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/house_1f3e0.png", name: "Housing" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/house_1f3e0.png", name: "Buildings" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/hospital_1f3e5.png", name: "Medical" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/police-car_1f693.png", name: "Police" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/fire-engine_1f692.png", name: "Fire" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/fire-engine_1f692.png", name: "Fire Dept" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/helicopter_1f681.png", name: "Aviation" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/364/speedboat_1f6a4.png", name: "Boats" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/anchor_2693.png", name: "Nautical" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/guitar_1f3b8.png", name: "Guitars" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/saxophone_1f3b7.png", name: "Jazz" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/trumpet_1f3ba.png", name: "Brass" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/violin_1f3bb.png", name: "Strings" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/violin_1f3bb.png", name: "Classical" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/drum_1f941.png", name: "Percussion" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/puzzle-piece_1f9e9.png", name: "Puzzles" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/bowling_1f3b3.png", name: "Bowling" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/crystal-ball_1f52e.png", name: "Magic" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/crystal-ball_1f52e.png", name: "Fortune" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/ring_1f48d.png", name: "Jewelry" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/high-heeled-shoe_1f460.png", name: "Shoes" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/jeans_1f456.png", name: "Pants" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/jeans_1f456.png", name: "Clothing" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/necktie_1f454.png", name: "Formal" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/glasses_1f453.png", name: "Eyewear" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/watch_231a.png", name: "Watches" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/mobile-phone_1f4f1.png", name: "Phones" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/telephone-receiver_1f4de.png", name: "Calling" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/desktop-computer_1f5a5-fe0f.png", name: "PCs" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/video-camera_1f4f9.png", name: "Film" },
-            { url: "https://em-content.zobj.net/source/microsoft-teams/337/radio_1f4fb.png", name: "Audio" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/mobile-phone_1f4f1.png", name: "Mobiles" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/telephone-receiver_1f4de.png", name: "Telephones" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/desktop-computer_1f5a5-fe0f.png", name: "Computers" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/video-camera_1f4f9.png", name: "Cameras" },
+            { url: "https://em-content.zobj.net/source/microsoft-teams/337/radio_1f4fb.png", name: "Radios" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/compass_1f9ed.png", name: "Navigation" },
             { url: "https://em-content.zobj.net/source/microsoft-teams/337/stopwatch_23f1-fe0f.png", name: "Time" }
         ];
@@ -840,7 +840,26 @@
             const [isPrivate, setIsPrivate] = useState(false);
             const wordsBackdropRef = useRef(null);
             
-            const [isIconModalOpen, setIsIconModalOpen] = useState(false);
+            const PLACEHOLDERS =[
+                "Spongebob, iCarly, {Ed, Edd n Eddy}...",
+                "Inception, {The Good, the Bad and the Ugly}, Alien...",
+                "Monopoly, {Rock, Paper, Scissors}, Chess...",
+                "New York, {Washington, D.C.}, Los Angeles...",
+                "The Beatles, {Earth, Wind & Fire}, Queen...",
+                "Instagram, Snapchat, TikTok...",
+                "Albert Einstein, Sir Isaac Newton, Nikola Tesla...",
+                "Iron Man, Batman, Superman..."
+            ];
+            const[placeholderIndex, setPlaceholderIndex] = useState(0);
+
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    setPlaceholderIndex(prev => (prev + 1) % PLACEHOLDERS.length);
+                }, 6500);
+                return () => clearInterval(interval);
+            },[]);
+            
+            const[isIconModalOpen, setIsIconModalOpen] = useState(false);
             const [selectedIcon, setSelectedIcon] = useState(ICONS_LIST[0].url);
 
             const [error, setError] = useState('');
@@ -1393,9 +1412,21 @@
                                                     {renderStyledWords()}
                                                 </div>
                                                 
+                                                {!newCatWords && (
+                                                    <div className="absolute inset-0 px-5 py-4 font-display font-semibold text-lg leading-relaxed pointer-events-none overflow-hidden">
+                                                        {PLACEHOLDERS.map((text, i) => (
+                                                            <span 
+                                                                key={i} 
+                                                                className={`absolute left-5 right-5 top-4 transition-opacity duration-[2500ms] ease-in-out ${i === placeholderIndex ? 'opacity-100' : 'opacity-0'} text-white/20`}
+                                                            >
+                                                                {text}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                
                                                 <textarea 
                                                     rows="5" 
-                                                    placeholder={newCatWords ? "" : "Spongebob, iCarly, Drake & Josh..."}
                                                     value={newCatWords} 
                                                     onChange={e => {setNewCatWords(e.target.value); setError('');}}
                                                     onScroll={e => {
@@ -1403,11 +1434,11 @@
                                                             wordsBackdropRef.current.scrollTop = e.target.scrollTop;
                                                         }
                                                     }}
-                                                    className={`w-full block bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none font-display font-semibold text-lg resize-none leading-relaxed no-scrollbar ${newCatWords ? 'text-overlay-textarea' : 'text-white placeholder:text-white/20'}`}
+                                                    className={`w-full block bg-transparent px-5 py-4 outline-none focus:outline-none focus:ring-0 focus:shadow-none appearance-none font-display font-semibold text-lg resize-none leading-relaxed no-scrollbar text-overlay-textarea`}
                                                 ></textarea>
                                             </div>
 
-                                            <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-all">
+                                            <div className="flex items-center justify-between bg-black/20 border border-white/5 rounded-[1.5rem] p-4 transition-colors">
                                                 <div className="flex items-center gap-4 pr-4">
                                                     <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 flex-shrink-0">
                                                         <FaIcon name="icon-lock" className="text-lg" />
@@ -1419,9 +1450,9 @@
                                                 </div>
                                                 <button 
                                                     onClick={() => { playSound(!isPrivate ? 'switchOn' : 'switchOff'); setIsPrivate(!isPrivate); }}
-                                                    className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-all duration-300 ${isPrivate ? 'bg-orange-500/80' : 'bg-white/10'}`}
+                                                    className={`group flex-shrink-0 w-12 h-7 rounded-full p-1 cursor-pointer transition-colors duration-300 ${isPrivate ? 'bg-orange-500/80' : 'bg-white/10'}`}
                                                 >
-                                                    <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isPrivate ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
+                                                    <div className={`w-5 h-5 group-active:w-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isPrivate ? 'translate-x-5 group-active:translate-x-4' : 'translate-x-0'}`} />
                                                 </button>
                                             </div>
                                         </div>
