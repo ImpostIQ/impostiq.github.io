@@ -6826,15 +6826,21 @@
                 }
 
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
+                
+                const isWebView = window.median || window.gonative || 
+                                  /median|gonative|wv/i.test(navigator.userAgent) || 
+                                  (/iphone|ipod|ipad/i.test(navigator.userAgent) && !/safari/i.test(navigator.userAgent));
+                
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-                if (isMobile) {
+                const isAlreadyFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+
+                if (isMobile && !isWebView && !isStandalone && !isAlreadyFullscreen) {
                     try {
                         const elem = document.documentElement;
-                        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                            const fsPromise = elem.requestFullscreen ? elem.requestFullscreen() : 
-                                             (elem.webkitRequestFullscreen ? elem.webkitRequestFullscreen() : null);
-                            if (fsPromise) fsPromise.catch(() => {});
-                        }
+                        const fsPromise = elem.requestFullscreen ? elem.requestFullscreen() : 
+                                         (elem.webkitRequestFullscreen ? elem.webkitRequestFullscreen() : null);
+                        if (fsPromise) fsPromise.catch(() => {});
                     } catch (err) {}
                 }
 
