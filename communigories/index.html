@@ -848,7 +848,19 @@
             if (error) errorRef.current = error;
 
             useEffect(() => {
-                if (error) { const timer = setTimeout(() => setError(''), 4000); return () => clearTimeout(timer); }
+                if (error) {
+                    setTimeout(() => {
+                        if (scrollContainerRef.current) {
+                            scrollContainerRef.current.scrollTo({ 
+                                top: scrollContainerRef.current.scrollHeight, 
+                                behavior: 'smooth' 
+                            });
+                        }
+                    }, 50);
+                    
+                    const timer = setTimeout(() => setError(''), 4000); 
+                    return () => clearTimeout(timer); 
+                }
             }, [error]);
 
             const getMyIds = () => { try { return JSON.parse(localStorage.getItem('my_communigories') || '[]'); } catch { return []; } };
