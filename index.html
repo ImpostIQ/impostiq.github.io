@@ -490,11 +490,16 @@
                     }
                 }
             } catch (e) {
-                isUnofficial = true;
+                isUnofficial = true; 
             }
 
             if (isUnofficial) {
                 document.addEventListener('DOMContentLoaded', () => {
+                    document.body.classList.remove('uninitialized');
+                    document.body.style.opacity = '1';
+                    document.body.style.visibility = 'visible';
+                    document.body.style.overflow = 'hidden';
+
                     const root = document.getElementById('root');
                     if (root) root.remove();
 
@@ -505,50 +510,52 @@
                             @keyframes uf-slide { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
                             @keyframes uf-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
                         </style>
-                        <div class="fixed inset-0 bg-[#020617] z-[9999999] flex flex-col items-center justify-center p-6 relative font-sans text-slate-200 select-none">
-                            <div class="absolute inset-0 pointer-events-none z-0">
-                                <div class="absolute rounded-full filter blur-[80px] opacity-40 bg-brand-600/30 top-[-20%] left-[-20%] w-[60%] h-[60%]" style="animation: uf-blob 10s infinite ease-in-out;"></div>
-                                <div class="absolute rounded-full filter blur-[80px] opacity-40 bg-cyan-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%]" style="animation: uf-blob 10s infinite ease-in-out; animation-delay: 2s;"></div>
+
+                        <div style="position: fixed; inset: 0; background-color: #020617; z-index: 9999999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; font-family: 'Inter', sans-serif; color: #f8fafc; user-select: none;">
+                            
+                            <div style="position: absolute; inset: 0; pointer-events: none; z-index: 0;">
+                                <div style="position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; background-color: rgba(124, 58, 237, 0.3); top: -20%; left: -20%; width: 60%; height: 60%; animation: uf-blob 10s infinite ease-in-out;"></div>
+                                <div style="position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; background-color: rgba(8, 145, 178, 0.3); bottom: -20%; right: -20%; width: 60%; height: 60%; animation: uf-blob 10s infinite ease-in-out; animation-delay: 2s;"></div>
                             </div>
 
-                            <div class="relative z-10 w-full max-w-sm flex flex-col items-center" style="animation: uf-fade 0.5s ease-out forwards;">
-                                <div class="relative w-40 h-40 flex justify-center z-20 -mb-2.5">
-                                    <div class="absolute inset-0 bg-red-500/20 blur-2xl rounded-full" style="animation: uf-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></div>
+                            <div style="position: relative; z-index: 10; width: 100%; max-width: 24rem; display: flex; flex-direction: column; align-items: center; animation: uf-fade 0.5s ease-out forwards;">
+                                
+                                <div style="position: relative; width: 10rem; height: 10rem; display: flex; justify-content: center; z-index: 20; margin-bottom: -0.625rem;">
+                                    <div style="position: absolute; inset: 0; background-color: rgba(239, 68, 68, 0.2); filter: blur(40px); border-radius: 50%; animation: uf-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></div>
                                     
                                     <img src="https://em-content.zobj.net/source/microsoft-teams/364/detective_medium-skin-tone_1f575-1f3fd_1f3fd.png" 
-                                         class="uf-fade-emoji absolute bottom-0 w-40 h-40 object-contain object-bottom drop-shadow-2xl transition-opacity duration-1000 opacity-100" 
+                                         class="uf-fade-emoji" style="position: absolute; bottom: 0; width: 10rem; height: 10rem; object-fit: contain; object-position: bottom; filter: drop-shadow(0 25px 25px rgba(0,0,0,0.5)); transition: opacity 1s; opacity: 1;" 
                                          draggable="false" alt="Detective">
                                          
                                     <img src="https://em-content.zobj.net/source/microsoft-teams/337/man-pouting-light-skin-tone_1f64e-1f3fb-200d-2642-fe0f.png" 
-                                         class="uf-fade-emoji absolute bottom-0 w-40 h-40 object-contain object-bottom drop-shadow-2xl transition-opacity duration-1000 opacity-0" 
+                                         class="uf-fade-emoji" style="position: absolute; bottom: 0; width: 10rem; height: 10rem; object-fit: contain; object-position: bottom; filter: drop-shadow(0 25px 25px rgba(0,0,0,0.5)); transition: opacity 1s; opacity: 0;" 
                                          draggable="false" alt="Pouting">
                                          
                                     <img src="https://em-content.zobj.net/source/microsoft-teams/337/police-officer_light-skin-tone_1f46e-1f3fb_1f3fb.png" 
-                                         class="uf-fade-emoji absolute bottom-0 w-40 h-40 object-contain object-bottom drop-shadow-2xl transition-opacity duration-1000 opacity-0" 
+                                         class="uf-fade-emoji" style="position: absolute; bottom: 0; width: 10rem; height: 10rem; object-fit: contain; object-position: bottom; filter: drop-shadow(0 25px 25px rgba(0,0,0,0.5)); transition: opacity 1s; opacity: 0;" 
                                          draggable="false" alt="Police">
                                          
                                     <img src="https://em-content.zobj.net/source/microsoft-teams/337/man-gesturing-no-light-skin-tone_1f645-1f3fb-200d-2642-fe0f.png" 
-                                         class="uf-fade-emoji absolute bottom-0 w-40 h-40 object-contain object-bottom drop-shadow-2xl transition-opacity duration-1000 opacity-0" 
+                                         class="uf-fade-emoji" style="position: absolute; bottom: 0; width: 10rem; height: 10rem; object-fit: contain; object-position: bottom; filter: drop-shadow(0 25px 25px rgba(0,0,0,0.5)); transition: opacity 1s; opacity: 0;" 
                                          draggable="false" alt="Gesturing No">
                                 </div>
 
-                                <div class="relative z-10 w-full rounded-[2.5rem] p-8 pt-8 text-center" style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); animation: uf-slide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
+                                <div style="position: relative; z-index: 10; width: 100%; border-radius: 2.5rem; padding: 2rem; text-align: center; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); animation: uf-slide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
                                     
-                                    <h1 class="text-3xl sm:text-4xl font-display font-black text-transparent bg-clip-text bg-gradient-to-br from-red-400 via-white to-white/50 mb-4 drop-shadow-lg tracking-tight">
-                                        Unauthorized Site
+                                    <h1 style="font-size: 2.25rem; line-height: 2.5rem; font-family: 'Outfit', sans-serif; font-weight: 900; color: transparent; background-clip: text; -webkit-background-clip: text; background-image: linear-gradient(to bottom right, #f87171, #ffffff, rgba(255,255,255,0.5)); margin-bottom: 1rem; filter: drop-shadow(0 10px 8px rgba(0,0,0,0.04)); letter-spacing: -0.025em;">
+                                        This site is Unofficial
                                     </h1>
                                     
-                                    <p class="text-white/70 text-sm font-medium leading-relaxed mb-4 mx-auto">
-                                        It looks like you're playing on an unofficial or cloned website. To ensure you have the full, safe experience, please play the original game by <strong class="text-white font-bold">Jandré du Preez (Fillabrona)</strong>.
+                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.875rem; font-weight: 500; line-height: 1.625; margin-bottom: 1rem;">
+                                        Please visit the actual website at <strong style="color: white; font-weight: 700;">impostiq.github.io</strong> by Jandré du Preez (Fillabrona).
                                     </p>
 
-                                    <p class="text-white/40 text-xs font-medium leading-relaxed mb-8 mx-auto">
-                                        If you believe this is a mistake, please <a href="https://discord.gg/m9WrJxGKtr" target="_top" class="text-brand-400 hover:text-brand-300 transition-colors font-bold underline">report it to us</a>.
+                                    <p style="color: rgba(255,255,255,0.4); font-size: 0.75rem; font-weight: 500; line-height: 1.625; margin-bottom: 2rem;">
+                                        If you believe this is a mistake, please <a href="https://discord.gg/m9WrJxGKtr" target="_top" style="color: #a78bfa; text-decoration: underline; font-weight: 700;">report it to us</a>.
                                     </p>
 
-                                    <button onclick="window.top.location.href='https://impostiq.github.io'"
-                                        class="w-full bg-white hover:bg-slate-200 text-slate-950 font-display font-bold text-lg py-5 rounded-[1.5rem] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" class="w-5 h-5" shape-rendering="geometricPrecision"><path d="M490.134,185.472L338.966,34.304c-45.855-45.737-120.076-45.737-165.931,0L21.867,185.472C7.819,199.445-0.055,218.457,0,238.272v221.397C0.047,488.568,23.475,511.976,52.374,512h407.253c28.899-0.023,52.326-23.432,52.373-52.331V238.272C512.056,218.457,504.182,199.445,490.134,185.472zM448,448H341.334v-67.883c0-44.984-36.467-81.451-81.451-81.451c0,0,0,0,0,0h-7.765c-44.984,0-81.451,36.467-81.451,81.451l0,0V448H64V238.272c0.007-2.829,1.125-5.541,3.115-7.552L218.283,79.552c20.825-20.831,54.594-20.835,75.425-0.01c0.003,0.003,0.007,0.007,0.01,0.01L444.886,230.72c1.989,2.011,3.108,4.723,3.115,7.552V448z"/></svg>
+                                    <button onclick="window.top.location.href='https://impostiq.github.io'" style="width: 100%; background-color: white; color: #020617; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.125rem; padding: 1.25rem 0; border-radius: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.75rem; border: none; transition: transform 0.1s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" style="width: 1.25rem; height: 1.25rem;" shape-rendering="geometricPrecision"><path d="M490.134,185.472L338.966,34.304c-45.855-45.737-120.076-45.737-165.931,0L21.867,185.472C7.819,199.445-0.055,218.457,0,238.272v221.397C0.047,488.568,23.475,511.976,52.374,512h407.253c28.899-0.023,52.326-23.432,52.373-52.331V238.272C512.056,218.457,504.182,199.445,490.134,185.472zM448,448H341.334v-67.883c0-44.984-36.467-81.451-81.451-81.451c0,0,0,0,0,0h-7.765c-44.984,0-81.451,36.467-81.451,81.451l0,0V448H64V238.272c0.007-2.829,1.125-5.541,3.115-7.552L218.283,79.552c20.825-20.831,54.594-20.835,75.425-0.01c0.003,0.003,0.007,0.007,0.01,0.01L444.886,230.72c1.989,2.011,3.108,4.723,3.115,7.552V448z"/></svg>
                                         PLAY OFFICIAL VERSION
                                     </button>
                                 </div>
@@ -559,11 +566,9 @@
                     const emojis = document.querySelectorAll('.uf-fade-emoji');
                     let currentIndex = 0;
                     setInterval(() => {
-                        emojis[currentIndex].classList.remove('opacity-100');
-                        emojis[currentIndex].classList.add('opacity-0');
+                        emojis[currentIndex].style.opacity = '0';
                         currentIndex = (currentIndex + 1) % emojis.length;
-                        emojis[currentIndex].classList.remove('opacity-0');
-                        emojis[currentIndex].classList.add('opacity-100');
+                        emojis[currentIndex].style.opacity = '1';
                     }, 4000);
 
                     throw new Error("UNAUTHORIZED_SITE_DETECTED");
