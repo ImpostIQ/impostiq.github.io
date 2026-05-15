@@ -2116,7 +2116,7 @@
                 const isHalloween = cat === 'Halloween';
                 const isSeasonal = isChristmas || isHalloween;
 
-                let cardClasses = `relative overflow-hidden flex flex-col items-center justify-center gap-3 p-5 rounded-[1.5rem] transition-all duration-300 group min-h-[120px] `;
+                let cardClasses = `relative overflow-hidden flex flex-col items-center justify-center gap-3 p-4 rounded-[1.5rem] transition-all duration-300 group min-h-[120px] `;
 
                 if (isChristmas) {
                     if (isSelected) cardClasses += 'bg-red-500/10 text-white';
@@ -2197,7 +2197,7 @@
                             </button>
                         )}
 
-                        <div className="relative z-10 flex flex-col items-center gap-3 transition-transform duration-150 group-active:scale-[0.98]">
+                        <div className="relative z-10 flex-1 w-full flex flex-col items-center justify-center gap-3 transition-transform duration-150 group-active:scale-[0.98]">
                             {isMystery ? (
                                 <img src={iconSource} alt="Dice" draggable="false" className={`w-10 h-10 transition-transform duration-300 drop-shadow-md ${isSelected ? 'rotate-0 opacity-100' : 'opacity-100 group-hover:opacity-100 group-hover:rotate-0'}`} />
                             ) : (
@@ -2207,7 +2207,7 @@
                                     className={`transition-colors duration-300 ${isSupercell || isSeasonal ? "brightness-125" : (isSelected ? "text-brand-400" : "text-slate-500 group-hover:text-slate-300")}`} 
                                 />
                             )}
-                            <span className={`text-xs font-bold tracking-wide text-center leading-tight line-clamp-2 px-1 w-full break-words ${isSupercell || isSeasonal || isMystery ? 'text-white' : ''}`}>{customCategoryNames[cat] || cat}</span>
+                            <span className={`text-xs font-bold tracking-wide text-center leading-tight line-clamp-2 px-1 w-full break-words ${isSupercell || isSeasonal || isMystery ? 'text-white' : 'text-white'}`}>{customCategoryNames[cat] || cat}</span>
                         </div>
                     </button>
                 );
