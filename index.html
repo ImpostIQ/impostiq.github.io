@@ -561,7 +561,7 @@
                                     </h1>
                                     
                                     <p style="color: rgba(255,255,255,0.7); font-size: 0.875rem; font-weight: 500; line-height: 1.625; margin-bottom: 1rem;">
-                                        You are currently accessing a cloned or unauthorized version of Impostiq. To ensure security, access to the latest features, and to support the original creators, please play on the official platform by <strong style="color: white; font-weight: 700;">Fillabrona</strong>.
+                                        You are currently accessing a cloned or unauthorized version of Impostiq. To ensure security, access to the latest features, and to support the original creator, please play on the official platform by <strong style="color: white; font-weight: 700;">Fillabrona</strong>.
                                     </p>
 
                                     <p style="color: rgba(255,255,255,0.4); font-size: 0.75rem; font-weight: 500; line-height: 1.625; margin-bottom: 2rem;">
@@ -1467,7 +1467,51 @@
             );
         };
 
-        const GameModeSelectionScreen = ({ onSelectMode, onShowHowToPlay, onShowCommunigories, audioManager, onMuteToggle, isMuted, roundedWordCount }) => {
+        const SponsorModal = ({ onClose, audioManager }) => {
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fadeIn">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
+                    <div className="relative w-full max-w-sm glass-panel rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-slide-up flex flex-col overflow-hidden bg-slate-950/80">
+                        
+                        <div className="absolute top-0 left-0 w-full h-[65%] z-0 pointer-events-none" style={{
+                            backgroundImage: "url('https://i.ibb.co/JwRBsVbQ/sponsor-backg.png')",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+                            WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+                            opacity: 0.75
+                        }}></div>
+
+                        <button onClick={onClose} className="absolute top-5 right-5 w-10 h-10 flex items-center justify-center bg-white/10 backdrop-blur-md rounded-full text-white/70 hover:bg-white/20 hover:text-white active:scale-90 transition z-20 shadow-md">
+                            <FaIcon name="icon-xmark" className="" />
+                        </button>
+                        
+                        <div className="p-8 pt-12 relative z-10 flex flex-col items-center text-center">
+                            <FaIcon name="icon-donate" className="text-[5rem] text-brand-400 mb-6 drop-shadow-lg" />
+                            
+                            <h2 className="text-3xl font-display font-black text-white mb-3 tracking-tight">Support Impostiq</h2>
+                            
+                            <p className="text-white/70 text-sm font-medium leading-relaxed mb-8 max-w-[290px] mx-auto drop-shadow-sm">
+                                Impostiq is 100% free and ad-free. Your support covers server costs and directly fuels new features, game modes, and massive content updates!
+                            </p>
+
+                            <button 
+                                onClick={() => {
+                                    if (audioManager) audioManager.playSound('uiClick');
+                                    window.open("https://github.com/sponsors/ImpostIQ?frequency=one-time", "_blank");
+                                }}
+                                className="w-full bg-white text-slate-950 font-display font-bold text-lg py-4 rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                            >
+                                <FaIcon name="icon-donate" className="text-lg" />
+                                DONATE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const GameModeSelectionScreen = ({ onSelectMode, onShowHowToPlay, onShowCommunigories, onShowSponsor, audioManager, onMuteToggle, isMuted, roundedWordCount }) => {
             const [isDownloading, setIsDownloading] = useState(false);
             const[isAndroid, setIsAndroid] = useState(false);
 
@@ -1518,6 +1562,13 @@
                      <div className="absolute top-6 left-6 z-20 flex gap-3">
                         <button onClick={() => window.open("https://discord.gg/m9WrJxGKtr", "_blank")} className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all">
                             <FaIcon name="icon-discord" className="" />
+                        </button>
+                        <button onClick={() => { audioManager.playSound('uiClick'); onShowSponsor(); }} className="relative w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all group">
+                            <FaIcon name="icon-donate" className="" />
+                            <div className="absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-800 text-white text-xs rounded-md px-3 py-2 shadow-lg z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                Support Impostiq
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-b-4 border-b-slate-800"></div>
+                            </div>
                         </button>
                         <button onClick={() => { audioManager.playSound('uiClick'); audioManager.playMusic('communigoriesMusic'); onShowCommunigories(); }} className="relative w-12 h-12 flex items-center justify-center bg-white/5 rounded-full text-white/50 hover:bg-white/10 hover:text-white active:scale-90 transition-all group">
                             <FaIcon name="icon-layers" className="" />
@@ -3436,6 +3487,11 @@
             "icon-discord": (props) => (
                 <svg shapeRendering="geometricPrecision" viewBox="-0.5 0 25 25" width="1.1em" {...props}>
                     <path fill="currentColor" d="M20.317,4.37c-1.53-0.702-3.17-1.219-4.885-1.515c-0.031-0.006-0.062,0.009-0.079,0.037c-0.211,0.375-0.445,0.865-0.608,1.249c-1.845-0.276-3.68-0.276-5.487,0C9.095,3.748,8.852,3.267,8.641,2.892C8.624,2.864,8.593,2.85,8.562,2.855C6.848,3.15,5.208,3.667,3.677,4.37C3.664,4.375,3.652,4.385,3.645,4.397c-3.111,4.648-3.964,9.182-3.546,13.66c0.002,0.022,0.014,0.043,0.031,0.056c2.053,1.508,4.041,2.423,5.993,3.029c0.031,0.01,0.064-0.002,0.084-0.028c0.462-0.63,0.873-1.295,1.226-1.994c0.021-0.041,0.001-0.09-0.042-0.106c-0.653-0.248-1.274-0.55-1.872-0.892c-0.047-0.028-0.051-0.095-0.008-0.128c0.126-0.094,0.252-0.192,0.372-0.291c0.022-0.018,0.052-0.022,0.078-0.01c3.928,1.793,8.18,1.793,12.061,0c0.026-0.012,0.056-0.009,0.079,0.01c0.12,0.099,0.246,0.198,0.373,0.292c0.044,0.032,0.041,0.1-0.007,0.128c-0.598,0.349-1.219,0.645-1.873,0.891c-0.043,0.016-0.061,0.066-0.041,0.107c0.36,0.698,0.772,1.363,1.225,1.993c0.019,0.027,0.053,0.038,0.084,0.029c1.961-0.607,3.95-1.522,6.002-3.029c0.018-0.013,0.029-0.033,0.031-0.055c0.5-5.177-0.838-9.674-3.548-13.66C20.342,4.385,20.33,4.375,20.317,4.37zM8.02,15.331c-1.183,0-2.157-1.086-2.157-2.419s0.955-2.419,2.157-2.419c1.211,0,2.176,1.095,2.157,2.419C10.177,14.246,9.221,15.331,8.02,15.331zM15.995,15.331c-1.182,0-2.157-1.086-2.157-2.419s0.955-2.419,2.157-2.419c1.211,0,2.176,1.095,2.157,2.419C18.152,14.246,17.206,15.331,15.995,15.331z" />
+                </svg>
+            ),
+            "icon-donate": (props) => (
+                <svg shapeRendering="geometricPrecision" viewBox="0 0 24 24" width="1em" {...props}>
+                    <path fill="currentColor" d="m9.708,12.55c-1.007-.934-2.66-.748-3.412.498,0,0,0,0,0,0-.488.81-.35,1.855.245,2.589l1.788,2.304c.339.436.26,1.064-.177,1.403-.436.339-1.064.26-1.403-.177l-1.788-2.304c-1.122-1.383-1.285-3.345-.378-4.848.123-.204.266-.391.417-.568v-5.844c0-1.308-.941-2.499-2.242-2.63-1.496-.15-2.758,1.021-2.758,2.487v10.547c0,2.134.853,4.18,2.369,5.683l1.792,1.775c.37.343.855.533,1.36.533h7.479c.552,0,1-.448,1-1v-3.82c0-1.655-.684-3.237-1.89-4.371l-2.402-2.258ZM21.242,2.975c-1.301.13-2.242,1.322-2.242,2.63v5.844c.151.177.293.363.417.568.906,1.503.744,3.465-.378,4.848l-3.038,3.024v3.112c0,.352-.072.686-.184,1h2.664c.504,0,.99-.19,1.36-.533l1.79-1.772c1.517-1.502,2.371-3.549,2.371-5.685V5.462c0-1.466-1.261-2.637-2.758-2.487Zm-3.538,10.074s0,0,0,0c-.752-1.246-2.405-1.432-3.412-.498l-.832.782.02.019c1.141,1.073,1.921,2.464,2.283,3.968l1.695-1.682c.595-.734.733-1.78.245-2.589Zm-.701-10.298c0,2.163-2.82,4.851-4.225,5.978-.453.363-1.097.363-1.55,0-1.405-1.128-4.225-3.815-4.225-5.978-.066-1.449,1.052-2.678,2.5-2.75,1.448.072,2.566,1.301,2.5,2.75-.066-1.449,1.052-2.678,2.5-2.75,1.448.072,2.566,1.301,2.5,2.75Z" />
                 </svg>
             ),
             "icon-android": (props) => (
@@ -5847,6 +5903,7 @@
             const [gameMode, setGameMode] = useState('select');
             const [showHowToPlay, setShowHowToPlay] = useState(false);
             const [showCommunigories, setShowCommunigories] = useState(false);
+            const [showSponsorModal, setShowSponsorModal] = useState(false);
             const [initialLobbyParams, setInitialLobbyParams] = useState(null);
 
             useEffect(() => {
@@ -6973,7 +7030,7 @@
                 }
 
                 if (gameMode === 'select') {
-                    return <GameModeSelectionScreen onSelectMode={setGameMode} onShowHowToPlay={() => setShowHowToPlay(true)} onShowCommunigories={() => setShowCommunigories(true)} audioManager={audioManagerRef.current} onMuteToggle={handleMuteToggle} isMuted={isMuted} roundedWordCount={roundedWordCount} />;
+                    return <GameModeSelectionScreen onSelectMode={setGameMode} onShowHowToPlay={() => setShowHowToPlay(true)} onShowCommunigories={() => setShowCommunigories(true)} onShowSponsor={() => setShowSponsorModal(true)} audioManager={audioManagerRef.current} onMuteToggle={handleMuteToggle} isMuted={isMuted} roundedWordCount={roundedWordCount} />;
                 }
 
                 if (gameMode === 'local') {
@@ -7056,6 +7113,7 @@
                         <div className="blob bg-cyan-600/30 bottom-[-20%] right-[-20%] w-[60%] h-[60%] animation-delay-2000"></div>
                     </div>
                     {showHowToPlay && <HowToPlayModal onClose={() => setShowHowToPlay(false)} />}
+                    {showSponsorModal && <SponsorModal onClose={() => setShowSponsorModal(false)} audioManager={audioManagerRef.current} />}
                     {showRemovedModal && <RemovedModal onClose={() => {
                         setShowRemovedModal(false);
                     }} />}
